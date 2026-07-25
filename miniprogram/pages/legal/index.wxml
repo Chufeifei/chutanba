@@ -1,0 +1,14 @@
+<view class="page-no-nav">
+  <view class="legal-hero card">
+    <image class="legal-icon" src="/assets/icons/notice.png" mode="aspectFit" />
+    <text class="legal-title">{{document.title}}</text>
+    <text class="legal-date">版本日期：2026-07-21</text>
+  </view>
+
+  <view class="legal-card card">
+    <view wx:for="{{document.sections}}" wx:key="heading" class="legal-section">
+      <text class="heading">{{item.heading}}</text>
+      <text class="body">{{item.body}}</text>
+    </view>
+  </view>
+</view>

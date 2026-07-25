@@ -1,0 +1,55 @@
+<view class="page-no-nav">
+  <view class="manage-hero card">
+    <view>
+      <text class="manage-title">出摊状态要及时</text>
+      <text class="manage-sub">临时改期、提前卖完或天气原因取消时，记得尽快更新。</text>
+    </view>
+    <button class="mini-btn" bindtap="publish">发布新一场</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">正在读取我的发布…</view>
+
+  <view wx:elif="{{items.length}}">
+    <view wx:for="{{items}}" wx:key="_id" class="manage-card card">
+      <view class="manage-top" data-id="{{item._id}}" bindtap="open">
+        <view class="manage-icon"><image src="{{item.categoryIcon || '/assets/icons/store.png'}}" mode="aspectFit" /></view>
+        <view class="manage-main">
+          <text class="stall-name">{{item.name}}</text>
+          <text class="stall-meta">{{item.timeText}}</text>
+          <view class="stall-location">
+            <image src="/assets/icons/location.png" mode="aspectFit" />
+            <text>{{item.address}}</text>
+          </view>
+        </view>
+        <text class="audit {{item.auditStatus}}">{{item.auditStatus === 'approved' ? '已通过' : item.auditStatus === 'rejected' ? '未通过' : '审核中'}}</text>
+      </view>
+
+      <view wx:if="{{item.auditRemark}}" class="audit-remark">审核说明：{{item.auditRemark}}</view>
+
+      <view class="manage-actions">
+        <button class="action" data-id="{{item._id}}" bindtap="open">查看</button>
+        <button
+          wx:if="{{item.status !== 'cancelled'}}"
+          class="action warn"
+          data-id="{{item._id}}"
+          data-status="cancelled"
+          bindtap="setStatus"
+        >取消本场</button>
+        <button
+          wx:else
+          class="action green"
+          data-id="{{item._id}}"
+          data-status="active"
+          bindtap="setStatus"
+        >恢复</button>
+        <button class="action danger" data-id="{{item._id}}" bindtap="remove">删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty card">
+    <image class="empty-art" src="/assets/icons/nav-publish.png" mode="aspectFit" />
+    <text>你还没有发布过出摊信息</text>
+    <button class="primary-btn publish-btn" bindtap="publish">发布第一场</button>
+  </view>
+</view>

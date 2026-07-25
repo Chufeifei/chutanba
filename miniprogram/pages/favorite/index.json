@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的关注",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "stall-card": "/components/stall-card/index"
+  }
+}

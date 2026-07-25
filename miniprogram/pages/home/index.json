@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "出摊吧",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "stall-card": "/components/stall-card/index"
+  }
+}

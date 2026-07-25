@@ -1,0 +1,42 @@
+<view class="stall-card" bindtap="open">
+  <view class="visual {{stall.theme || 'coral'}}">
+    <image
+      wx:if="{{stall.images && stall.images.length}}"
+      class="cover"
+      src="{{stall.images[0]}}"
+      mode="aspectFill"
+    />
+    <view wx:else class="category-visual">
+      <image class="category-visual-icon" src="{{stall.categoryIcon || '/assets/icons/store.png'}}" mode="aspectFit" />
+    </view>
+    <text class="status {{stall.isOpen ? 'open' : ''}}">{{stall.statusText}}</text>
+  </view>
+
+  <view class="content">
+    <view class="title-row">
+      <view class="title-box">
+        <text class="title">{{stall.name}}</text>
+        <text class="vendor">{{stall.vendorName}}</text>
+      </view>
+      <button class="heart {{stall.isFavorite ? 'active' : ''}}" catchtap="favorite">
+        <image src="/assets/icons/follow.png" mode="aspectFit" />
+      </button>
+    </view>
+
+    <view class="meta">
+      <view class="meta-row">
+        <image src="/assets/icons/time.png" mode="aspectFit" />
+        <text>{{stall.timeText}}</text>
+      </view>
+      <view class="meta-row">
+        <image src="/assets/icons/location.png" mode="aspectFit" />
+        <text>{{stall.address}} · {{stall.distanceText}}</text>
+      </view>
+    </view>
+
+    <view class="footer">
+      <text class="category">{{stall.category}}</text>
+      <text class="price">{{stall.priceText}}</text>
+    </view>
+  </view>
+</view>

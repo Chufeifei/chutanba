@@ -1,0 +1,9 @@
+{
+  "desc": "出摊吧 sitemap",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

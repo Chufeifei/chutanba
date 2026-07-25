@@ -1,0 +1,50 @@
+.favorite-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22rpx;
+  padding: 28rpx;
+  background: linear-gradient(135deg, #fff0e8, #f0faf5);
+}
+
+.favorite-title,
+.favorite-sub,
+.empty-title,
+.empty-copy {
+  display: block;
+}
+
+.favorite-title {
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.favorite-sub {
+  max-width: 500rpx;
+  margin-top: 9rpx;
+  color: #826961;
+  font-size: 23rpx;
+  line-height: 1.55;
+}
+
+.empty-title {
+  color: #5e4640;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.empty-copy {
+  margin-top: 10rpx;
+}
+
+.explore {
+  width: 360rpx;
+  margin: 30rpx auto 0;
+}
+
+.empty-art {
+  display: block;
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0 auto 18rpx;
+}

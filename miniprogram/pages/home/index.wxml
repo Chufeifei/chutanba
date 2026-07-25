@@ -1,0 +1,91 @@
+<view class="page">
+  <view class="hero card">
+    <view class="hero-orb"></view>
+    <view class="hero-content">
+      <view class="brand-pill">CHU TAN LO</view>
+      <text class="hero-title">出摊吧</text>
+      <text class="hero-desc">记录摊主档案、出摊时间和地点，让每一次寻找都有温度。</text>
+      <button class="location-pill" bindtap="locate">
+        <image src="/assets/icons/location.png" mode="aspectFit" />
+        <text>{{locating ? '定位中…' : locationName}}</text>
+      </button>
+    </view>
+    <view class="hero-icon-card">
+      <image src="/assets/icons/store.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="feature-grid">
+    <view
+      wx:for="{{features}}"
+      wx:key="key"
+      class="feature-card card {{item.key === 'open' && openNow ? 'selected' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="featureTap"
+    >
+      <view class="feature-icon-wrap">
+        <image src="{{item.icon}}" mode="aspectFit" />
+      </view>
+      <text class="feature-label">{{item.label}}</text>
+      <text class="feature-sub">{{item.key === 'open' && openNow ? '已开启筛选' : item.sub}}</text>
+    </view>
+  </view>
+
+  <view class="search-box card">
+    <image class="search-icon" src="/assets/icons/search.png" mode="aspectFit" />
+    <input
+      class="search-input"
+      value="{{keyword}}"
+      placeholder="搜摊位、菜品或地点"
+      confirm-type="search"
+      bindinput="onKeywordInput"
+      bindconfirm="search"
+    />
+    <text wx:if="{{keyword}}" class="clear" bindtap="clearSearch">×</text>
+  </view>
+
+  <view class="section-title category-heading">
+    <text class="section-title-main">卖点分类</text>
+    <text class="section-title-sub">左右滑动查看更多</text>
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="category-row">
+      <view
+        wx:for="{{categories}}"
+        wx:key="value"
+        class="category-item {{activeCategory === item.value ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="chooseCategory"
+      >
+        <view class="category-icon-wrap">
+          <image src="{{item.icon}}" mode="aspectFit" />
+        </view>
+        <text>{{item.value}}</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="section-title">
+    <text class="section-title-main">附近出摊</text>
+    <text class="section-title-sub">{{stalls.length}} 个结果</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">正在找摊位…</view>
+
+  <block wx:elif="{{stalls.length}}">
+    <stall-card
+      wx:for="{{stalls}}"
+      wx:key="_id"
+      stall="{{item}}"
+      bind:open="openStall"
+      bind:favorite="favorite"
+    />
+  </block>
+
+  <view wx:else class="empty card">
+    <image class="empty-image" src="/assets/icons/store.png" mode="aspectFit" />
+    <text>暂时没有符合条件的出摊信息</text>
+    <button class="mini-btn empty-btn" bindtap="goPublish">发布第一条</button>
+  </view>
+</view>

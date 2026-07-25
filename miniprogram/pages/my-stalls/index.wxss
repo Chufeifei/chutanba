@@ -1,0 +1,171 @@
+.manage-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 28rpx;
+  background: linear-gradient(135deg, #fff0e6, #effaf5);
+}
+
+.manage-title,
+.manage-sub {
+  display: block;
+}
+
+.manage-title {
+  font-size: 33rpx;
+  font-weight: 900;
+}
+
+.manage-sub {
+  max-width: 470rpx;
+  margin-top: 8rpx;
+  color: #826961;
+  font-size: 23rpx;
+  line-height: 1.55;
+}
+
+.manage-card {
+  overflow: hidden;
+  margin-top: 20rpx;
+}
+
+.manage-top {
+  display: flex;
+  align-items: flex-start;
+  padding: 24rpx;
+}
+
+.manage-icon {
+  width: 90rpx;
+  height: 90rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 18rpx;
+  border-radius: 26rpx;
+  background: #fff0e8;
+}
+
+.manage-icon image {
+  width: 64rpx;
+  height: 64rpx;
+}
+
+.manage-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.stall-name,
+.stall-meta {
+  display: block;
+}
+
+.stall-name {
+  font-size: 30rpx;
+  font-weight: 850;
+}
+
+.stall-meta {
+  margin-top: 6rpx;
+  overflow: hidden;
+  color: #80675f;
+  font-size: 22rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.audit {
+  padding: 8rpx 13rpx;
+  border-radius: 999rpx;
+  background: #fff0e7;
+  color: #d86b52;
+  font-size: 20rpx;
+}
+
+.audit.approved {
+  background: #e7f7ef;
+  color: #329374;
+}
+
+.audit.rejected {
+  background: #f7e9e9;
+  color: #b34f4f;
+}
+
+.audit-remark {
+  margin: 0 24rpx 18rpx;
+  padding: 16rpx 18rpx;
+  border-radius: 16rpx;
+  background: #fff4ed;
+  color: #8c6256;
+  font-size: 22rpx;
+}
+
+.manage-actions {
+  display: flex;
+  border-top: 1rpx solid #f3dfd7;
+}
+
+.action {
+  flex: 1;
+  min-height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1rpx solid #f3dfd7;
+  color: #6c514a;
+  font-size: 23rpx;
+  font-weight: 700;
+}
+
+.action:last-child {
+  border-right: 0;
+}
+
+.action.warn {
+  color: #e1783e;
+}
+
+.action.green {
+  color: #329374;
+}
+
+.action.danger {
+  color: #b65e58;
+}
+
+.publish-btn {
+  width: 360rpx;
+  margin: 28rpx auto 0;
+}
+
+.stall-location {
+  display: flex;
+  align-items: center;
+  margin-top: 6rpx;
+  min-width: 0;
+  color: #80675f;
+  font-size: 22rpx;
+}
+
+.stall-location image {
+  width: 28rpx;
+  height: 28rpx;
+  margin-right: 6rpx;
+  flex-shrink: 0;
+}
+
+.stall-location text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty-art {
+  display: block;
+  width: 96rpx;
+  height: 96rpx;
+  margin: 0 auto 18rpx;
+}

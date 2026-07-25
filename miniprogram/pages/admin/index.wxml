@@ -1,0 +1,111 @@
+<view class="page-no-nav">
+  <view class="admin-hero card">
+    <view>
+      <text class="admin-title">运营管理台</text>
+      <text class="admin-sub">审核内容、处理举报，并由超级管理员维护运营人员。</text>
+    </view>
+    <view wx:if="{{isSuperAdmin}}" class="super-badge">SUPER</view>
+  </view>
+
+  <view class="tabs card">
+    <view class="tab {{active === 'pending' ? 'active' : ''}}" data-tab="pending" bindtap="changeTab">
+      待审核 {{pending.length}}
+    </view>
+    <view class="tab {{active === 'reports' ? 'active' : ''}}" data-tab="reports" bindtap="changeTab">
+      举报 {{reports.length}}
+    </view>
+    <view wx:if="{{isSuperAdmin}}" class="tab {{active === 'admins' ? 'active' : ''}}" data-tab="admins" bindtap="changeTab">
+      管理员 {{admins.length}}
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">正在读取管理数据…</view>
+
+  <block wx:elif="{{active === 'pending'}}">
+    <view wx:for="{{pending}}" wx:key="_id" class="audit-card card">
+      <view class="audit-head">
+        <view class="audit-icon"><image src="{{item.categoryIcon || '/assets/icons/store.png'}}" mode="aspectFit" /></view>
+        <view class="audit-main">
+          <text class="audit-name">{{item.name}}</text>
+          <text class="audit-meta">{{item.vendorName}} · {{item.category}}</text>
+          <view class="audit-location"><image src="/assets/icons/location.png" mode="aspectFit" /><text>{{item.address}}</text></view>
+        </view>
+      </view>
+      <text class="audit-desc">{{item.description}}</text>
+      <view wx:if="{{item.images && item.images.length}}" class="audit-images">
+        <image wx:for="{{item.images}}" wx:key="*this" src="{{item}}" mode="aspectFill" />
+      </view>
+      <view class="audit-actions">
+        <button class="reject" data-id="{{item._id}}" data-result="rejected" bindtap="audit">驳回</button>
+        <button class="approve" data-id="{{item._id}}" data-result="approved" bindtap="audit">通过</button>
+      </view>
+    </view>
+
+    <view wx:if="{{!pending.length}}" class="empty card">
+      <text class="empty-icon">✅</text>
+      <text>没有待审核内容</text>
+    </view>
+  </block>
+
+  <block wx:elif="{{active === 'reports'}}">
+    <view wx:for="{{reports}}" wx:key="_id" class="report-card card">
+      <text class="report-reason">{{item.reason}}</text>
+      <text class="report-detail">{{item.detail || '未填写补充说明'}}</text>
+      <text class="report-meta">摊位：{{item.stallId}} · 状态：{{item.status}}</text>
+      <view class="report-actions">
+        <button data-id="{{item._id}}" data-status="dismissed" bindtap="handleReport">不成立</button>
+        <button class="handled" data-id="{{item._id}}" data-status="handled" bindtap="handleReport">已处理</button>
+      </view>
+    </view>
+
+    <view wx:if="{{!reports.length}}" class="empty card">
+      <image class="empty-art" src="/assets/icons/shield.png" mode="aspectFit" />
+      <text>暂时没有举报</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="admin-form card">
+      <view class="form-title">添加运营管理员</view>
+      <text class="form-tip">让对方在“我的”页面复制身份编号，再粘贴到这里。</text>
+      <view class="openid-row">
+        <input
+          class="openid-input"
+          value="{{adminOpenid}}"
+          placeholder="粘贴用户 OpenID"
+          maxlength="128"
+          bindinput="onAdminOpenidInput"
+        />
+        <button class="paste-btn" bindtap="pasteAdminOpenid">粘贴</button>
+      </view>
+      <input
+        class="name-input"
+        value="{{adminName}}"
+        placeholder="管理员备注名称（可选）"
+        maxlength="30"
+        bindinput="onAdminNameInput"
+      />
+      <button class="add-admin-btn" bindtap="addAdmin">添加管理员</button>
+    </view>
+
+    <view class="admin-list-title">当前管理员</view>
+    <view wx:for="{{admins}}" wx:key="openid" class="admin-user card">
+      <view class="admin-avatar"><image src="/assets/icons/shield.png" mode="aspectFit" /></view>
+      <view class="admin-user-main" data-openid="{{item.openid}}" bindtap="copyAdminOpenid">
+        <view class="admin-name-row">
+          <text class="admin-name">{{item.name}}</text>
+          <text class="role-badge {{item.role === 'super_admin' ? 'super' : ''}}">{{item.role === 'super_admin' ? '超级管理员' : '管理员'}}</text>
+        </view>
+        <text class="admin-id">{{item.openid}}</text>
+        <text class="copy-tip">点击身份编号可复制</text>
+      </view>
+      <button
+        wx:if="{{item.role !== 'super_admin'}}"
+        class="remove-btn"
+        data-openid="{{item.openid}}"
+        data-name="{{item.name}}"
+        bindtap="removeAdmin"
+      >移除</button>
+    </view>
+  </block>
+</view>

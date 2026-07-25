@@ -1,0 +1,95 @@
+<view wx:if="{{loading}}" class="page-no-nav loading">正在加载出摊详情…</view>
+
+<view wx:elif="{{item}}" class="detail-page">
+  <view class="cover {{item.theme || 'coral'}}">
+    <image wx:if="{{item.images && item.images.length}}" src="{{item.images[0]}}" mode="aspectFill" />
+    <view wx:else class="cover-icon-card">
+      <image src="{{item.categoryIcon || '/assets/icons/store.png'}}" mode="aspectFit" />
+    </view>
+    <text class="cover-status {{item.isOpen ? 'open' : ''}}">{{item.statusText}}</text>
+  </view>
+
+  <view class="main-card card">
+    <view class="title-row">
+      <view>
+        <text class="title">{{item.name}}</text>
+        <text class="vendor">由 {{item.vendorName}} 发布</text>
+      </view>
+      <button class="favorite {{item.isFavorite ? 'active' : ''}}" bindtap="favorite">
+        <image src="/assets/icons/follow.png" mode="aspectFit" />
+      </button>
+    </view>
+
+    <view class="tags">
+      <text class="tag">{{item.category}}</text>
+      <text class="tag">{{item.priceText}}</text>
+    </view>
+
+    <view class="info-block">
+      <view class="info-icon coral"><image src="/assets/icons/time.png" mode="aspectFit" /></view>
+      <view class="info-main">
+        <text class="info-title">出摊时间</text>
+        <text class="info-value">{{item.timeText}}</text>
+      </view>
+      <button class="text-btn" bindtap="remind">提醒我</button>
+    </view>
+
+    <view class="info-block">
+      <view class="info-icon mint"><image src="/assets/icons/location.png" mode="aspectFit" /></view>
+      <view class="info-main">
+        <text class="info-title">出摊地点</text>
+        <text class="info-value">{{item.address}}</text>
+        <text class="info-extra" bindtap="locateAndReload">{{item.distanceText}} · 点击定位刷新距离</text>
+      </view>
+      <button class="text-btn" bindtap="openLocation">导航</button>
+    </view>
+  </view>
+
+  <view wx:if="{{item.notice}}" class="notice card">
+    <image src="/assets/icons/notice.png" mode="aspectFit" />
+    <view>
+      <text class="notice-label">摊主公告</text>
+      <text class="notice-text">{{item.notice}}</text>
+    </view>
+  </view>
+
+  <view class="content-card card">
+    <view class="content-head">
+      <image src="{{item.categoryIcon || '/assets/icons/store.png'}}" mode="aspectFit" />
+      <text class="content-title">这次卖什么</text>
+    </view>
+    <text class="description">{{item.description}}</text>
+    <view wx:if="{{item.menuText}}" class="menu-box">
+      <text class="menu-label">菜单关键词</text>
+      <text class="menu-value">{{item.menuText}}</text>
+    </view>
+  </view>
+
+  <scroll-view wx:if="{{item.images && item.images.length > 1}}" class="photo-scroll" scroll-x>
+    <view class="photo-row">
+      <image
+        wx:for="{{item.images}}"
+        wx:key="*this"
+        class="photo"
+        src="{{item}}"
+        mode="aspectFill"
+        data-url="{{item}}"
+        bindtap="preview"
+      />
+    </view>
+  </scroll-view>
+
+  <view class="safe card">
+    <image src="/assets/icons/shield.png" mode="aspectFit" />
+    <view class="safe-main">
+      <text class="safe-title">购买前的小提醒</text>
+      <text class="safe-copy">平台仅提供出摊信息。请现场核验摊主经营资质、食品卫生、价格和商品实际情况；不要脱离平台信息进行高风险转账。</text>
+      <button class="report" bindtap="report">举报不实或违规信息</button>
+    </view>
+  </view>
+
+  <view class="bottom-actions">
+    <button class="action-secondary" bindtap="favorite">{{item.isFavorite ? '已关注' : '关注摊主'}}</button>
+    <button class="action-primary" bindtap="openLocation">打开地图导航</button>
+  </view>
+</view>

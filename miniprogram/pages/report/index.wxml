@@ -1,0 +1,26 @@
+<view class="page-no-nav">
+  <view class="report-card card">
+    <text class="report-title">你发现了什么问题？</text>
+    <text class="report-sub">请选择最符合的一项。恶意举报可能影响账号正常使用。</text>
+
+    <view class="reasons">
+      <view
+        wx:for="{{reasons}}"
+        wx:key="*this"
+        class="reason {{reason === item ? 'active' : ''}}"
+        data-reason="{{item}}"
+        bindtap="chooseReason"
+      >
+        <text>{{item}}</text>
+        <view class="radio {{reason === item ? 'active' : ''}}"><view class="radio-dot"></view></view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">补充说明</text>
+      <textarea class="textarea" maxlength="300" value="{{detail}}" placeholder="请尽量描述具体情况，便于运营人员核实。" bindinput="inputDetail" />
+    </view>
+
+    <button class="primary-btn" loading="{{submitting}}" bindtap="submit">提交举报</button>
+  </view>
+</view>

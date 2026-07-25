@@ -1,0 +1,183 @@
+<view class="page">
+  <view class="publish-hero card">
+    <view class="hero-copy">
+      <view class="brand-pill">STALL NOTICE</view>
+      <text class="publish-title">今天几点，在哪里出摊</text>
+      <text class="publish-desc">完善一次摊主资料，之后每次发布都会自动带入常用分类、菜单、价格和地点。</text>
+    </view>
+    <view class="hero-icon-card">
+      <image src="/assets/icons/nav-publish.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view wx:if="{{!vendor}}" class="vendor-tip card">
+    <view class="vendor-card-icon">
+      <image src="/assets/icons/vendor.png" mode="aspectFit" />
+    </view>
+    <view class="vendor-copy">
+      <text class="vendor-title">先完善摊主资料</text>
+      <text class="vendor-sub">填写常用信息后，发布出摊会自动带入。</text>
+    </view>
+    <button class="mini-btn" bindtap="editVendor">去完善</button>
+  </view>
+
+  <view wx:else class="vendor-ready card">
+    <view class="vendor-avatar">
+      <image wx:if="{{vendor.avatarUrl}}" src="{{vendor.avatarUrl}}" mode="aspectFill" />
+      <image wx:else src="/assets/icons/vendor.png" mode="aspectFit" />
+    </view>
+    <view class="vendor-info" bindtap="editVendor">
+      <text class="vendor-name">{{vendor.name}}</text>
+      <text class="vendor-sub">常用资料已自动填写 · 点击修改摊主资料</text>
+    </view>
+    <button class="prefill-btn" bindtap="reapplyVendorDefaults">重新带入</button>
+  </view>
+
+  <view class="form-card card">
+    <view class="form-section-title">
+      <image src="/assets/icons/edit.png" mode="aspectFit" />
+      <view>
+        <text class="form-section-main">本场基础信息</text>
+        <text class="form-section-sub">自动带入后仍可按本场情况修改</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label required">本场名称</text>
+      <input class="input" maxlength="30" placeholder="例如：阿圆饭团今晚出摊" value="{{form.name}}" data-field="name" bindinput="input" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label required">卖点分类</text>
+      <view class="category-grid">
+        <view
+          wx:for="{{categories}}"
+          wx:key="value"
+          class="category-option {{categoryIndex === index ? 'active' : ''}}"
+          data-index="{{index}}"
+          bindtap="chooseCategory"
+        >
+          <view class="category-option-icon">
+            <image src="{{item.icon}}" mode="aspectFit" />
+          </view>
+          <text>{{item.value}}</text>
+        </view>
+      </view>
+      <input
+        wx:if="{{customMode}}"
+        class="input custom-category"
+        maxlength="20"
+        placeholder="自由填写品类，例如：贵州糯米饭"
+        value="{{customCategory}}"
+        bindinput="inputCustomCategory"
+      />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label required">本场介绍</text>
+      <textarea class="textarea" maxlength="300" placeholder="今天卖什么、有什么特色、预计准备多少份…" value="{{form.description}}" data-field="description" bindinput="input" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">菜单关键词</text>
+      <input class="input" maxlength="100" placeholder="例如：紫米饭团 / 卤蛋 / 柠檬茶" value="{{form.menuText}}" data-field="menuText" bindinput="input" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">价格说明</text>
+      <input class="input" maxlength="50" placeholder="例如：人均约 8-15 元" value="{{form.priceText}}" data-field="priceText" bindinput="input" />
+    </view>
+  </view>
+
+  <view class="form-card card">
+    <view class="form-section-title">
+      <image src="/assets/icons/time.png" mode="aspectFit" />
+      <view>
+        <text class="form-section-main">时间与地点</text>
+        <text class="form-section-sub">地点变化时请及时更新</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label required">出摊日期</text>
+      <picker mode="date" value="{{form.date}}" bindchange="chooseDate">
+        <view class="picker-value">{{form.date}} <text class="picker-arrow">⌄</text></view>
+      </picker>
+    </view>
+
+    <view class="time-row">
+      <view class="form-item time-item">
+        <text class="form-label required">开始时间</text>
+        <picker mode="time" value="{{form.startTime}}" bindchange="chooseStart">
+          <view class="picker-value">{{form.startTime}}</view>
+        </picker>
+      </view>
+      <view class="form-item time-item">
+        <text class="form-label required">结束时间</text>
+        <picker mode="time" value="{{form.endTime}}" bindchange="chooseEnd">
+          <view class="picker-value">{{form.endTime}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label required">出摊地点</text>
+      <button class="place-btn" bindtap="choosePlace">
+        <view class="place-main">
+          <image src="/assets/icons/location.png" mode="aspectFit" />
+          <text class="place-text">{{form.address || '点击地图选择地点'}}</text>
+        </view>
+        <text class="place-arrow">›</text>
+      </button>
+      <view class="privacy-row">
+        <view>
+          <text class="privacy-title">仅在本场时间内展示精确位置</text>
+          <text class="hint">非出摊时段可在后续版本中降级展示为附近区域。</text>
+        </view>
+        <switch checked="{{form.preciseDuringEvent}}" color="#ff7561" bindchange="togglePrecise" />
+      </view>
+    </view>
+  </view>
+
+  <view class="form-card card">
+    <view class="form-section-title">
+      <image src="/assets/icons/camera.png" mode="aspectFit" />
+      <view>
+        <text class="form-section-main">现场内容</text>
+        <text class="form-section-sub">真实、清晰的图片更容易被找到</text>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">现场图片（最多 6 张）</text>
+      <view class="image-grid">
+        <view wx:for="{{images}}" wx:key="*this" class="image-item">
+          <image src="{{item}}" mode="aspectFill" data-url="{{item}}" bindtap="previewImage" />
+          <text class="remove" data-index="{{index}}" catchtap="removeImage">×</text>
+        </view>
+        <button wx:if="{{images.length < 6}}" class="add-image" bindtap="chooseImages">
+          <image src="/assets/icons/camera.png" mode="aspectFit" />
+          <text>添加图片</text>
+        </button>
+      </view>
+      <text class="hint">图片会进入平台安全巡检；请勿上传二维码、联系方式、违法违规或与出摊无关的内容。</text>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">临时公告</text>
+      <textarea class="textarea small" maxlength="120" placeholder="例如：今天可能晚到 15 分钟；卖完会及时更新。" value="{{form.notice}}" data-field="notice" bindinput="input" />
+    </view>
+
+    <view class="safe-note">
+      食品安全提示：请按实际经营资质和当地管理要求开展经营。平台仅提供信息发布与查找服务，不替代经营许可、现场核验或交易凭证。
+    </view>
+
+    <button class="primary-btn submit {{publishSucceeded ? 'submitted' : ''}}" loading="{{submitting}}" disabled="{{submitting || publishSucceeded}}" bindtap="submit">
+      {{publishSucceeded ? '发布成功，请勿重复点击' : submitting ? '正在提交…' : '发布出摊信息'}}
+    </button>
+    <view wx:if="{{publishSucceeded}}" class="publish-success-tip">
+      <text class="success-mark">✓</text>
+      <text>出摊信息已成功提交，系统正在为你跳转到首页。</text>
+    </view>
+  </view>
+</view>

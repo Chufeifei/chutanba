@@ -1,0 +1,34 @@
+<view class="map-page">
+  <view class="map-card card">
+    <map
+      class="map"
+      latitude="{{latitude}}"
+      longitude="{{longitude}}"
+      scale="{{scale}}"
+      markers="{{markers}}"
+      show-location
+      bindmarkertap="onMarkerTap"
+    />
+    <button class="locate-fab" bindtap="locate"><image src="/assets/icons/nearby.png" mode="aspectFit" /></button>
+  </view>
+
+  <view class="map-summary">
+    <view>
+      <text class="map-title">附近出摊地图</text>
+      <text class="map-sub">{{stalls.length}} 个摊位 · 点击地图标记查看</text>
+    </view>
+    <button class="mini-btn ghost" bindtap="openLocation" disabled="{{!selected}}">去这里</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">正在加载地图…</view>
+  <stall-card
+    wx:elif="{{selected}}"
+    stall="{{selected}}"
+    bind:open="openStall"
+    bind:favorite="favorite"
+  />
+  <view wx:else class="empty card">
+    <image class="empty-art" src="/assets/icons/nav-map.png" mode="aspectFit" />
+    <text>地图上还没有摊位</text>
+  </view>
+</view>
