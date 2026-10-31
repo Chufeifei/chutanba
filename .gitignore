@@ -12,8 +12,12 @@ $RECYCLE.BIN/
 
 # Node.js
 node_modules/
-# >>> Comet managed project state >>>
-!/.comet/
-/.comet/*
-!/.comet/config.yaml
-# <<< Comet managed project state <<<
+
+# Local tooling / agent workspace (not project code)
+.agents/
+.codex/
+.comet/*
+!.comet/config.yaml
+.trae/
+.trellis/
+.workbuddy/
