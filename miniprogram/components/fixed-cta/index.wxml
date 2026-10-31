@@ -1,0 +1,6 @@
+<view class="cta-spacer"></view>
+<view class="fixed-cta">
+  <slot name="leading"></slot>
+  <button class="cta-secondary" wx:if="{{secondaryText}}" bindtap="onSecondary">{{secondaryText}}</button>
+  <button class="cta-primary" wx:if="{{primaryText}}" disabled="{{disabled || processing}}" loading="{{processing}}" bindtap="onPrimary">{{primaryText}}</button>
+</view>

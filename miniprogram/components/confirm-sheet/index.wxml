@@ -1,0 +1,9 @@
+<view class="sheet-mask" wx:if="{{visible}}" bindtap="onCancel">
+  <view class="confirm-sheet" catchtap="preventClose">
+    <view class="sheet-handle"></view>
+    <view class="sheet-title">{{title}}</view>
+    <view class="sheet-description" wx:if="{{description}}">{{description}}</view>
+    <button class="sheet-confirm {{destructive ? 'destructive' : ''}}" loading="{{processing}}" disabled="{{processing}}" bindtap="onConfirm">{{confirmText}}</button>
+    <button class="sheet-cancel" disabled="{{processing}}" bindtap="onCancel">{{cancelText}}</button>
+  </view>
+</view>

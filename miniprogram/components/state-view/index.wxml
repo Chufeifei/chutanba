@@ -1,0 +1,9 @@
+<view class="state-view state-{{type}}" role="status">
+  <view class="state-mark" aria-hidden="true">
+    <view class="state-spinner" wx:if="{{type === viewState.LOADING || type === viewState.PROCESSING}}"></view>
+    <text wx:else>{{type === viewState.SUCCESS ? '✓' : type === viewState.PERMISSION ? '!' : type === viewState.RETRYABLE_FAILURE ? '↻' : '•'}}</text>
+  </view>
+  <view class="state-title">{{title}}</view>
+  <view class="state-description" wx:if="{{description}}">{{description}}</view>
+  <button class="state-action" wx:if="{{actionText}}" bindtap="onAction">{{actionText}}</button>
+</view>

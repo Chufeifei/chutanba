@@ -1,0 +1,14 @@
+{
+  "name": "chutanba-miniprogram",
+  "version": "1.0.0",
+  "description": "出摊吧小程序",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  },
+  "scripts": {
+    "validate:vnext-schema": "node tools/validate_vnext_schema.js",
+    "check:static": "node tools/check_workspace_syntax.js",
+    "test:vnext": "node --test tests/*.test.js",
+    "test": "npm run validate:vnext-schema && npm run check:static && npm run test:vnext"
+  }
+}

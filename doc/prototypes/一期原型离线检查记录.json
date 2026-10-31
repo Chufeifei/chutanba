@@ -1,0 +1,14 @@
+{
+  "artifact": "doc/prototypes/一期页面交互原型.html",
+  "verification": "offline-script-and-scenario-check; not browser/WeChat validation",
+  "pages": 18,
+  "renderedScenes": 113,
+  "definedScreenActions": 49,
+  "criticalFlows": 23,
+  "syntax": "passed",
+  "markupPairs": "static shell plus all 113 scene outputs passed",
+  "externalBusinessCalls": "none",
+  "persistentStorage": "none",
+  "browserVisualReview": "not-performed: file protocol blocked by browser tool",
+  "checkedAt": "2026-10-30T15:30:30.994Z"
+}

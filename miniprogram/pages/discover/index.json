@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  },
+  "navigationBarTitleText": "找摊位"
+}

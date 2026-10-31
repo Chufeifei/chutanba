@@ -1,9 +1,0 @@
-{
-  "name": "chutanlo-api",
-  "version": "1.0.0",
-  "description": "出摊吧统一云函数 API",
-  "main": "index.js",
-  "dependencies": {
-    "wx-server-sdk": "latest"
-  }
-}

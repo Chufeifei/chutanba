@@ -1,0 +1,8 @@
+.state-view { margin: 32rpx; padding: 64rpx 32rpx; border-radius: 32rpx; background: #FFFFFF; text-align: center; box-sizing: border-box; }
+.state-mark { width: 88rpx; height: 88rpx; margin: 0 auto 24rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #FFF1EB; color: #FF7A45; font-size: 44rpx; font-weight: 700; }
+.state-title { color: #1F1F1F; font-size: 34rpx; line-height: 48rpx; font-weight: 600; }
+.state-description { margin-top: 12rpx; color: #6B6B6B; font-size: 28rpx; line-height: 42rpx; }
+.state-action { min-width: 224rpx; height: 88rpx; margin-top: 32rpx; padding: 0 32rpx; border-radius: 44rpx; background: #FF7A45; color: #FFFFFF; font-size: 30rpx; line-height: 88rpx; }
+.state-terminal .state-mark, .state-permission .state-mark { background: #F3F1EF; color: #6B6B6B; }
+.state-spinner { width: 40rpx; height: 40rpx; border: 5rpx solid #FFD6C5; border-top-color: #FF7A45; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }

@@ -1,0 +1,28 @@
+{
+  "name": "chutanba-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "出摊吧微信云托管后端服务",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node --check src/server.js && node --check src/app.js",
+    "migrate": "node scripts/migrate.js",
+    "migrate:status": "node scripts/migrate-status.js",
+    "admin:seed-super": "node scripts/seed-super-admin.js",
+    "jobs:core:once": "node scripts/run-core-jobs-once.js",
+    "calendar:import": "node scripts/import-holiday-calendar.js",
+    "outbox:once": "node scripts/run-outbox-once.js",
+    "location:expire:once": "node scripts/run-location-expiry-once.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.23.2",
+    "qrcode": "^1.5.4"
+  }
+}

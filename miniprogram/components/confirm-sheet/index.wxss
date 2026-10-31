@@ -1,0 +1,9 @@
+.sheet-mask { position: fixed; z-index: 1200; inset: 0; display: flex; align-items: flex-end; background: rgba(31,31,31,0.42); }
+.confirm-sheet { width: 100%; padding: 20rpx 32rpx calc(32rpx + env(safe-area-inset-bottom)); border-radius: 48rpx 48rpx 0 0; background: #FFFFFF; box-sizing: border-box; }
+.sheet-handle { width: 72rpx; height: 8rpx; margin: 0 auto 32rpx; border-radius: 4rpx; background: #D9D6D2; }
+.sheet-title { color: #1F1F1F; font-size: 36rpx; line-height: 50rpx; font-weight: 600; }
+.sheet-description { margin-top: 16rpx; color: #6B6B6B; font-size: 28rpx; line-height: 42rpx; }
+.confirm-sheet button { height: 88rpx; border-radius: 44rpx; font-size: 30rpx; line-height: 88rpx; }
+.sheet-confirm { margin-top: 40rpx; background: #FF7A45; color: #FFFFFF; }
+.sheet-confirm.destructive { background: #E54D42; }
+.sheet-cancel { margin-top: 16rpx; background: #F3F1EF; color: #3F3F3F; }

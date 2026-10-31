@@ -1,5 +1,5 @@
 {
-  "description": "出摊吧｜真实身份、超级管理员与关注提醒优化版",
+  "description": "出摊吧",
   "packOptions": {
     "ignore": [
       {
@@ -39,11 +39,12 @@
   },
   "compileType": "miniprogram",
   "libVersion": "3.15.3",
-  "appid": "wx371c0080e6d19d64",
+  "appid": "wx27ad0ec74183877f",
   "projectname": "出摊吧",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
   "condition": {},
   "simulatorPluginLibVersion": {},
-  "editorSetting": {}
+  "editorSetting": {},
+  "cloudfunctionTemplateRoot": "cloudfunctionTemplate/"
 }

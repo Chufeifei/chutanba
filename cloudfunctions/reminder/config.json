@@ -1,9 +1,0 @@
-{
-  "triggers": [
-    {
-      "name": "stallReminder",
-      "type": "timer",
-      "config": "0 * * * * * *"
-    }
-  ]
-}

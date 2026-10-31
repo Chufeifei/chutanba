@@ -1,9 +1,0 @@
-{
-  "name": "chutanlo-reminder",
-  "version": "1.0.0",
-  "description": "出摊吧订阅消息定时提醒",
-  "main": "index.js",
-  "dependencies": {
-    "wx-server-sdk": "latest"
-  }
-}

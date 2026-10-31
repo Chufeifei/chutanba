@@ -1,73 +1,25 @@
 {
   "pages": [
-    "pages/home/index",
-    "pages/map/index",
-    "pages/publish/index",
-    "pages/favorite/index",
-    "pages/mine/index",
-    "pages/detail/index",
-    "pages/vendor-edit/index",
-    "pages/my-stalls/index",
-    "pages/report/index",
-    "pages/legal/index",
-    "pages/admin/index"
+    "pages/discover/index"
   ],
   "window": {
+    "navigationBarBackgroundColor": "#FAF8F5",
     "navigationBarTitleText": "出摊吧",
-    "navigationBarBackgroundColor": "#FFF8F2",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FFF8F2",
-    "backgroundTextStyle": "dark"
+    "backgroundColor": "#FAF8F5"
+  },
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "status-dot": "/components/status-dot/index",
+    "fixed-cta": "/components/fixed-cta/index",
+    "confirm-sheet": "/components/confirm-sheet/index"
   },
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents",
   "permission": {
     "scope.userLocation": {
-      "desc": "用于展示附近的出摊信息，以及让摊主选择出摊地点"
+      "desc": "用于按距离筛选附近摊位（半径筛选）、一键出摊定位和核实现场反馈；区域筛选不需要位置"
     }
   },
-  "requiredPrivateInfos": [
-    "getLocation",
-    "chooseLocation"
-  ],
-  "sitemapLocation": "sitemap.json",
-  "tabBar": {
-    "custom": true,
-    "color": "#9A8178",
-    "selectedColor": "#FF6F5C",
-    "backgroundColor": "#FFFFFF",
-    "borderStyle": "white",
-    "list": [
-      {
-        "pagePath": "pages/home/index",
-        "text": "找摊",
-        "iconPath": "assets/icons/nav-home.png",
-        "selectedIconPath": "assets/icons/nav-home.png"
-      },
-      {
-        "pagePath": "pages/map/index",
-        "text": "地图",
-        "iconPath": "assets/icons/nav-map.png",
-        "selectedIconPath": "assets/icons/nav-map.png"
-      },
-      {
-        "pagePath": "pages/publish/index",
-        "text": "出摊",
-        "iconPath": "assets/icons/nav-publish.png",
-        "selectedIconPath": "assets/icons/nav-publish.png"
-      },
-      {
-        "pagePath": "pages/favorite/index",
-        "text": "关注",
-        "iconPath": "assets/icons/nav-favorite.png",
-        "selectedIconPath": "assets/icons/nav-favorite.png"
-      },
-      {
-        "pagePath": "pages/mine/index",
-        "text": "我的",
-        "iconPath": "assets/icons/nav-mine.png",
-        "selectedIconPath": "assets/icons/nav-mine.png"
-      }
-    ]
-  }
+  "requiredPrivateInfos": ["getLocation"],
+  "sitemapLocation": "sitemap.json"
 }

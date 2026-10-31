@@ -1,5 +1,5 @@
 {
-  "desc": "出摊吧 sitemap",
+  "desc": "出摊吧小程序站点地图配置",
   "rules": [
     {
       "action": "allow",

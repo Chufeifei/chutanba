@@ -1,9 +1,9 @@
 {
-  "libVersion": "3.15.3",
+  "libVersion": "3.16.2",
   "projectname": "chutanba-miniprogram-fixed-v4",
   "condition": {},
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "coverView": true,
     "lazyloadPlaceholderEnable": false,
     "skylineRenderEnable": false,
