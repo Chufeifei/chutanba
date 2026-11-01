@@ -1,7 +1,8 @@
-const { runMigrations } = require('../src/database/migration-runner');
-const { closeDatabase } = require('../src/config/database');
+const { runPhase1Migrations } = require('../src/database/phase1/migration-runner');
+const { getPool, closeDatabase } = require('../src/config/database');
 
-runMigrations()
+Promise.resolve()
+  .then(() => runPhase1Migrations(getPool()))
   .then((result) => {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   })
@@ -10,4 +11,3 @@ runMigrations()
     process.exitCode = 1;
   })
   .finally(closeDatabase);
-

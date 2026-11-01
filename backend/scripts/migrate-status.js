@@ -1,7 +1,8 @@
-const { migrationStatus } = require('../src/database/migration-runner');
-const { closeDatabase } = require('../src/config/database');
+const { phase1MigrationStatus } = require('../src/database/phase1/migration-runner');
+const { getPool, closeDatabase } = require('../src/config/database');
 
-migrationStatus()
+Promise.resolve()
+  .then(() => phase1MigrationStatus(getPool()))
   .then((status) => {
     process.stdout.write(`${JSON.stringify(status, null, 2)}\n`);
     if (!status.compatible) {
@@ -13,4 +14,3 @@ migrationStatus()
     process.exitCode = 1;
   })
   .finally(closeDatabase);
-

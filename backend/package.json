@@ -10,6 +10,7 @@
     "check": "node --check src/server.js && node --check src/app.js",
     "migrate": "node scripts/migrate.js",
     "migrate:status": "node scripts/migrate-status.js",
+    "migrate:verify": "node scripts/verify-phase1-schema.js",
     "admin:seed-super": "node scripts/seed-super-admin.js",
     "jobs:core:once": "node scripts/run-core-jobs-once.js",
     "calendar:import": "node scripts/import-holiday-calendar.js",
