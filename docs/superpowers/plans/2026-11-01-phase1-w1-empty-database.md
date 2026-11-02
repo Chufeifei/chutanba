@@ -4,16 +4,18 @@
 
 **Goal:** Build a clean phase-one MySQL schema and migration chain from an empty database.
 
-**Architecture:** Add a phase-one migration directory and runner, separate from the three legacy location migrations. Keep legacy files intact. Group DDL by domain and verify the live database constraints on an isolated MySQL instance.
+**Baseline:** On 2026-11-01 the user deleted all legacy code, migrations and scripts. This plan runs against the new skeleton and must not restore or depend on the deleted legacy files.
+
+**Architecture:** Add a phase-one migration directory and runner, independent of the removed legacy location migrations. Build DDL by domain and verify the live database constraints on an isolated MySQL instance.
 
 **Tech Stack:** Node.js >=20, CommonJS, mysql2, MySQL 8, `node:test`.
 
-**Spec:** `.trellis/tasks/11-01-phase1-w1-migration-baseline/prd.md` and `design.md`; field contract in `doc/一期数据模型与接口约定.md` §2–3.
+**Spec:** `.trellis/tasks/11-01-phase1-w1-migration-baseline/prd.md` and `design.md`; field contract in `doc/MVP/一期数据模型与接口约定.md` §2–3.
 
 ## Global Constraints
 
 - Start only from a new, empty schema; no legacy data conversion or old migration-history support.
-- Preserve existing uncommitted files and old migration files.
+- Preserve existing uncommitted files; do not restore the deleted legacy code or migrations.
 - `utf8mb4`, UTC database sessions, millisecond Unix timestamps, GCJ-02 coordinates as `DECIMAL(10,7)`/`DECIMAL(11,7)`.
 - No physical foreign keys; use indexes and business transactions for references.
 - Never run DDL against a production database in this task.
@@ -24,7 +26,7 @@
 - A failed DDL statement must leave a clear failed migration name; retry must not pretend partial DDL rolled back (Task 1).
 - Concurrent inserts must not permit two active rows where only one is allowed (Tasks 2–3).
 - Large `BIGINT` IDs and millisecond values must not be rounded by JavaScript verification scripts (Task 4).
-- The normal `npm run migrate` command must not silently run the legacy migration directory (Task 5).
+- The normal `npm run migrate` command must scan only the phase-one migration directory.
 
 ---
 
@@ -73,11 +75,11 @@
 
 ### Task 5: Command wiring and documentation
 
-**Files:** Modify `backend/package.json`, `backend/scripts/migrate.js`, `backend/scripts/migrate-status.js`; create `backend/README-phase1-migrations.md`, `backend/test/phase1-command.test.js`. Review the already revised `doc/一期实施计划.md` and `doc/一期开发准备进度.md`.
+**Files:** Modify `backend/package.json`, `backend/scripts/migrate.js`, `backend/scripts/migrate-status.js`; create `backend/README-phase1-migrations.md`, `backend/test/phase1-command.test.js`. Review the already revised `doc/MVP/一期实施计划.md` and `doc/MVP/一期开发准备进度.md`.
 
-**Interfaces:** `npm run migrate` and `npm run migrate:status` use the phase-one runner only; old migrations remain available solely as source history, never on the phase-one command path.
+**Interfaces:** `npm run migrate` and `npm run migrate:status` use the phase-one runner only; they must not reference the deleted legacy migrations or scan outside the phase-one directory.
 
-- [ ] Add a command-level test proving the package scripts resolve to the phase-one runner and do not load the legacy migration directory; run it red.
-- [ ] Wire commands and document the empty-schema safety check and isolated verification procedure. Confirm G-02/G-03/W1 reflect the clean-start decision and W5 retains the old-public-route shutdown gate.
+- [ ] Add a command-level test proving the package scripts resolve to the phase-one runner and do not scan outside the phase-one migration directory; run it red.
+- [ ] Wire commands and document the empty-schema safety check and isolated verification procedure. Confirm G-02/G-03/W1 reflect the clean-start decision and W5 confirms the old public-coordinate routes are not reintroduced.
 - [ ] Run command test, `npm --prefix backend run check`, `node --test backend/test/*.test.js`, and the live integration test when the isolated database is available.
 - [ ] Review the diff for unrelated edits and report pass/fail evidence plus remaining environment gates. Do not mark W1 complete without live MySQL evidence.

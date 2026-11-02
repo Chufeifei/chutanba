@@ -1,25 +1,32 @@
-const test = require('node:test');
 const assert = require('node:assert/strict');
-const { readTestConfig, verifyPhase1Schema } = require('../scripts/verify-phase1-schema');
+const test = require('node:test');
 
-test('verification requires explicit isolated configuration and never falls back to application DB', () => {
-  assert.equal(readTestConfig({ DB_NAME: 'production' }).reason, 'PHASE1_TEST_DATABASE is not configured');
-  assert.throws(() => readTestConfig({ PHASE1_TEST_DATABASE: 'production' }), /phase1_test_/);
-  assert.throws(() => readTestConfig({ PHASE1_TEST_DATABASE: 'phase1_test_w1' }), /ISOLATED/);
-  assert.throws(() => readTestConfig({ PHASE1_TEST_DATABASE: 'phase1_test_w1', PHASE1_TEST_ISOLATED: 'YES' }), /VERSION/);
-  const config = readTestConfig({ PHASE1_TEST_DATABASE: 'phase1_test_w1', PHASE1_TEST_ISOLATED: 'YES', PHASE1_TEST_MYSQL_VERSION: '8.0.36', PHASE1_TEST_USER: 'tester' });
-  assert.equal(config.connection.bigNumberStrings, true);
-  assert.equal(config.connection.supportBigNumbers, true);
-  assert.equal(config.connection.decimalNumbers, false);
+let verifier = {};
+try { verifier = require('../scripts/verify-phase1-schema'); }
+catch (error) { if (error.code !== 'MODULE_NOT_FOUND') throw error; }
+const { readConfig, verifyPhase1Schema } = verifier;
+
+test('verifier rejects application schema and missing isolation confirmation', () => {
+  assert.equal(typeof readConfig, 'function');
+  const base = {
+    PHASE1_TEST_DATABASE: 'phase1_test_w1',
+    PHASE1_TEST_MYSQL_VERSION: '8.0.30-cynos-3.1.19.002',
+    PHASE1_TEST_USER: 'test_user',
+    PHASE1_TEST_PASSWORD: 'test_password',
+  };
+  assert.throws(() => readConfig({ ...base, PHASE1_TEST_ISOLATED: 'YES', PHASE1_TEST_DATABASE: 'chutanba' }), /phase1_test_/);
+  assert.throws(() => readConfig(base), /PHASE1_TEST_ISOLATED/);
 });
 
-const config = readTestConfig(process.env);
-test('isolated target MySQL: migration, drift, concurrency, types and CHECK enforcement', {
-  skip: config.reason || false,
-  timeout: 120000
-}, async t => {
-  await verifyPhase1Schema(config, {
-    check: (name, fn) => t.test(name, fn),
-    report: evidence => t.diagnostic(JSON.stringify(evidence))
-  });
+test('live verifier checks migrations and database constraints on the isolated schema', {
+  skip: !process.env.PHASE1_TEST_DATABASE,
+}, async () => {
+  const result = await verifyPhase1Schema(readConfig(process.env));
+  assert.equal(result.database, 'phase1_test_w1');
+  for (const check of [
+    'empty-schema', 'repeat-migration', 'checksum-drift', 'table-contract',
+    'active-profile-unique', 'active-session-unique', 'active-location-unique',
+    'decimal-and-checks', 'coordinate-boundaries', 'large-integer',
+    'bigint-metadata', 'unicode-roundtrip', 'binary-identity',
+  ]) assert.ok(result.checks.includes(check), `missing check: ${check}`);
 });

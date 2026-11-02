@@ -1,16 +1,21 @@
+const { getPool, closeDatabase } = require('../src/db/pool');
 const { phase1MigrationStatus } = require('../src/database/phase1/migration-runner');
-const { getPool, closeDatabase } = require('../src/config/database');
 
-Promise.resolve()
-  .then(() => phase1MigrationStatus(getPool()))
-  .then((status) => {
-    process.stdout.write(`${JSON.stringify(status, null, 2)}\n`);
-    if (!status.compatible) {
-      process.exitCode = 2;
-    }
-  })
-  .catch((error) => {
-    process.stderr.write(`${error.stack || error.message}\n`);
-    process.exitCode = 1;
-  })
-  .finally(closeDatabase);
+async function main() {
+  if (process.argv.includes('--help')) {
+    console.log('Show phase-one migration status for the configured DB_NAME (一期迁移状态).');
+    return;
+  }
+  try {
+    const status = await phase1MigrationStatus(getPool());
+    console.log(JSON.stringify(status));
+  } finally {
+    await closeDatabase();
+  }
+}
+
+if (require.main === module) {
+  main().catch((error) => { console.error(error.message); process.exitCode = 1; });
+}
+
+module.exports = { main };

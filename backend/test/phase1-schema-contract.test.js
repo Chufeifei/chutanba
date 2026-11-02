@@ -1,91 +1,112 @@
-const test = require('node:test');
 const assert = require('node:assert/strict');
+const test = require('node:test');
+
 const { loadPhase1Migrations } = require('../src/database/phase1/migration-runner');
 
-function tables() {
-  return new Map(loadPhase1Migrations().flatMap(m => m.statements).map(sql => {
-    const match = sql.match(/^\s*CREATE TABLE (cb_\w+)\s*\(/i);
-    assert.ok(match, 'Each schema statement must create a named table');
-    return [match[1], sql.replace(/\s+/g, ' ')];
-  }));
+function schema() {
+  try {
+    return loadPhase1Migrations().flatMap(({ statements }) => statements).join('\n');
+  } catch (error) {
+    if (error.code === 'ENOENT') return '';
+    throw error;
+  }
 }
 
-test('phase-one identity and operating tables are available to later work packages', () => {
-  const schema = tables();
-  for (const name of ['cb_accounts', 'cb_management_grants', 'cb_vendors', 'cb_vendor_profile_versions', 'cb_profile_review_events', 'cb_vendor_sessions', 'cb_vendor_open_attempts', 'cb_session_locations', 'cb_vendor_open_days', 'cb_publication_controls', 'cb_location_contexts']) {
-    assert.ok(schema.has(name), `Missing ${name}`);
-    assert.match(schema.get(name), /ENGINE=InnoDB DEFAULT CHARSET=utf8mb4/);
-    assert.doesNotMatch(schema.get(name), /FOREIGN KEY|RECENT_LAST/i);
+test('identity and profile migration creates the contracted tables', () => {
+  const sql = schema();
+  for (const name of [
+    'cb_user_account', 'cb_vendor_identity', 'cb_user_role', 'cb_admin_permission',
+    'cb_admin_permission_grant', 'cb_admin_authorization_event',
+    'cb_vendor_profile_version', 'cb_profile_review_event',
+  ]) assert.match(sql, new RegExp(`CREATE TABLE ${name}\\s*\\(`));
+});
+
+test('session and location migration creates the contracted tables', () => {
+  const sql = schema();
+  for (const name of [
+    'cb_vendor_open_attempt', 'cb_vendor_session', 'cb_session_location',
+    'cb_vendor_open_day', 'cb_vendor_publication_control', 'cb_location_context',
+  ]) assert.match(sql, new RegExp(`CREATE TABLE ${name}\\s*\\(`));
+});
+
+test('active profile, session and location rows have conditional unique keys', () => {
+  const sql = schema();
+  for (const column of ['pending_vendor_id', 'active_vendor_id', 'active_session_id']) {
+    assert.match(sql, new RegExp(`${column}[^,]*GENERATED ALWAYS AS`, 'i'));
+    assert.match(sql, new RegExp(`UNIQUE KEY uq_[^\\s]+ \\(${column}\\)`, 'i'));
   }
 });
 
-test('identity, profile sequence and terminal review have unique keys', () => {
-  const schema = tables();
-  for (const [name, columns] of [['cb_accounts', 'wx_openid'], ['cb_vendors', 'account_id'], ['cb_vendor_profile_versions', 'vendor_id, version_no'], ['cb_profile_review_events', 'profile_version_id'], ['cb_location_contexts', 'token_hash']]) {
-    assert.match(schema.get(name) || '', new RegExp(`UNIQUE KEY \\w+ \\(${columns}\\)`));
+test('locations use precise coordinates and no physical foreign keys', () => {
+  const sql = schema();
+  assert.match(sql, /lat DECIMAL\(10,7\)/i);
+  assert.match(sql, /lng DECIMAL\(11,7\)/i);
+  assert.doesNotMatch(sql, /FOREIGN KEY|REFERENCES\s+cb_/i);
+});
+
+test('feedback and governance migration creates contracted fact and decision tables', () => {
+  const sql = schema();
+  for (const name of [
+    'cb_feedback_observation', 'cb_navigation_check', 'cb_feedback_case',
+    'cb_feedback_fact', 'cb_feedback_review_event', 'cb_feedback_fact_decision',
+    'cb_management_action',
+  ]) assert.match(sql, new RegExp(`CREATE TABLE ${name}\\s*\\(`));
+  for (const key of [
+    'uq_feedback_fact_dedupe', 'uq_feedback_case_pending',
+    'uq_feedback_review_case', 'uq_fact_decision_fact',
+  ]) assert.match(sql, new RegExp(`UNIQUE KEY ${key}\\s*\\(`));
+});
+
+test('clearance and audit migration creates contracted lifecycle tables', () => {
+  const sql = schema();
+  for (const name of [
+    'cb_vendor_impact_record', 'cb_data_clear_request',
+    'cb_vendor_impact_review_request', 'cb_retention_hold',
+    'cb_audit_event', 'cb_idempotency_operation', 'cb_pilot_event',
+  ]) assert.match(sql, new RegExp(`CREATE TABLE ${name}\\s*\\(`));
+  for (const key of ['uq_impact_source', 'uq_idempotency_replay', 'uq_pilot_event_dedupe']) {
+    assert.match(sql, new RegExp(`UNIQUE KEY ${key}\\s*\\(`));
   }
 });
 
-test('nullable generated unique keys guard pending profiles and active session/location rows', () => {
-  const schema = tables();
-  for (const [name, predicate, owner, key] of [
-    ['cb_vendor_profile_versions', "review_status = 'PENDING'", 'vendor_id', 'pending_vendor_id'],
-    ['cb_vendor_sessions', 'ended_at_ms IS NULL', 'vendor_id', 'unfinished_vendor_id'],
-    ['cb_session_locations', 'stopped_at_ms IS NULL', 'session_id', 'unstopped_session_id']
+test('every new business table names a check constraint', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  for (const statement of statements) {
+    const name = /^CREATE TABLE (cb_\w+)/.exec(statement)?.[1];
+    if (!name) continue;
+    const laterCheck = statements.some((candidate) =>
+      candidate.startsWith(`ALTER TABLE ${name} ADD CONSTRAINT ck_`));
+    assert.ok(/CONSTRAINT ck_[a-z0-9_]+ CHECK/i.test(statement) || laterCheck, name);
+  }
+});
+
+test('every business table ends up with a BIGINT id primary key', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  for (const statement of statements) {
+    const name = /^CREATE TABLE (cb_\w+)/.exec(statement)?.[1];
+    if (!name) continue;
+    const addsId = statements.some((candidate) =>
+      candidate.startsWith(`ALTER TABLE ${name}`) &&
+      /ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY/i.test(candidate));
+    assert.ok(/id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY/i.test(statement) || addsId, name);
+  }
+});
+
+test('identity and code columns receive binary collation in the migration chain', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  for (const [table, column] of [
+    ['cb_user_account', 'wx_openid'], ['cb_user_account', 'wx_unionid'],
+    ['cb_vendor_identity', 'vendor_code'], ['cb_admin_permission', 'permission_code'],
+    ['cb_vendor_profile_version', 'category_code'],
   ]) {
-    const sql = schema.get(name) || '';
-    assert.ok(sql.includes(`${key} BIGINT GENERATED ALWAYS AS (CASE WHEN ${predicate} THEN ${owner} ELSE NULL END) STORED`), name);
-    assert.match(sql, new RegExp(`UNIQUE KEY \\w+ \\(${key}\\)`));
+    const sql = statements.filter((item) => item.startsWith(`CREATE TABLE ${table} (`) ||
+      item.startsWith(`ALTER TABLE ${table}\n`)).join('\n');
+    assert.match(sql, new RegExp(`(?:MODIFY )?${column} VARCHAR\\([^)]*\\) COLLATE utf8mb4_bin`, 'i'), `${table}.${column}`);
   }
 });
 
-test('location precision, range and version identity are preserved', () => {
-  const sql = tables().get('cb_session_locations') || '';
-  assert.match(sql, /lat DECIMAL\(10,7\) NULL/);
-  assert.match(sql, /lng DECIMAL\(11,7\) NULL/);
-  assert.match(sql, /CHECK \(lat BETWEEN -90 AND 90\)/);
-  assert.match(sql, /CHECK \(lng BETWEEN -180 AND 180\)/);
-  assert.match(sql, /UNIQUE KEY \w+ \(session_id, version_no\)/);
-  assert.match(sql, /effective_at_ms BIGINT NOT NULL/);
-  assert.match(sql, /stopped_at_ms BIGINT NULL/);
-});
-
-test('feedback and lifecycle tables retain contract domains without foreign keys', () => {
-  const schema = tables();
-  for (const name of ['cb_feedback_observations', 'cb_navigation_checks', 'cb_feedback_cases', 'cb_feedback_facts', 'cb_feedback_review_events', 'cb_feedback_fact_decisions', 'cb_management_actions', 'cb_vendor_impact_records', 'cb_impact_review_requests', 'cb_data_clear_requests', 'cb_retention_holds', 'cb_audit_events', 'cb_idempotency_operations', 'cb_pilot_events']) {
-    assert.ok(schema.has(name), `Missing ${name}`);
-    assert.match(schema.get(name), /ENGINE=InnoDB DEFAULT CHARSET=utf8mb4/);
-    assert.doesNotMatch(schema.get(name), /FOREIGN KEY/i);
-  }
-});
-
-test('feedback decisions, operation replay and pilot facts cannot be duplicated', () => {
-  const schema = tables();
-  for (const [name, columns] of [
-    ['cb_feedback_facts', 'reporter_account_id, observation_id, feedback_type'],
-    ['cb_feedback_review_events', 'case_id'], ['cb_feedback_fact_decisions', 'fact_id'],
-    ['cb_vendor_impact_records', 'source_type, source_id'],
-    ['cb_idempotency_operations', 'actor_scope, operation_type, key_hash'],
-    ['cb_pilot_events', 'event_type, dedupe_ref']
-  ]) assert.match(schema.get(name) || '', new RegExp(`UNIQUE KEY \\w+ \\(${columns}\\)`), name);
-});
-
-test('pending case grouping and impact appeals use database uniqueness', () => {
-  const schema = tables();
-  assert.match(schema.get('cb_feedback_cases') || '', /pending_marker TINYINT GENERATED ALWAYS AS \(CASE WHEN status = 'PENDING' THEN 1 ELSE NULL END\) STORED/);
-  assert.match(schema.get('cb_feedback_cases') || '', /UNIQUE KEY \w+ \(reporter_account_id, vendor_id, event_date, feedback_type, pending_marker\)/);
-  assert.match(schema.get('cb_impact_review_requests') || '', /pending_impact_id BIGINT GENERATED ALWAYS AS \(CASE WHEN status = 'PENDING' THEN impact_record_id ELSE NULL END\) STORED/);
-  assert.match(schema.get('cb_impact_review_requests') || '', /UNIQUE KEY \w+ \(pending_impact_id\)/);
-});
-
-test('restricted feedback coordinates are erasable decimal pairs with range checks', () => {
-  const sql = tables().get('cb_feedback_facts') || '';
-  assert.match(sql, /reporter_lat DECIMAL\(10,7\) NULL/);
-  assert.match(sql, /reporter_lng DECIMAL\(11,7\) NULL/);
-  assert.match(sql, /CHECK \(reporter_lat BETWEEN -90 AND 90\)/);
-  assert.match(sql, /CHECK \(reporter_lng BETWEEN -180 AND 180\)/);
-  assert.match(sql, /reporter_lat IS NULL AND reporter_lng IS NULL/);
-  for (const name of ['cb_feedback_observations', 'cb_navigation_checks', 'cb_audit_events', 'cb_idempotency_operations', 'cb_pilot_events']) {
-    assert.doesNotMatch(tables().get(name) || '', /\b(?:lat|lng|reporter_lat|reporter_lng)\b/i, name);
-  }
+test('permission catalog gains numeric primary key while permission code stays unique', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items).join('\n');
+  assert.match(statements, /ALTER TABLE cb_admin_permission[\s\S]*ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY/i);
+  assert.match(statements, /ADD UNIQUE KEY uq_admin_permission_code \(permission_code\)/i);
 });

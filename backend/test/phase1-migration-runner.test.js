@@ -1,98 +1,178 @@
-const test = require('node:test');
 const assert = require('node:assert/strict');
+const { afterEach, test } = require('node:test');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const fixture = fs.mkdtempSync(path.join(os.tmpdir(), 'phase1-runner-'));
-fs.writeFileSync(path.join(fixture, '0002_test.js'), "module.exports = { statements: ['CREATE TABLE fixture_three (id INT)'] };");
-fs.writeFileSync(path.join(fixture, '0001_test.js'), "module.exports = { statements: ['CREATE TABLE fixture_one (id INT)', 'CREATE TABLE fixture_two (id INT)'] };");
-const options = { directory: fixture };
-test.after(() => fs.rmSync(fixture, { recursive: true, force: true }));
-const { runPhase1Migrations, phase1MigrationStatus, loadPhase1Migrations } = require('../src/database/phase1/migration-runner');
 
-function database({ tables = [], lock = 1, failStatement = false, failUnlock = false } = {}) {
-  const state = { tables: [...tables], rows: [], executed: [], lock, failStatement, released: false, unlocks: 0, failUnlock };
-  const conn = {
-    async query(sql, params = []) {
-      if (/GET_LOCK/i.test(sql)) return [[{ acquired: state.lock }]];
-      if (/RELEASE_LOCK/i.test(sql)) { state.unlocks++; if (state.failUnlock) throw new Error('unlock broke'); return [[{ released: 1 }]]; }
-      if (/SET time_zone/i.test(sql)) return [[]];
-      if (/information_schema\.tables/i.test(sql)) return [state.tables.map(table_name => ({ table_name }))];
-      if (/CREATE TABLE IF NOT EXISTS cb_phase1_schema_migrations/i.test(sql)) { if (!state.tables.includes('cb_phase1_schema_migrations')) state.tables.push('cb_phase1_schema_migrations'); return [[]]; }
-      if (/SELECT .* FROM cb_phase1_schema_migrations/i.test(sql)) return [state.rows.map(row => ({ ...row }))];
-      if (/INSERT INTO cb_phase1_schema_migrations/i.test(sql)) { state.rows.push({ name: params[0], checksum: params[1], status: 'RUNNING' }); return [[]]; }
-      if (/UPDATE cb_phase1_schema_migrations/i.test(sql)) { state.rows.find(row => row.name === params[0]).status = 'APPLIED'; return [[]]; }
-      if (state.failStatement && state.executed.length === 1) throw new Error('DDL broke');
-      state.executed.push(sql); return [[]];
-    },
-    release() { state.released = true; }
-  };
-  return { state, async getConnection() { return conn; } };
+const { loadPhase1Migrations, phase1MigrationStatus, runPhase1Migrations } =
+  require('../src/database/phase1/migration-runner');
+
+const directories = [];
+afterEach(() => {
+  for (const directory of directories.splice(0)) fs.rmSync(directory, { recursive: true, force: true });
+});
+
+function migrationDirectory(statements = ['CREATE TABLE cb_sample (id BIGINT)']) {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'phase1-migration-'));
+  directories.push(directory);
+  fs.writeFileSync(path.join(directory, '0001_sample.js'), `module.exports = ${JSON.stringify({ statements })};\n`);
+  return directory;
 }
 
-test('empty schema migrates in order and repeat run is a no-op', async () => {
-  const pool = database();
-  const migrations = loadPhase1Migrations(fixture);
-  await runPhase1Migrations(pool, options);
-  assert.deepEqual(pool.state.rows.map(row => row.name), migrations.map(m => m.name));
-  assert.deepEqual(pool.state.executed, ['CREATE TABLE fixture_one (id INT)', 'CREATE TABLE fixture_two (id INT)', 'CREATE TABLE fixture_three (id INT)']);
-  assert.equal(pool.state.unlocks, 1);
-  const count = pool.state.executed.length;
-  await runPhase1Migrations(pool, options);
-  assert.equal(pool.state.executed.length, count);
-  const status = await phase1MigrationStatus(pool, options);
+function respondToQuery(state, initial, sql, params) {
+  if (/^SET time_zone/i.test(sql)) return [[], []];
+  if (/GET_LOCK/i.test(sql)) return [[{ acquired: initial.lockResult ?? 1 }], []];
+  if (/RELEASE_LOCK/i.test(sql)) {
+    state.lockReleased++;
+    if (initial.failUnlock) throw new Error('synthetic unlock failure');
+    return [[{ released: initial.unlockResult ?? 1 }], []];
+  }
+  if (/information_schema\.tables/i.test(sql)) {
+    return [[...state.tables].map((tableName) => ({ tableName })), []];
+  }
+  if (/^CREATE TABLE IF NOT EXISTS cb_schema_migrations/i.test(sql)) {
+    state.tables.add('cb_schema_migrations');
+    return [{}, []];
+  }
+  if (/^SELECT name, checksum, status FROM cb_schema_migrations/i.test(sql)) {
+    return [[...state.applied].map(([name, row]) => ({ name, ...row })), []];
+  }
+  if (/^INSERT INTO cb_schema_migrations/i.test(sql)) {
+    state.applied.set(params[0], { checksum: params[1], status: 'RUNNING' });
+    return [{ affectedRows: 1 }, []];
+  }
+  if (/^UPDATE cb_schema_migrations/i.test(sql)) {
+    state.applied.get(params[0]).status = 'APPLIED';
+    return [{ affectedRows: 1 }, []];
+  }
+  if (initial.failStatement && sql.includes(initial.failStatement)) {
+    throw new Error('synthetic DDL failure');
+  }
+  if (/^CREATE TABLE cb_/i.test(sql)) {
+    state.tables.add(sql.match(/^CREATE TABLE (cb_\w+)/i)[1]);
+    return [{}, []];
+  }
+  throw new Error(`unexpected SQL: ${sql}`);
+}
+
+function fakePool(initial = {}) {
+  const state = {
+    tables: new Set(initial.tables || []),
+    applied: new Map(initial.applied || []),
+    statements: [],
+    released: 0,
+    lockReleased: 0,
+  };
+  const connection = {
+    async query(sql, params = []) {
+      state.statements.push({ sql, params });
+      return respondToQuery(state, initial, sql, params);
+    },
+    release() { state.released++; },
+  };
+  return { state, getConnection: async () => connection };
+}
+
+test('loads only ordered phase-one migration modules with stable checksums', () => {
+  const directory = migrationDirectory();
+  fs.writeFileSync(path.join(directory, 'README.md'), 'ignored');
+  fs.writeFileSync(path.join(directory, '0002_second.js'), 'module.exports = { statements: ["CREATE TABLE cb_second (id BIGINT)"] };\n');
+  const migrations = loadPhase1Migrations(directory);
+  assert.deepEqual(migrations.map(({ name }) => name), ['0001_sample', '0002_second']);
+  assert.match(migrations[0].checksum, /^[a-f0-9]{64}$/);
+});
+
+test('first run creates metadata and applies each migration once; repeat and status stay stable', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool();
+  const first = await runPhase1Migrations(pool, { directory });
+  assert.deepEqual(first.applied, ['0001_sample']);
+  assert.deepEqual([...pool.state.tables].sort(), ['cb_sample', 'cb_schema_migrations']);
+  const second = await runPhase1Migrations(pool, { directory });
+  assert.deepEqual(second.applied, []);
+  const status = await phase1MigrationStatus(pool, { directory });
   assert.equal(status.compatible, true);
-  assert.equal(status.pending.length, 0);
-  assert.equal(status.drift.length, 0);
+  assert.deepEqual(status.applied, ['0001_sample']);
+  assert.deepEqual(status.pending, []);
+  assert.deepEqual(status.drift, []);
+  assert.equal(pool.state.statements.filter(({ sql }) => sql === 'CREATE TABLE cb_sample (id BIGINT)').length, 1);
+  assert.equal(pool.state.released, 3);
 });
 
-test('rejects nonempty schema before metadata bootstrap', async () => {
-  const pool = database({ tables: ['legacy_table'] });
-  await assert.rejects(runPhase1Migrations(pool, options), /non.?empty/i);
-  assert.deepEqual(pool.state.tables, ['legacy_table']);
+test('first run rejects an existing table before creating migration metadata', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool({ tables: ['cb_legacy_location'] });
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /nonempty|非空/i);
+  assert.deepEqual([...pool.state.tables], ['cb_legacy_location']);
+  assert.equal(pool.state.lockReleased, 1);
+  assert.equal(pool.state.released, 1);
 });
 
-test('detects checksum drift before applying pending migrations', async () => {
-  const pool = database();
-  await runPhase1Migrations(pool, options);
-
-  pool.state.rows.pop();
-  pool.state.rows[0].checksum = 'changed';
-  assert.deepEqual(pool.state.executed, ['CREATE TABLE fixture_one (id INT)', 'CREATE TABLE fixture_two (id INT)', 'CREATE TABLE fixture_three (id INT)']);
-  assert.equal(pool.state.unlocks, 1);
-  const count = pool.state.executed.length;
-  const status = await phase1MigrationStatus(pool, options);
-  assert.equal(status.drift.length, 1);
-  assert.equal(status.pending.length, 1);
-  await assert.rejects(runPhase1Migrations(pool, options), /drift/i);
-  assert.equal(pool.state.executed.length, count);
+test('changed applied migration is reported as drift and never rerun', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool();
+  await runPhase1Migrations(pool, { directory });
+  fs.writeFileSync(path.join(directory, '0001_sample.js'), 'module.exports = { statements: ["CREATE TABLE cb_changed (id BIGINT)"] };\n');
+  const status = await phase1MigrationStatus(pool, { directory });
+  assert.equal(status.compatible, false);
+  assert.deepEqual(status.drift, ['0001_sample']);
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /drift|漂移/i);
+  assert.equal(pool.state.tables.has('cb_changed'), false);
 });
 
-test('fails when advisory lock cannot be acquired', async () => {
-  const pool = database({ lock: 0 });
-  await assert.rejects(runPhase1Migrations(pool, options), /lock/i);
-  assert.equal(pool.state.tables.length, 0);
-  assert.equal(pool.state.released, true);
+test('lock failure prevents DDL and releases the connection', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool({ lockResult: 0 });
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /lock|锁/i);
+  assert.equal(pool.state.tables.size, 0);
+  assert.equal(pool.state.lockReleased, 0);
+  assert.equal(pool.state.released, 1);
 });
 
-test('names failed migration and warns that partial DDL needs inspection', async () => {
-  const migrations = loadPhase1Migrations(fixture);
-
-  const pool = database({ failStatement: true });
-  await assert.rejects(runPhase1Migrations(pool, options), error => error.message.includes(migrations[0].name) && /inspect|rebuild/i.test(error.message));
-  assert.equal(pool.state.unlocks, 1);
-  assert.equal(pool.state.executed.length, 1);
-  assert.equal(pool.state.rows[0].status, 'RUNNING');
-  await assert.rejects(runPhase1Migrations(pool, options), /Incomplete migration/i);
+test('accepts a lock result returned as a driver string', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool({ lockResult: '1' });
+  const result = await runPhase1Migrations(pool, { directory });
+  assert.deepEqual(result.applied, ['0001_sample']);
 });
 
+test('mid-DDL failure names the migration and does not imply rollback', async () => {
+  const directory = migrationDirectory([
+    'CREATE TABLE cb_first (id BIGINT)',
+    'CREATE TABLE cb_fail (id BIGINT)',
+  ]);
+  const pool = fakePool({ failStatement: 'cb_fail' });
+  await assert.rejects(runPhase1Migrations(pool, { directory }),
+    /0001_sample.*partial DDL.*Cause: synthetic DDL failure/i);
+  assert.equal(pool.state.tables.has('cb_first'), true);
+  assert.equal(pool.state.applied.get('0001_sample').status, 'RUNNING');
+  assert.equal(pool.state.lockReleased, 1);
+  assert.equal(pool.state.released, 1);
+});
 
+test('retry refuses a migration left incomplete by partial DDL', async () => {
+  const directory = migrationDirectory([
+    'CREATE TABLE cb_first (id BIGINT)',
+    'CREATE TABLE cb_fail (id BIGINT)',
+  ]);
+  const pool = fakePool({ failStatement: 'cb_fail' });
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /partial DDL/i);
+  const attemptsBeforeRetry = pool.state.statements.filter(({ sql }) => sql.includes('cb_first')).length;
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /incomplete|未完成/i);
+  assert.equal(pool.state.statements.filter(({ sql }) => sql.includes('cb_first')).length, attemptsBeforeRetry);
+});
 
+test('unlock failure does not hide the failed migration', async () => {
+  const directory = migrationDirectory(['CREATE TABLE cb_fail (id BIGINT)']);
+  const pool = fakePool({ failStatement: 'cb_fail', failUnlock: true });
+  await assert.rejects(runPhase1Migrations(pool, { directory }),
+    /0001_sample.*partial DDL.*unlock failure/i);
+  assert.equal(pool.state.released, 1);
+});
 
-test('preserves migration error when lock release also fails', async () => {
-  const pool = database({ failStatement: true, failUnlock: true });
-  await assert.rejects(runPhase1Migrations(pool, options), error =>
-    /0001_test\.js/.test(error.message) && /DDL broke/.test(error.message) && /unlock broke/.test(error.message));
-  assert.equal(pool.state.unlocks, 1);
-  assert.equal(pool.state.released, true);
+test('a failed lock release result is not reported as migration success', async () => {
+  const directory = migrationDirectory();
+  const pool = fakePool({ unlockResult: 0 });
+  await assert.rejects(runPhase1Migrations(pool, { directory }), /unlock failure/i);
+  assert.equal(pool.state.released, 1);
 });
