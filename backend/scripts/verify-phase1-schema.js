@@ -185,7 +185,8 @@ async function verifyPhase1Schema(config) {
     const version = await preflight(pool, config);
     checks.push('empty-schema');
     const first = await runPhase1Migrations(pool);
-    assert.equal(first.applied.length, 7);
+    // 迁移数量随只增迁移增长，不能写死为 W1 的 7 个，否则新增迁移会让验证器误报。
+    assert.equal(first.applied.length, loadPhase1Migrations().length);
     const second = await runPhase1Migrations(pool);
     assert.deepEqual(second.applied, []);
     const status = await phase1MigrationStatus(pool);

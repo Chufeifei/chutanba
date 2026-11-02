@@ -1,27 +1,24 @@
 /**
- * 统一 HTTP 响应。后端约定 code 为 HTTP 风格状态码：
- * 2xx 表示成功，4xx/5xx 表示业务或服务异常；msg 为可读信息，data 为业务数据。
+ * 响应信封的唯一出口：一期契约 §5 规定成功为 {code,msg,data,requestId}，
+ * 失败额外带 bizCode。所有路由与中间件都必须经这里返回，避免各写一套结构。
  */
-
-function ok(res, data = null, msg = 'ok') {
-  return res.status(200).json({ code: 200, msg, data });
+function success(res, data = null, httpStatus = 200) {
+  return res.status(httpStatus).json({
+    code: httpStatus,
+    msg: 'ok',
+    data,
+    requestId: res.locals.requestId || null,
+  });
 }
 
-function fail(res, code, msg, data = null) {
-  const numeric = typeof code === 'number' ? code : 0;
-  const status = numeric >= 400 && numeric < 600 ? numeric : 200;
-  return res.status(status).json({ code, msg, data });
+function failure(res, { httpStatus = 500, bizCode = 'INTERNAL_ERROR', msg, data = null }) {
+  return res.status(httpStatus).json({
+    code: httpStatus,
+    msg,
+    bizCode,
+    data,
+    requestId: res.locals.requestId || null,
+  });
 }
 
-/** 业务可预期错误：code 为 HTTP 风格状态码，bizCode 为业务错误码（api-contract 中的语义码），status 为 HTTP 状态码。 */
-class AppError extends Error {
-  constructor(code, msg, status, bizCode) {
-    super(msg);
-    this.name = 'AppError';
-    this.code = code;
-    this.bizCode = bizCode || null;
-    this.status = status || (typeof code === 'number' && code >= 400 ? code : 200);
-  }
-}
-
-module.exports = { ok, fail, AppError };
+module.exports = { success, failure };

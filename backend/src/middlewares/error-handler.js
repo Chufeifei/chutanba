@@ -1,44 +1,53 @@
+const { success, failure } = require('../utils/response');
 const env = require('../config/env');
 
 /**
- * Express 统一错误处理中间件。
- * - 业务可预期错误（AppError）按自带状态码与业务码返回。
- * - 其余错误按 500 处理，生产环境不把堆栈返回给客户端。
+ * 统一错误收口：业务错误按 DomainError 自带的 bizCode 与 HTTP 状态返回，
+ * 其余异常一律 500，且生产环境不把内部细节返回给客户端。
  */
 function errorHandler(error, req, res, next) { // eslint-disable-line no-unused-vars
   if (error && error.name === 'DomainError') {
-    // 统一信封 {code, bizCode, msg, data}：data 恒为 null，保证小程序端解析路径单一。
-    const body = { code: error.httpStatus, bizCode: error.code, msg: error.message, data: null };
-    if (error.details && env.nodeEnv !== 'production') body.details = error.details;
-    return res.status(error.httpStatus).json(body);
+    return failure(res, {
+      httpStatus: error.httpStatus,
+      bizCode: error.bizCode,
+      msg: error.message,
+      data: error.data,
+    });
   }
 
-  if (error && error.name === 'AppError') {
-    const status = error.status || (error.code >= 400 ? error.code : 200);
-    const body = { code: error.code, msg: error.message, data: null };
-    if (error.bizCode) {
-      body.bizCode = error.bizCode;
-    }
-    return res.status(status).json(body);
+  // 请求体解析失败（超限或 JSON 非法）属于客户端入参问题，必须落 400，
+  // 否则会被兜底成 500，让客户端误以为是服务故障。
+  if (error && (error.type === 'entity.too.large' || error.type === 'entity.parse.failed')) {
+    return failure(res, {
+      httpStatus: 400,
+      bizCode: 'VALIDATION_FAILED',
+      msg: '请求体不合法或超出大小上限',
+    });
   }
 
+  // 唯一索引冲突通常是并发重复写入；not-found 与错误码语义不同，不能当业务成功处理。
   if (error && error.code === 'ER_DUP_ENTRY') {
-    return res.status(409).json({
-      code: 409,
-      bizCode: 'CONCURRENT_CONFLICT',
+    return failure(res, {
+      httpStatus: 409,
+      bizCode: 'STATE_CONFLICT',
       msg: '请求与当前业务状态冲突，请刷新后重试',
-      data: null,
     });
   }
 
   console.error(error);
 
-  const response = { code: 500, msg: '服务器内部错误', data: null };
+  const body = {
+    httpStatus: 500,
+    bizCode: 'INTERNAL_ERROR',
+    msg: '服务器内部错误',
+  };
+
+  // 本地排查需要看到原始异常；生产环境连错误信息都不能外泄。
   if (env.nodeEnv !== 'production') {
-    response.detail = error.message;
+    body.data = { detail: error && error.message };
   }
 
-  return res.status(500).json(response);
+  return failure(res, body);
 }
 
 module.exports = errorHandler;

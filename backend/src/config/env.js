@@ -31,21 +31,6 @@ function readStringList(name) {
   );
 }
 
-function readJsonObject(name) {
-  const rawValue = String(process.env[name] || '').trim();
-  if (!rawValue) return Object.freeze({});
-  let value;
-  try {
-    value = JSON.parse(rawValue);
-  } catch (_error) {
-    throw new Error(`Environment variable ${name} must be a valid JSON object`);
-  }
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error(`Environment variable ${name} must be a JSON object`);
-  }
-  return Object.freeze({ ...value });
-}
-
 // 所有环境变量集中在这里读取，业务代码不直接散落访问 process.env。
 const env = Object.freeze({
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -59,35 +44,23 @@ const env = Object.freeze({
     connectionLimit: readPositiveInteger('DB_CONNECTION_LIMIT', 10),
     ssl: process.env.DB_SSL === 'true',
   },
-  security: {
-    qrTokenSecret: process.env.QR_TOKEN_SECRET || (process.env.NODE_ENV === 'production' ? null : 'development-only-change-me'),
-    accountPiiKey: process.env.ACCOUNT_PII_KEY || null,
+  identity: {
+    // 本地身份模拟必须显式开启；生产环境无论该值如何都忽略 X-Dev-Openid。
+    allowDev: process.env.ALLOW_DEV_IDENTITY === 'true',
   },
-  wechat: {
-    appId: process.env.WECHAT_APP_ID || null,
-    appSecret: process.env.WECHAT_APP_SECRET || null,
-  },
-  admin: {
-    // 运营写操作白名单（openid，逗号分隔）。为空时运营写能力不开放（503），不裸奔。
-    operatorOpenids: readStringList('ADMIN_OPERATOR_OPENIDS'),
+  authorization: {
+    // 管理资格只来自部署配置：客户端无法通过请求体或查询参数获得角色。
+    // SUPER_ADMIN 仍然单列，ADMIN 与两类审核员由部署名单幂等同步到角色/权限表。
+    superAdminOpenids: readStringList('SUPER_ADMIN_OPENIDS'),
+    adminOpenids: readStringList('ADMIN_OPENIDS'),
+    profileReviewerOpenids: readStringList('PROFILE_REVIEWER_OPENIDS'),
+    fieldReviewerOpenids: readStringList('FIELD_REVIEWER_OPENIDS'),
   },
   jobs: {
     // 调度端点令牌：未配置时调度端点返回 503，宁可不可用也不裸奔。
     triggerToken: process.env.JOB_TRIGGER_TOKEN || null,
-    outboxBatchSize: readPositiveInteger('OUTBOX_BATCH_SIZE', 100),
     // 单次 HTTP 触发的时间预算，必须小于平台请求超时，避免被掐断留下半截状态。
     timeBudgetMs: readPositiveInteger('JOB_TIME_BUDGET_MS', 20000),
-  },
-  officialAccount: {
-    appId: process.env.WECHAT_OA_APP_ID || null,
-    appSecret: process.env.WECHAT_OA_APP_SECRET || null,
-    callbackToken: process.env.WECHAT_OA_CALLBACK_TOKEN || null,
-    encodingAesKey: process.env.WECHAT_OA_ENCODING_AES_KEY || null,
-    reservationDigestTemplateId: process.env.WECHAT_OA_RESERVATION_DIGEST_TEMPLATE_ID || null,
-    reservationDigestFields: readJsonObject('WECHAT_OA_RESERVATION_DIGEST_FIELDS_JSON'),
-    displayName: process.env.WECHAT_OA_DISPLAY_NAME || '',
-    qrImageUrl: process.env.WECHAT_OA_QR_IMAGE_URL || '',
-    miniProgramAppId: process.env.WECHAT_MINIPROGRAM_APP_ID || process.env.WECHAT_APP_ID || null,
   },
 });
 

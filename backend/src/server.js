@@ -1,6 +1,6 @@
 const app = require('./app');
 const env = require('./config/env');
-const { closeDatabase, pingDatabase } = require('./config/database');
+const { closeDatabase, pingDatabase } = require('./db/pool');
 
 let server;
 

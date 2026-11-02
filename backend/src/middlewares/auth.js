@@ -1,15 +1,16 @@
 const env = require('../config/env');
+const { DomainError } = require('../domain/errors');
 
 /**
  * 可信身份边界（架构手册 §可信身份）：
  * - 生产环境只信任微信云托管在请求头注入的身份（X-WX-OPENID / X-WX-UNIONID / X-WX-USERID）。
- * - 绝不信任请求体中的 openid / role / user_id。
- * - 非生产环境允许 X-Dev-Openid 用于本地联调，生产必须移除该分支。
+ * - 绝不信任请求体或查询参数中的 openid / role / user_id。
+ * - X-Dev-Openid 仅在非生产且显式配置 ALLOW_DEV_IDENTITY=true 时可用；
+ *   生产环境即使误配该开关也必须忽略，避免模拟头成为绕过身份链的后门。
  *
- * 注：原 requireUser / requireAdmin 等资源级鉴权函数已随业务逻辑移除；
- * 后续业务模块接入时，应在此可信身份边界之上自行实现授权校验。
+ * 第二个参数只用于单元测试注入配置；运行时调用方一律使用默认的 env。
  */
-function extractTrustedIdentity(req) {
+function extractTrustedIdentity(req, config = env) {
   const openid = req.headers['x-wx-openid'];
   const unionid = req.headers['x-wx-unionid'];
   const userId = req.headers['x-wx-userid'];
@@ -23,7 +24,8 @@ function extractTrustedIdentity(req) {
     };
   }
 
-  if (env.nodeEnv !== 'production') {
+  const allowDev = Boolean(config.identity && config.identity.allowDev);
+  if (config.nodeEnv !== 'production' && allowDev) {
     const devOpenid = req.headers['x-dev-openid'];
     if (devOpenid) {
       return { openid: devOpenid, unionid: null, userId: null, source: 'dev' };
@@ -39,4 +41,12 @@ function attachIdentity(req, res, next) {
   next();
 }
 
-module.exports = { attachIdentity, extractTrustedIdentity };
+/** 本人资源与写操作入口：无身份直接按契约返回 401 AUTH_REQUIRED。 */
+function requireIdentity(req, res, next) {
+  if (!req.identity) {
+    return next(new DomainError('AUTH_REQUIRED'));
+  }
+  return next();
+}
+
+module.exports = { attachIdentity, extractTrustedIdentity, requireIdentity };

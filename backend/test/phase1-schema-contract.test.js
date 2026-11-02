@@ -116,3 +116,10 @@ test('authorization event whitelists are enforced by the migration chain', () =>
   assert.match(statements, /ck_authorization_event_role CHECK \(role_code IS NULL OR role_code IN \('ADMIN','SUPER_ADMIN'\)\)/i);
   assert.match(statements, /ck_authorization_event_scope CHECK \(scope_type IS NULL OR scope_type IN \('NATIONAL','CITY','REGION'\)\)/i);
 });
+
+test('W2 migrations seed reviewer permissions and extend grant and operation rows', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items).join('\n');
+  assert.match(statements, /'PROFILE_REVIEWER'[\s\S]*'FIELD_REVIEWER'/);
+  assert.match(statements, /MODIFY granted_by_account_id BIGINT UNSIGNED NULL/i);
+  assert.match(statements, /ADD COLUMN error_code VARCHAR\(64\)[^,]*NULL/i);
+});
