@@ -185,7 +185,7 @@ async function verifyPhase1Schema(config) {
     const version = await preflight(pool, config);
     checks.push('empty-schema');
     const first = await runPhase1Migrations(pool);
-    assert.equal(first.applied.length, 6);
+    assert.equal(first.applied.length, 7);
     const second = await runPhase1Migrations(pool);
     assert.deepEqual(second.applied, []);
     const status = await phase1MigrationStatus(pool);

@@ -110,3 +110,9 @@ test('permission catalog gains numeric primary key while permission code stays u
   assert.match(statements, /ALTER TABLE cb_admin_permission[\s\S]*ADD COLUMN id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY/i);
   assert.match(statements, /ADD UNIQUE KEY uq_admin_permission_code \(permission_code\)/i);
 });
+
+test('authorization event whitelists are enforced by the migration chain', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items).join('\n');
+  assert.match(statements, /ck_authorization_event_role CHECK \(role_code IS NULL OR role_code IN \('ADMIN','SUPER_ADMIN'\)\)/i);
+  assert.match(statements, /ck_authorization_event_scope CHECK \(scope_type IS NULL OR scope_type IN \('NATIONAL','CITY','REGION'\)\)/i);
+});
