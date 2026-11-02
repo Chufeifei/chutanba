@@ -123,3 +123,9 @@ test('W2 migrations seed reviewer permissions and extend grant and operation row
   assert.match(statements, /MODIFY granted_by_account_id BIGINT UNSIGNED NULL/i);
   assert.match(statements, /ADD COLUMN error_code VARCHAR\(64\)[^,]*NULL/i);
 });
+
+test('W3 adds the profile review queue index without altering earlier tables', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_vendor_profile_version[\s\S]*ADD KEY ix_profile_status_submitted \(review_status, submitted_at_ms, id\)/i.test(statement)));
+});

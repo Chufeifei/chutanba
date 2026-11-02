@@ -5,8 +5,14 @@ const { canonicalJson, sha256Hex } = require('../../utils/digest');
 const { assertIdempotencyKey, assertOperationIdentity } = require('./schema');
 const repository = require('./repository');
 
-async function replay(connection, { actorScope, operationType, keyHash, requestHash, reload }) {
-  const row = await repository.findOperation(connection, { actorScope, operationType, keyHash });
+/**
+ * 回放先在独立事务读取原记录，提交后再调用调用方的 reload；
+ * reload 自身可能使用事务，不能嵌在回放事务里占用第二条连接。
+ */
+async function replayKey({ actorScope, operationType, keyHash, requestHash, reload }) {
+  const row = await withTransaction((connection) => repository.findOperation(connection, {
+    actorScope, operationType, keyHash,
+  }));
   if (!row) throw new DomainError('STATE_CONFLICT', '幂等操作状态不可用，请重试');
   if (row.request_hash !== requestHash) throw new DomainError('IDEMPOTENCY_MISMATCH');
   if (row.status === 'SUCCEEDED') {
@@ -14,12 +20,6 @@ async function replay(connection, { actorScope, operationType, keyHash, requestH
   }
   if (row.status === 'PENDING') return { replayed: true, status: 'PROCESSING' };
   return { replayed: true, status: 'FAILED', bizCode: row.error_code };
-}
-
-function replayKey({ actorScope, operationType, keyHash, requestHash, reload }) {
-  return withTransaction((connection) => replay(connection, {
-    actorScope, operationType, keyHash, requestHash, reload,
-  }));
 }
 
 async function markFailure({ actorScope, operationType, keyHash, errorCode }) {
