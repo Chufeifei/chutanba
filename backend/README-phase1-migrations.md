@@ -61,3 +61,35 @@ node --test backend/test/w4-sessions-publication.integration.test.js
 $env:PHASE1_TEST_HTTP_PIPE='1'
 node --test backend/test/w4-sessions-publication.integration.test.js
 ```
+
+## 本地应用库 `chutanba_app` 与演示数据
+
+应用库 `chutanba` 自 2026-11-01 起停留在旧结构：迁移表是旧名 `cb_phase1_schema_migrations`，
+只有 `0001`、`0002` 两条记录，`cb_session_location` 无 `active_session_id`，
+`cb_navigation_check`、`cb_feedback_observation` 等表不存在。当前代码连它会直接 500
+（`Unknown column 'l.active_session_id'`）；现有 runner 使用新表名 `cb_schema_migrations`，
+无法识别该库已有状态，因此不能对该库直接续跑迁移。
+
+本地开发改用同实例的空库 `chutanba_app`（与 `phase1_test_*` 隔离，不触碰 `chutanba`）：
+
+```sql
+CREATE DATABASE chutanba_app CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+```powershell
+$env:DB_NAME='chutanba_app'
+npm --prefix backend run migrate          # 首遍 0001-0012 全部 applied
+npm --prefix backend run migrate          # 第二遍应全部 skipped
+```
+
+演示数据由脚本按资格谓词逐条构造，避免手写 SQL 漏条件导致列表为空或详情 `UNVIEWABLE`：
+
+```powershell
+$env:DB_NAME='chutanba_app'
+node backend/scripts/seed-demo-public-vendors.js           # 幂等写入，已存在则跳过
+node backend/scripts/seed-demo-public-vendors.js --reset   # 先清理上次的 DEMO 对象再写入
+```
+
+脚本自带护栏：拒绝在 `DB_NAME=chutanba` 上执行，且只清理 `vendor_code` 以 `DEMO` 开头的对象。
+写入后公开集合应有 `DEMO0001`、`DEMO0002`、`DEMO0003` 三个摊位；`DEMO0004` 为已收摊，
+只在详情返回 `RESTING`，且响应不含任何坐标。
