@@ -1,0 +1,5 @@
+.countdown { display: inline-flex; align-items: baseline; font-size: 26rpx; color: var(--color-text-muted); }
+.countdown-label { margin-right: 8rpx; }
+.countdown-value { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
+
+.tone-warning .countdown-value { color: var(--color-warning); }

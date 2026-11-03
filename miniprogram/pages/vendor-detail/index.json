@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "摊主详情",
+  "usingComponents": {
+    "phase-badge": "/components/phase-badge/index",
+    "countdown": "/components/countdown/index"
+  }
+}

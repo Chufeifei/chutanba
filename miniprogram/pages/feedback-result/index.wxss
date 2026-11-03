@@ -1,0 +1,6 @@
+.result-card { padding: 48rpx 32rpx; border-radius: var(--radius-card); background: var(--color-surface); text-align: center; }
+.result-title { margin-top: 20rpx; font-size: 38rpx; font-weight: 600; color: var(--color-text); }
+.result-desc { margin-top: 12rpx; font-size: 28rpx; line-height: 44rpx; color: var(--color-text-muted); }
+
+.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+.notice { margin-top: 24rpx; font-size: 24rpx; line-height: 38rpx; color: var(--color-text-hint); }

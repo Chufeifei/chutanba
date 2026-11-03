@@ -1,0 +1,16 @@
+.vendor-card { padding: 32rpx; border-radius: var(--radius-card); background: var(--color-surface); }
+.vendor-card + .vendor-card { margin-top: 24rpx; }
+
+.card-head { display: flex; align-items: center; justify-content: space-between; }
+.vendor-name { flex: 1; margin-right: 16rpx; font-size: 34rpx; font-weight: 500; color: var(--color-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 12rpx; font-size: 26rpx; color: var(--color-text-muted); }
+.meta-distance { color: var(--color-brand); font-weight: 500; }
+
+.card-summary { margin-top: 16rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+
+.card-foot { display: flex; flex-direction: column; margin-top: 20rpx; font-size: 24rpx; line-height: 38rpx; color: var(--color-text-hint); }
+.foot-updated { margin-top: 4rpx; }
+
+.is-compact { padding: 24rpx 28rpx; }
+.is-compact .vendor-name { font-size: 30rpx; }

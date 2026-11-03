@@ -1,51 +1,10 @@
-.discover-page { padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); }
+.notice-bar { margin-bottom: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
+.notice-bar.warn { background: var(--color-warning-soft); color: var(--color-warning); }
 
-.filter-title { font-size: 32rpx; font-weight: 600; color: #1F1F1F; }
-.filter-note { margin-top: 8rpx; font-size: 24rpx; color: #6B6B6B; }
-.filter-empty { margin-top: 24rpx; font-size: 26rpx; color: #6B6B6B; }
+.mode-switch { display: flex; margin-bottom: 24rpx; padding: 6rpx; border-radius: 32rpx; background: var(--color-surface); }
+.mode-item { flex: 1; height: 64rpx; border-radius: 28rpx; font-size: 26rpx; line-height: 64rpx; text-align: center; color: var(--color-text-muted); }
+.mode-item.is-active { background: var(--color-brand-soft); color: var(--color-brand); font-weight: 500; }
 
-.region-scroll { margin-top: 24rpx; white-space: nowrap; }
-.region-row { display: inline-flex; gap: 16rpx; }
-.region-chip {
-  padding: 12rpx 28rpx;
-  border-radius: 999rpx;
-  background: #F4F1EC;
-  color: #1F1F1F;
-  font-size: 26rpx;
-}
-.region-chip-active { background: #FF7A45; color: #FFFFFF; }
+.vendor-map { width: 100%; height: 760rpx; border-radius: var(--radius-card); overflow: hidden; }
 
-.radius-row { margin-top: 24rpx; display: flex; align-items: center; gap: 16rpx; }
-.radius-input {
-  flex: 1;
-  height: 80rpx;
-  padding: 0 24rpx;
-  border-radius: 20rpx;
-  background: #F4F1EC;
-  font-size: 28rpx;
-}
-.radius-button {
-  height: 80rpx;
-  padding: 0 32rpx;
-  border-radius: 20rpx;
-  background: #FF7A45;
-  color: #FFFFFF;
-  font-size: 28rpx;
-  line-height: 80rpx;
-}
-
-.condition-summary { margin-top: 16rpx; font-size: 28rpx; color: #1F1F1F; }
-.clear-button {
-  margin-top: 16rpx;
-  padding: 0 28rpx;
-  height: 64rpx;
-  border-radius: 999rpx;
-  background: #F4F1EC;
-  color: #1F1F1F;
-  font-size: 26rpx;
-  line-height: 64rpx;
-}
-
-.vendor-item { margin-top: 24rpx; padding-top: 24rpx; border-top: 1rpx solid #F0EDE7; }
-.vendor-name { font-size: 30rpx; color: #1F1F1F; }
-.vendor-meta { margin-top: 8rpx; font-size: 24rpx; color: #6B6B6B; }
+.map-card { margin-top: 24rpx; padding: 8rpx; border-radius: var(--radius-card); background: var(--color-brand-soft); }

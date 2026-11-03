@@ -1,0 +1,9 @@
+.section + .section { margin-top: 40rpx; }
+
+.candidate, .record { margin-top: 24rpx; padding: 28rpx 32rpx; border-radius: var(--radius-card); background: var(--color-surface); }
+
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+.candidate-name { flex: 1; margin-right: 16rpx; font-size: 30rpx; font-weight: 500; color: var(--color-text); }
+.candidate-meta { margin-top: 8rpx; font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
+
+.empty-line { margin-top: 24rpx; padding: 32rpx; border-radius: var(--radius-card); background: var(--color-surface); font-size: 26rpx; text-align: center; color: var(--color-text-hint); }

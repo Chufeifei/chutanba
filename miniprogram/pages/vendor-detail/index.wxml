@@ -1,0 +1,74 @@
+<view class="page-shell {{showContent && isOpen ? 'with-fixed-cta' : ''}}">
+  <state-view
+    wx:if="{{!showContent}}"
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card" wx:if="{{detail.profile}}">
+      <view class="detail-head">
+        <text class="detail-name">{{detail.profile.name}}</text>
+        <phase-badge
+          wx:if="{{detail.session}}"
+          label="{{detail.session.phaseLabel}}"
+          tone="{{detail.session.phaseTone}}"
+        />
+      </view>
+      <view class="detail-category">{{detail.profile.categoryName}}</view>
+      <view class="detail-row" wx:if="{{detail.profile.summary}}">{{detail.profile.summary}}</view>
+      <view class="detail-row" wx:if="{{detail.profile.hasPrice}}">价格说明：{{detail.profile.priceDescription}}</view>
+      <view class="detail-block" wx:if="{{detail.profile.hasAnnouncement}}">{{detail.profile.announcement}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{detail.session}}">
+      <view class="row-between">
+        <text class="section-title">本轮营业</text>
+        <countdown
+          text="{{detail.session.remainingText}}"
+          tone="{{detail.session.preparedToClose ? 'warning' : 'neutral'}}"
+        />
+      </view>
+      <view class="detail-row">预计收摊：{{detail.session.plannedEndText}}</view>
+      <view class="detail-row" wx:if="{{detail.location}}">当前位置：{{detail.location.locationName}}</view>
+      <view class="detail-row" wx:if="{{detail.location}}">位置更新于：{{detail.location.locatedText}}</view>
+      <view class="detail-note">
+        {{detail.session.preparedToClose ? '摊主已准备收摊，前往前会再确认一次最新状态。' : '摊主移动地点后会主动刷新位置，这里显示最后一次成功定位时间。'}}
+      </view>
+    </view>
+
+    <view class="detail-card rest" wx:if="{{detail.isResting}}">
+      该摊主当前休息中，暂无可用位置；可在营业时段再来查看
+    </view>
+
+    <view class="detail-note warn" wx:if="{{syncStale}}">
+      状态未更新，暂时无法确认是否仍在营业；请勿据此前往
+    </view>
+
+    <view class="disclaimer">价格仅供参考；平台提供找摊信息，不保证持续营业、有货或交易结果。</view>
+  </block>
+
+  <fixed-cta
+    wx:if="{{showContent && isOpen}}"
+    primary-text="{{navBusy ? '正在确认最新状态…' : '导航前往'}}"
+    secondary-text="反馈现场状态"
+    disabled="{{syncStale}}"
+    processing="{{navBusy || feedbackBusy}}"
+    bind:primary="onNavigate"
+    bind:secondary="onFeedback"
+  />
+
+  <confirm-sheet
+    visible="{{confirmVisible}}"
+    title="{{confirmSheet.title}}"
+    description="{{confirmSheet.description}}"
+    confirm-text="{{confirmSheet.confirmText}}"
+    cancel-text="{{confirmSheet.cancelText}}"
+    processing="{{navBusy}}"
+    bind:confirm="onConfirmContinue"
+    bind:cancel="onConfirmCancel"
+  />
+</view>

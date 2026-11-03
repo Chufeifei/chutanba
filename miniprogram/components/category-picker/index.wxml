@@ -1,0 +1,14 @@
+<scroll-view class="category-bar" scroll-x enable-flex>
+  <view
+    class="category-chip {{activeCode === '' ? 'is-active' : ''}}"
+    data-code=""
+    bindtap="onSelect"
+  >全部</view>
+  <view
+    wx:for="{{items}}"
+    wx:key="code"
+    class="category-chip {{activeCode === item.code ? 'is-active' : ''}}"
+    data-code="{{item.code}}"
+    bindtap="onSelect"
+  >{{item.emoji}} {{item.name}}</view>
+</scroll-view>

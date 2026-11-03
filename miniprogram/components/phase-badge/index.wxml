@@ -1,0 +1,4 @@
+<view class="phase-badge tone-{{tone}}" wx:if="{{label}}">
+  <view class="phase-dot"></view>
+  <text class="phase-text">{{label}}</text>
+</view>

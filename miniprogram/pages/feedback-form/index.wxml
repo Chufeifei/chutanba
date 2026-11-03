@@ -1,0 +1,74 @@
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
+  <state-view
+    wx:if="{{!showContent}}"
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <text class="section-title">本次反馈对象</text>
+      <view class="meta">摊主：{{observation.vendorName}}</view>
+      <view class="meta">看到时间：{{observation.eventText}}</view>
+      <view class="meta">{{observation.windowText}}</view>
+      <view class="hint">反馈只针对这一次营业轮次；刷新位置、收摊或同日重开都不会替换本对象。</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">现场情况</text>
+      <radio-group bindchange="onTypeChange">
+        <label
+          class="option {{item.disabled ? 'is-disabled' : ''}}"
+          wx:for="{{typeOptions}}"
+          wx:key="value"
+        >
+          <radio
+            value="{{item.value}}"
+            checked="{{selectedType === item.value}}"
+            disabled="{{item.disabled}}"
+            color="#FF7A45"
+          />
+          <view class="option-body">
+            <text class="option-label">{{item.label}}</text>
+            <text class="option-desc">{{item.disabled ? '该问题已提交过' : item.description}}</text>
+          </view>
+        </label>
+      </radio-group>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">补充说明（可不填）</text>
+      <textarea
+        class="desc-input"
+        value="{{description}}"
+        maxlength="{{descriptionMax}}"
+        placeholder="补充能看到的现场情况；不要填写他人姓名或联系方式"
+        bindinput="onDescriptionInput"
+      />
+      <view class="counter">{{description.length}}/{{descriptionMax}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">本次现场位置</text>
+      <view class="hint">
+        提交时会读取一次实时位置，用于核对是否在现场（距原营业位置 300 米内、定位在 5 分钟内有效）。
+        定位只参与本次核对，不会用于其他用途。
+      </view>
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+    <button class="query-button" wx:if="{{cannotSubmit}}" bindtap="onOpenRecords">查看我的反馈记录</button>
+  </block>
+
+  <fixed-cta
+    wx:if="{{showContent}}"
+    primary-text="{{cannotSubmit ? '本次已结束' : (submitting ? '正在提交…' : '定位并提交反馈')}}"
+    processing="{{submitting}}"
+    disabled="{{!selectedType || cannotSubmit}}"
+    bind:primary="onSubmit"
+  />
+</view>

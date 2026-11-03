@@ -1,0 +1,32 @@
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
+  <state-view
+    wx:if="{{!showContent}}"
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="result-card">
+      <status-dot tone="{{result.statusTone}}" text="{{result.statusLabel}}" />
+      <view class="result-title">{{result.title}}</view>
+      <view class="result-desc">{{result.description}}</view>
+    </view>
+
+    <view class="surface-card">
+      <view class="meta" wx:if="{{result.submittedText}}">提交时间：{{result.submittedText}}</view>
+      <view class="meta" wx:if="{{result.reasonText}}">核实说明：{{result.reasonText}}</view>
+      <view class="notice">{{result.notice}}</view>
+    </view>
+  </block>
+
+  <fixed-cta
+    wx:if="{{showContent}}"
+    primary-text="查看我的反馈"
+    secondary-text="返回"
+    bind:primary="onOpenRecords"
+    bind:secondary="onStateAction"
+  />
+</view>

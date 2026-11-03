@@ -1,0 +1,4 @@
+<view class="countdown tone-{{tone}}" wx:if="{{text}}">
+  <text class="countdown-label">{{label}}</text>
+  <text class="countdown-value">{{text}}</text>
+</view>

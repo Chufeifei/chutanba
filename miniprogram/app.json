@@ -1,12 +1,53 @@
 {
   "pages": [
-    "pages/discover/index"
+    "pages/discover/index",
+    "pages/vendor-detail/index",
+    "pages/mine/index",
+    "pages/feedback-candidates/index",
+    "pages/feedback-form/index",
+    "pages/feedback-result/index",
+    "pages/vendor-profile/index",
+    "pages/vendor-profile-edit/index",
+    "pages/workbench/index",
+    "pages/open-days/index",
+    "pages/publication/index",
+    "pages/data-clear/index",
+    "pages/impact-records/index"
+  ],
+  "subPackages": [
+    {
+      "root": "packageManagement",
+      "name": "management",
+      "pages": [
+        "pages/index/index",
+        "pages/profile-review/index",
+        "pages/field-review/index",
+        "pages/governance/index",
+        "pages/impact-review/index"
+      ]
+    }
   ],
   "window": {
     "navigationBarBackgroundColor": "#FAF8F5",
     "navigationBarTitleText": "出摊吧",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#FAF8F5"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#77746F",
+    "selectedColor": "#FF7A45",
+    "backgroundColor": "#FAF8F5",
+    "list": [
+      {
+        "pagePath": "pages/discover/index",
+        "text": "找摊"
+      },
+      {
+        "pagePath": "pages/mine/index",
+        "text": "我的"
+      }
+    ]
   },
   "usingComponents": {
     "state-view": "/components/state-view/index",
@@ -17,7 +58,7 @@
   "style": "v2",
   "permission": {
     "scope.userLocation": {
-      "desc": "用于按距离筛选附近摊位（半径筛选）、一键出摊定位和核实现场反馈；区域筛选不需要位置"
+      "desc": "用于按距离展示附近摊位、一键出摊定位和核实现场反馈；拒绝后仍可浏览全部当前摊位，只是不显示距离"
     }
   },
   "requiredPrivateInfos": ["getLocation"],

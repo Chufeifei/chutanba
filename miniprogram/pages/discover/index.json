@@ -1,6 +1,8 @@
 {
+  "navigationBarTitleText": "找摊",
+  "enablePullDownRefresh": true,
   "usingComponents": {
-    "state-view": "/components/state-view/index"
-  },
-  "navigationBarTitleText": "找摊位"
+    "category-picker": "/components/category-picker/index",
+    "vendor-card": "/components/vendor-card/index"
+  }
 }

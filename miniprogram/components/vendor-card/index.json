@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "phase-badge": "../phase-badge/index"
+  }
+}

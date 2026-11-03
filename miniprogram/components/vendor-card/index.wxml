@@ -1,0 +1,18 @@
+<view class="vendor-card {{compact ? 'is-compact' : ''}}" wx:if="{{vendor}}" bindtap="onTap">
+  <view class="card-head">
+    <text class="vendor-name">{{vendor.name}}</text>
+    <phase-badge label="{{vendor.phaseLabel}}" tone="{{vendor.phaseTone}}" />
+  </view>
+
+  <view class="card-meta">
+    <text class="meta-category">{{vendor.categoryEmoji}} {{vendor.categoryName}}</text>
+    <text class="meta-distance" wx:if="{{vendor.distanceText}}">{{vendor.distanceText}}</text>
+  </view>
+
+  <view class="card-summary" wx:if="{{!compact && vendor.summary}}">{{vendor.summary}}</view>
+
+  <view class="card-foot">
+    <text wx:if="{{vendor.plannedEndText}}">预计 {{vendor.plannedEndText}} 收摊</text>
+    <text class="foot-updated" wx:if="{{vendor.locatedText}}">位置更新于 {{vendor.locatedText}}</text>
+  </view>
+</view>

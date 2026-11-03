@@ -1,62 +1,52 @@
-<view class="page-shell discover-page">
-  <view class="surface-card">
-    <view class="filter-title">按区域筛选</view>
-    <view class="filter-note">区域是平台划分的经营片区，无需获取你的位置。</view>
-    <scroll-view class="region-scroll" scroll-x wx:if="{{regions.length}}">
-      <view class="region-row">
-        <view
-          class="region-chip {{selectedRegionId === '' ? 'region-chip-active' : ''}}"
-          data-region-id=""
-          bindtap="onSelectRegion"
-        >不限区域</view>
-        <view
-          class="region-chip {{selectedRegionId === item.regionId ? 'region-chip-active' : ''}}"
-          wx:for="{{regions}}"
-          wx:key="regionId"
-          data-region-id="{{item.regionId}}"
-          bindtap="onSelectRegion"
-        >{{item.regionName}}</view>
-      </view>
-    </scroll-view>
-    <view class="filter-empty" wx:else>暂无可用区域</view>
-  </view>
+<view class="page-shell with-tab-bar">
+  <category-picker
+    items="{{categoryItems}}"
+    activeCode="{{activeCategoryCode}}"
+    bind:change="onCategoryChange"
+  />
 
-  <view class="surface-card">
-    <view class="filter-title">按距离筛选</view>
-    <view class="filter-note">使用距离筛选需要你提供本次位置，仅用于当次距离计算。</view>
-    <view class="radius-row">
-      <input
-        class="radius-input"
-        type="number"
-        value="{{radiusM}}"
-        placeholder="半径（米）"
-        bindinput="onRadiusInput"
+  <view class="notice-bar warn" wx:if="{{syncStale}}">
+    状态未更新，暂时无法确认是否仍在营业；请重新确认后再前往
+  </view>
+  <view class="notice-bar" wx:if="{{locationHint}}">{{locationHint}}</view>
+
+  <state-view
+    wx:if="{{!hasContent}}"
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{hasContent}}">
+    <view class="mode-switch">
+      <view class="mode-item {{viewMode === 'list' ? 'is-active' : ''}}" data-mode="list" bindtap="onViewModeChange">列表</view>
+      <view class="mode-item {{viewMode === 'map' ? 'is-active' : ''}}" data-mode="map" bindtap="onViewModeChange">地图</view>
+    </view>
+
+    <block wx:if="{{viewMode === 'list'}}">
+      <vendor-card
+        wx:for="{{vendors}}"
+        wx:key="vendorId"
+        vendor="{{item}}"
+        bind:select="onVendorTap"
       />
-      <button class="radius-button" bindtap="onRadiusFilterTap">按距离筛选</button>
-    </view>
-  </view>
+    </block>
 
-  <view class="surface-card" wx:if="{{conditionSummary}}">
-    <view class="filter-title">当前条件</view>
-    <view class="condition-summary">{{conditionSummary}}</view>
-    <button class="clear-button" bindtap="onClearFilters">清除筛选</button>
-  </view>
-
-  <view class="surface-card" wx:if="{{viewState === 'content'}}">
-    <view class="filter-title">共 {{items.length}} 个摊位</view>
-    <view class="vendor-item" wx:for="{{items}}" wx:key="vendorId">
-      <view class="vendor-name">{{item.locationName}}</view>
-      <view class="vendor-meta">{{item.locationKind === 'RECENT_LAST' ? '最近出摊位置' : '当前摊位位置'}}</view>
-    </view>
-  </view>
-
-  <view class="surface-card" wx:else>
-    <state-view
-      type="{{viewState}}"
-      title="{{stateTitle}}"
-      description="{{stateDescription}}"
-      action-text="{{stateActionText}}"
-      bind:action="onRetry"
-    />
-  </view>
+    <block wx:else>
+      <map
+        class="vendor-map"
+        latitude="{{mapLatitude}}"
+        longitude="{{mapLongitude}}"
+        markers="{{markers}}"
+        scale="14"
+        show-location="{{canShowLocation}}"
+        bindmarkertap="onMarkerTap"
+      />
+      <view class="map-card" wx:if="{{activeVendor}}">
+        <vendor-card vendor="{{activeVendor}}" compact bind:select="onVendorTap" />
+      </view>
+    </block>
+  </block>
 </view>
