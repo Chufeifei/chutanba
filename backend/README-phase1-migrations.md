@@ -114,3 +114,31 @@ node --test backend/test/w6-feedback.integration.test.js
 用例覆盖：领取一次绑定与同键回放、他人领取 `STATE_CONFLICT`、候选项窗口内可见/关闭后消失、
 300 米内受理与超距 `LOCATION_TOO_FAR`、结束后 30 分钟 `WINDOW_CLOSED`、他人观察 404、
 同摊主同事件日不同轮次合并为同一事项且各自保留原轮次与位置、本人记录与详情不含坐标。
+
+## W7 隔离库验证
+
+W7 新增迁移 `0013`（`cb_feedback_fact_decision.reason_text`），验证同样使用新库
+`phase1_test_w7`，不重置其他隔离库，也不对应用库执行迁移：
+
+```sql
+CREATE DATABASE phase1_test_w7 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+```powershell
+$env:DB_NAME='phase1_test_w7'; npm --prefix backend run migrate   # 0001-0013
+$env:PHASE1_TEST_DATABASE='phase1_test_w7'
+$env:PHASE1_TEST_HOST='...'; $env:PHASE1_TEST_PORT='...'
+$env:PHASE1_TEST_USER='...'; $env:PHASE1_TEST_PASSWORD='...'
+$env:PHASE1_TEST_HTTP_PIPE='1'
+node --test backend/test/w7-management-review.integration.test.js
+```
+
+用例自带 `FIELD_REVIEWER_OPENIDS=w7-it-reviewer` 与 `ADMIN_OPENIDS=w7-it-admin`，覆盖：
+越权 401/403、管理上下文与待办计数、跨轮次事实逐条可追溯且详情留 `MANAGEMENT` 审计、
+漏判与旧版本冲突、确认成立生成影响记录且不结束当前轮次、全不确认不生成影响记录、
+纠错的 `SESSION_NOT_RELATED` 与 `ALREADY_PROCESSED`、治理暂停结束当前轮次并从公开集合移除、
+恢复不复活旧轮次、本人影响记录不含反馈人身份与坐标。
+
+管理端点为 `/management/context`、`/management/field-feedback`（含 `/{id}/decision`）、
+`/management/sessions/{id}/corrections`、`/management/vendors`（含治理上下文与治理决定）。
+本地联调需要 `ALLOW_DEV_IDENTITY=true`，并先调用一次 `GET /me`——部署名单授权在该请求内同步。

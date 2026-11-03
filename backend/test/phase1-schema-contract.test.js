@@ -141,3 +141,9 @@ test('W5 adds navigation launch columns, unique ref and the session window index
   assert.ok(statements.some((statement) =>
     /ALTER TABLE cb_vendor_session[\s\S]*ADD KEY ix_session_active_end \(ended_at_ms, planned_end_at_ms\)/i.test(statement)));
 });
+
+test('W7 adds the per-fact decision reason text without touching existing columns', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_feedback_fact_decision[\s\S]*ADD COLUMN reason_text VARCHAR\(500\) NULL/i.test(statement)));
+});

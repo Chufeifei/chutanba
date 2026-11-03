@@ -8,6 +8,11 @@ const vendorPublication = require('./v2/vendor-publication');
 const publicVendors = require('./v2/public-vendors');
 const observations = require('./v2/observations');
 const fieldFeedback = require('./v2/field-feedback');
+const managementContext = require('./v2/management-context');
+const managementFeedback = require('./v2/management-feedback');
+const managementSessions = require('./v2/management-sessions');
+const managementGovernance = require('./v2/management-governance');
+const impactRecords = require('./v2/impact-records');
 
 const router = express.Router();
 
@@ -16,8 +21,13 @@ router.use('/vendor', profile);
 router.use('/vendor', vendorSessions);
 router.use('/vendor', vendorPublication);
 router.use('/management/profile-reviews', profileReviews);
+router.use('/management/field-feedback', managementFeedback);
+router.use('/management/sessions', managementSessions);
+router.use('/management', managementContext);
+router.use('/management', managementGovernance);
 router.use('/public', publicVendors);
 router.use('/me', observations);
 router.use('/me', fieldFeedback);
+router.use('/me', impactRecords);
 
 module.exports = router;

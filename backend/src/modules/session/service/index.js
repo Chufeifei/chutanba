@@ -4,7 +4,7 @@ const { openSession } = require('./open');
 const { refreshLocation } = require('./refresh');
 const { closeSession } = require('./close');
 const { stopSelfPublication, resumeSelfPublication } = require('./publication');
-const { pauseGovernance, resumeGovernance } = require('./governance');
+const { applyGovernanceInTransaction } = require('./governance');
 const { getWorkbench } = require('./workbench');
 const { listOpenDays } = require('./open-days');
 
@@ -17,8 +17,8 @@ module.exports = {
   closeSession,
   stopSelfPublication,
   resumeSelfPublication,
-  pauseGovernance,
-  resumeGovernance,
+  // 治理状态变更只提供事务内入口：权限、处理记录与幂等由管理域（W7）持有。
+  applyGovernanceInTransaction,
   getWorkbench,
   listOpenDays,
 };

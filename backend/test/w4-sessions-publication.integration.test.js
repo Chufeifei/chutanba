@@ -17,6 +17,8 @@ if (!isolatedDatabase) {
 } else {
   process.env.NODE_ENV = 'test';
   process.env.ALLOW_DEV_IDENTITY = 'true';
+  // 治理暂停从 W7 起只有管理入口：W4 用例经部署名单取得 ADMIN 能力后再调用。
+  process.env.ADMIN_OPENIDS = process.env.ADMIN_OPENIDS || 'w4-it-admin';
   process.env.DB_HOST = process.env.PHASE1_TEST_HOST || process.env.DB_HOST;
   process.env.DB_PORT = process.env.PHASE1_TEST_PORT || process.env.DB_PORT;
   process.env.DB_USER = process.env.PHASE1_TEST_USER;
@@ -31,6 +33,7 @@ if (isolatedDatabase) {
   const { runPhase1Migrations } = require('../src/database/phase1/migration-runner');
   const account = require('../src/modules/account');
   const session = require('../src/modules/session');
+  const management = require('../src/modules/management');
   const publication = require('../src/modules/publication');
 
   const HOUR = 3_600_000;
@@ -430,13 +433,13 @@ if (isolatedDatabase) {
     const me = await httpRequest('/me', { openid: vendor.openid });
     assert.ok(me.body.data.selfStoppedAtMs > 0);
 
-    // 治理暂停：直接调用服务层，W4 不开放管理路由。
-    const paused = await session.pauseGovernance({
-      actorAccountId: vendor.accountId,
-      vendorId: String(vendor.vendorId),
-      expectedGovernanceVersion: 1,
+    // 治理暂停：W7 起只经管理入口，管理员身份由部署名单同步。
+    const adminLogin = await httpRequest('/me', { openid: 'w4-it-admin' });
+    assert.equal(adminLogin.status, 200);
+    const paused = await management.decideGovernance(identity('w4-it-admin'), String(vendor.vendorId), 'w4-pub-gov-pause', {
+      action: 'PAUSE',
       reason: '现场核实',
-      idempotencyKey: 'w4-pub-gov-pause',
+      expectedGovernanceVersion: 1,
     });
     assert.ok(paused.governancePausedAtMs > 0);
 
@@ -447,11 +450,10 @@ if (isolatedDatabase) {
     assert.equal(resumed.governancePausedAtMs > 0, true);
     assert.ok(resumed.profileEligibility.reasons.includes('GOVERNANCE_PAUSED'));
 
-    const restored = await session.resumeGovernance({
-      actorAccountId: vendor.accountId,
-      vendorId: String(vendor.vendorId),
+    const restored = await management.decideGovernance(identity('w4-it-admin'), String(vendor.vendorId), 'w4-pub-gov-restore', {
+      action: 'RESTORE',
+      reason: '复核后解除',
       expectedGovernanceVersion: 2,
-      idempotencyKey: 'w4-pub-gov-restore',
     });
     assert.equal(restored.governancePausedAtMs, undefined);
     const controls = await publication.getSelf(vendor.accountId);
