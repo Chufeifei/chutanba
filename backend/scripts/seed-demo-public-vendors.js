@@ -95,6 +95,9 @@ async function resetDemoData(pool) {
     await pool.execute('DELETE FROM cb_feedback_observation WHERE vendor_id = ?', [vendorId]);
     await pool.execute('DELETE FROM cb_session_location WHERE vendor_id = ?', [vendorId]);
     await pool.execute('DELETE FROM cb_vendor_session WHERE vendor_id = ?', [vendorId]);
+    // 管理处理与影响记录同样属于演示对象：重置后不应留下指向已删摊主的孤儿行。
+    await pool.execute('DELETE FROM cb_management_action WHERE vendor_id = ?', [vendorId]);
+    await pool.execute('DELETE FROM cb_vendor_impact_record WHERE vendor_id = ?', [vendorId]);
     await pool.execute('DELETE FROM cb_vendor_open_day WHERE vendor_id = ?', [vendorId]);
     await pool.execute('DELETE FROM cb_vendor_publication_control WHERE vendor_id = ?', [vendorId]);
     await pool.execute('DELETE FROM cb_vendor_profile_version WHERE vendor_id = ?', [vendorId]);
@@ -157,6 +160,12 @@ async function seedVendor(pool, spec) {
      VALUES (?, ?, 1, ?, ?, ?, ?, ?)`,
     [sessionId, vendorId, spec.lat, spec.lng, spec.locationName, now, started],
   );
+
+  // 与生产写入保持一致：未结束的轮次必须同时成为摊主当前指针，否则治理暂停与管理上下文
+  // 会按「无在途轮次」处理，出现「可开摊=true 却仍在公开集合」的自相矛盾演示数据。
+  await pool.execute('UPDATE cb_vendor_identity SET current_session_id = ? WHERE id = ?', [
+    resting ? null : sessionId, vendorId,
+  ]);
 
   return { vendorId, skipped: false };
 }
