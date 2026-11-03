@@ -1,7 +1,77 @@
 <view class="page-shell">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
   />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <view class="notice">{{noticeText}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">对本人有影响的处理</text>
+      <view class="meta" wx:if="{{!records.hasRecords}}">暂时没有影响你的处理记录。</view>
+
+      <view class="item-row" wx:for="{{records.records}}" wx:key="impactRecordId">
+        <view class="item-head">
+          <text class="item-title">{{item.sourceLabel}}</text>
+          <text class="item-count">{{item.statusLabel}}</text>
+        </view>
+        <view class="meta">{{item.summary}}</view>
+        <view class="meta">记录时间：{{item.createdText}}</view>
+        <view class="meta" wx:if="{{item.reviewableText}}">可复核至：{{item.reviewableText}}</view>
+        <view class="hint" wx:if="{{item.unavailableText}}">{{item.unavailableText}}</view>
+
+        <button
+          class="link-button"
+          wx:if="{{item.reviewable && activeId !== item.impactRecordId}}"
+          data-id="{{item.impactRecordId}}"
+          bindtap="onReviewTap"
+        >申请人工复核</button>
+
+        <view class="form-block" wx:if="{{activeId === item.impactRecordId}}">
+          <textarea
+            class="field-textarea"
+            value="{{form.reason}}"
+            maxlength="{{statementMax}}"
+            placeholder="说明你认为该处理有误的理由"
+            bindinput="onReasonInput"
+          />
+          <view class="field-error" wx:if="{{form.error}}">{{form.error}}</view>
+          <button class="primary-button" disabled="{{submitPending}}" bindtap="onSubmitTap">
+            {{submitPending ? '正在提交' : '提交复核申请'}}
+          </button>
+          <button class="link-button" disabled="{{submitPending}}" bindtap="onCancelTap">取消</button>
+        </view>
+      </view>
+
+      <button
+        class="more-button"
+        wx:if="{{records.nextCursor}}"
+        disabled="{{listLoading}}"
+        bindtap="onLoadMore"
+      >{{listLoading ? '正在加载' : '加载更多'}}</button>
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+
+    <view class="surface-card" wx:if="{{reviews.hasReviews}}">
+      <text class="section-title">我的复核申请</text>
+      <view class="item-row" wx:for="{{reviews.reviews}}" wx:key="impactReviewId">
+        <view class="item-head">
+          <text class="item-title">{{item.statusLabel}}</text>
+          <text class="item-count">{{item.submittedText}}</text>
+        </view>
+        <view class="meta">说明：{{item.statement}}</view>
+        <view class="meta" wx:if="{{item.hasDecided}}">处理于：{{item.decidedText}}</view>
+        <view class="meta" wx:if="{{item.hasDecisionReason}}">结论说明：{{item.decisionReason}}</view>
+      </view>
+    </view>
+  </block>
 </view>

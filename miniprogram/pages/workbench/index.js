@@ -145,4 +145,6 @@ Page({
     }
     wx.showToast({ title: '仍在处理中，请稍后再查', icon: 'none' });
   },
+  /** 只读入口统一走 data-url，不在页面里堆跳转方法。 */
+  onNavigateTap(event) { wx.navigateTo({ url: event.currentTarget.dataset.url }); },
 });

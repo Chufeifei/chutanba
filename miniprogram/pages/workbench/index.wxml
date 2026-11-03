@@ -68,6 +68,16 @@
       <view class="hint">收摊时间由你确认，最长不超过 12 小时；开摊后仍以服务端记录的截止时刻为准。</view>
     </view>
 
+    <view class="surface-card">
+      <text class="section-title">出摊记录</text>
+      <view class="meta">查看累计出摊天数与按日轮次摘要，不显示历史位置地图。</view>
+      <button
+        class="link-button"
+        data-url="/pages/open-days/index"
+        bindtap="onNavigateTap"
+      >查看出摊记录</button>
+    </view>
+
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
     <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
   </block>

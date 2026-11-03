@@ -11,3 +11,5 @@
 
 .submit-message { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-warning); }
 .query-button { margin-top: 16rpx; height: 88rpx; border-radius: 44rpx; background: var(--color-brand); color: #FFFFFF; font-size: 28rpx; line-height: 88rpx; }
+
+.link-button { margin-top: 20rpx; height: 76rpx; border-radius: 38rpx; background: var(--color-brand-soft); color: var(--color-brand); font-size: 26rpx; line-height: 76rpx; }

@@ -1,7 +1,79 @@
 <view class="page-shell">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <view class="card-head">
+        <text class="section-title">资料状态</text>
+        <text class="state-chip">{{model.profile.stateLabel}}</text>
+      </view>
+      <view class="hint" wx:if="{{model.profile.hint}}">{{model.profile.hint}}</view>
+      <button class="link-button" bindtap="onProfileTap">
+        {{model.profile.needsProfile ? '去补齐摊主资料' : '查看摊主资料'}}
+      </button>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">本人公开选择</text>
+      <view class="meta">{{model.self.statusText}}</view>
+      <view class="meta" wx:if="{{model.self.stopped}}">停止于：{{model.self.stoppedText}}</view>
+      <view class="hint">{{model.self.hint}}</view>
+      <view class="hint warn" wx:if="{{model.self.resumeBlockedText}}">{{model.self.resumeBlockedText}}</view>
+      <button
+        class="primary-button"
+        wx:if="{{model.self.canStop}}"
+        disabled="{{submitPending}}"
+        bindtap="onStopTap"
+      >停止公开</button>
+      <button
+        class="primary-button"
+        wx:if="{{model.self.canResume}}"
+        disabled="{{submitPending}}"
+        bindtap="onResumeTap"
+      >恢复公开</button>
+      <button
+        class="primary-button"
+        wx:if="{{!model.self.canStop && !model.self.canResume}}"
+        disabled
+      >暂不可恢复公开</button>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">治理限制</text>
+      <view class="meta">{{model.governance.statusText}}</view>
+      <view class="meta" wx:if="{{model.governance.paused}}">暂停于：{{model.governance.pausedText}}</view>
+      <view class="hint">{{model.governance.hint}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{model.bothLimitedText}}">
+      <view class="limit-row">{{model.bothLimitedText}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">资料处理</text>
+      <button class="entry-button" bindtap="onClearTap">清除不再需要的资料</button>
+      <button class="entry-button" bindtap="onRecordsTap">处理记录与人工复核</button>
+      <view class="hint">清除前会先列出范围与必要保留说明；已隐藏不等于已删除。</view>
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+  </block>
+
+  <confirm-sheet
+    visible="{{confirmVisible}}"
+    title="{{confirmSheet.title}}"
+    description="{{confirmSheet.description}}"
+    confirm-text="{{confirmSheet.confirmText}}"
+    processing="{{submitPending}}"
+    bind:confirm="onConfirmSubmit"
+    bind:cancel="onConfirmCancel"
   />
 </view>

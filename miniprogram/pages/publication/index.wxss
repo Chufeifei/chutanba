@@ -1,1 +1,75 @@
 /* 页面专属样式；通用样式与设计变量见 app.wxss */
+
+.card-head { display: flex; align-items: center; justify-content: space-between; }
+.state-chip {
+  padding: 6rpx 20rpx;
+  border-radius: 24rpx;
+  background: var(--color-brand-soft);
+  font-size: 24rpx;
+  line-height: 36rpx;
+  color: var(--color-brand);
+}
+
+.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+.hint { margin-top: 16rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
+.hint.warn { color: var(--color-warning); }
+
+.limit-row {
+  padding: 16rpx 20rpx;
+  border-radius: 20rpx;
+  background: var(--color-warning-soft);
+  font-size: 26rpx;
+  line-height: 38rpx;
+  color: var(--color-warning);
+}
+
+.primary-button {
+  margin-top: 24rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  line-height: 88rpx;
+}
+.primary-button[disabled] { background: var(--color-neutral-soft); color: var(--color-text-hint); }
+
+.link-button {
+  margin-top: 20rpx;
+  height: 76rpx;
+  border-radius: 38rpx;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-size: 26rpx;
+  line-height: 76rpx;
+}
+
+.entry-button {
+  margin-top: 20rpx;
+  height: 84rpx;
+  border-radius: 42rpx;
+  background: var(--color-neutral-soft);
+  color: var(--color-text);
+  font-size: 28rpx;
+  line-height: 84rpx;
+}
+
+.submit-message {
+  margin-top: 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: var(--color-warning-soft);
+  font-size: 26rpx;
+  line-height: 38rpx;
+  color: var(--color-warning);
+}
+
+.query-button {
+  margin-top: 16rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  line-height: 88rpx;
+}

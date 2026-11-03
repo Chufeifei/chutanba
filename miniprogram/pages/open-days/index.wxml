@@ -1,7 +1,46 @@
 <view class="page-shell">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
   />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <view class="stat-row">
+        <text class="stat-value">{{model.totalDaysText}}</text>
+        <text class="stat-label">累计出摊</text>
+      </view>
+      <view class="hint">{{noticeText}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{model.hasRecords}}">
+      <text class="section-title">按日记录</text>
+      <view class="day-row" wx:for="{{model.days}}" wx:key="openDate">
+        <view class="day-head">
+          <text class="day-date">{{item.dateText}}</text>
+          <text class="day-count">{{item.sessionCountText}}</text>
+        </view>
+        <view class="meta">首次开始：{{item.firstStartedText}}</view>
+        <view class="meta" wx:if="{{item.hasLastEnded}}">最后结束：{{item.lastEndedText}}</view>
+        <view class="meta" wx:if="{{!item.hasLastEnded}}">当日仍有未结束的轮次</view>
+      </view>
+      <button
+        class="more-button"
+        wx:if="{{model.nextCursor}}"
+        disabled="{{listLoading}}"
+        bindtap="onLoadMore"
+      >{{listLoading ? '正在加载' : '加载更多'}}</button>
+    </view>
+
+    <view class="surface-card" wx:if="{{!model.hasRecords}}">
+      <text class="section-title">还没有出摊记录</text>
+      <view class="meta">开摊一次后，这里会按日记录你的出摊情况。</view>
+    </view>
+
+    <view class="footnote">本页只显示天数与轮次摘要，不提供历史位置地图。</view>
+  </block>
 </view>

@@ -31,6 +31,7 @@ const ENTRY_ROUTES = {
   feedback: '/pages/feedback-candidates/index',
   profile: '/pages/vendor-profile/index',
   workbench: '/pages/workbench/index',
+  publication: '/pages/publication/index',
 };
 
 Page({

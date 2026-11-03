@@ -1,193 +1,20 @@
 /**
- * 一期业务枚举与错误码单一来源。
+ * 一期业务枚举与错误码单一来源（对外的唯一入口）。
  *
  * 约束：
  * 1. 这里的值必须与后端契约一致（doc/MVP/一期数据模型与接口约定.md §3、§6）；
  * 2. 页面与 service 不得就地写字面量，缺枚举先补这里；
  * 3. 只放常量，不放判断逻辑 —— 判断属于 services/。
+ *
+ * 内容按业务面拆到 ./contracts/ 下的子文件，本文件只做汇总，
+ * 因此 require('../config/contracts') 的调用方无需改动，也不要直连子文件。
  */
-
-// 公开可用性：顾客端只认这三种结果，不区分"已清除"与"受限"的内部差别
-const AVAILABILITY = Object.freeze({
-  OPEN: 'OPEN',
-  RESTING: 'RESTING',
-  UNVIEWABLE: 'UNVIEWABLE',
-});
-
-// 营业阶段：由服务端按 S/E/N 推导下发，客户端只用于展示与按钮文案
-const SESSION_PHASE = Object.freeze({
-  OPEN: 'OPEN',
-  PREPARING: 'PREPARING',
-  RESTING: 'RESTING',
-});
-
-// 营业阶段展示文案：阶段值由服务端下发，客户端只负责翻译成中文
-const SESSION_PHASE_LABEL = Object.freeze({
-  OPEN: '正常营业',
-  PREPARING: '准备收摊',
-  RESTING: '休息中',
-});
-
-// 轮次结束原因：用于工作台与记录页展示，不参与客户端资格判断
-const END_REASON = Object.freeze({
-  MANUAL: 'MANUAL',
-  DEADLINE: 'DEADLINE',
-  SELF_STOP: 'SELF_STOP',
-  GOVERNANCE: 'GOVERNANCE',
-  CORRECTION: 'CORRECTION',
-});
-
-// 资料审核状态：单次申请的审核结论（P07 的待审分区用它区分待审／已通过／未通过／已失效）
-const PROFILE_REVIEW_STATUS = Object.freeze({
-  PENDING: 'PENDING',
-  APPROVED: 'APPROVED',
-  REJECTED: 'REJECTED',
-  INVALIDATED: 'INVALIDATED',
-});
-
-// 资料状态：后端 profile/mapper.js 的 deriveProfileState 七值派生。
-// 与 PROFILE_REVIEW_STATUS 不是一回事 —— 后者是单次申请的状态，
-// 这里是「本人当前处于什么资料阶段」，/me 与 /vendor/profile 返回的都是这一组。
-const PROFILE_STATE = Object.freeze({
-  NONE: 'NONE',
-  FIRST_PENDING: 'FIRST_PENDING',
-  FIRST_REJECTED: 'FIRST_REJECTED',
-  INVALIDATED: 'INVALIDATED',
-  UPDATE_PENDING: 'UPDATE_PENDING',
-  UPDATE_REJECTED: 'UPDATE_REJECTED',
-  ACTIVE: 'ACTIVE',
-});
-
-const PROFILE_STATE_LABEL = Object.freeze({
-  [PROFILE_STATE.NONE]: '未申请',
-  [PROFILE_STATE.FIRST_PENDING]: '审核中',
-  [PROFILE_STATE.FIRST_REJECTED]: '未通过',
-  [PROFILE_STATE.INVALIDATED]: '已失效',
-  [PROFILE_STATE.UPDATE_PENDING]: '修改审核中',
-  [PROFILE_STATE.UPDATE_REJECTED]: '修改未通过',
-  [PROFILE_STATE.ACTIVE]: '已生效',
-});
-
-// 开摊资格原因：服务端 profileEligibility.reasons 逐条返回，多条同时成立时全部返回
-const ELIGIBILITY_REASON = Object.freeze({
-  PROFILE_REQUIRED: 'PROFILE_REQUIRED',
-  SELF_STOPPED: 'SELF_STOPPED',
-  GOVERNANCE_PAUSED: 'GOVERNANCE_PAUSED',
-  SESSION_ACTIVE: 'SESSION_ACTIVE',
-});
-
-const ELIGIBILITY_REASON_LABEL = Object.freeze({
-  [ELIGIBILITY_REASON.PROFILE_REQUIRED]: '缺少已生效的摊主资料',
-  [ELIGIBILITY_REASON.SELF_STOPPED]: '你已停止公开',
-  [ELIGIBILITY_REASON.GOVERNANCE_PAUSED]: '当前处于治理暂停',
-  [ELIGIBILITY_REASON.SESSION_ACTIVE]: '当前正在营业',
-});
-
-// 现场反馈问题类型：一期只这三类，无照片、无一般举报
-const FEEDBACK_TYPE = Object.freeze({
-  OWNER_ABSENT: 'OWNER_ABSENT',
-  LOCATION_MISMATCH: 'LOCATION_MISMATCH',
-  ALREADY_LEFT: 'ALREADY_LEFT',
-});
-
-const FEEDBACK_TYPE_LABEL = Object.freeze({
-  OWNER_ABSENT: '老板不在',
-  LOCATION_MISMATCH: '地点不符',
-  ALREADY_LEFT: '已经离开',
-});
-
-// 反馈事项状态：本人可见三态，不展示内部证据
-const FEEDBACK_CASE_STATUS = Object.freeze({
-  PENDING: 'PENDING',
-  CONFIRMED: 'CONFIRMED',
-  NOT_CONFIRMED: 'NOT_CONFIRMED',
-});
-
-const FEEDBACK_CASE_STATUS_LABEL = Object.freeze({
-  PENDING: '待处理',
-  CONFIRMED: '已核实',
-  NOT_CONFIRMED: '未核实',
-});
-
-// 未核实的原因码：必须区分"证据不足"与"已证明不存在异常"（需求 C-03.6）
-const FEEDBACK_REASON = Object.freeze({
-  INSUFFICIENT_EVIDENCE: 'INSUFFICIENT_EVIDENCE',
-  DISPROVED: 'DISPROVED',
-  MIXED: 'MIXED',
-});
-
-// 本人能力位：由 GET /me 的 capabilities 下发，决定 P03 显示哪些入口
-const CAPABILITY = Object.freeze({
-  SUBMIT_FEEDBACK: 'SUBMIT_FEEDBACK',
-  MANAGE_PROFILE: 'MANAGE_PROFILE',
-  OPERATE_SESSION: 'OPERATE_SESSION',
-  CONTROL_PUBLICATION: 'CONTROL_PUBLICATION',
-  REQUEST_CLEARANCE: 'REQUEST_CLEARANCE',
-  MANAGE_PROFILE_REVIEW: 'MANAGE_PROFILE_REVIEW',
-  MANAGE_FIELD_REVIEW: 'MANAGE_FIELD_REVIEW',
-  MANAGE_GOVERNANCE: 'MANAGE_GOVERNANCE',
-  MANAGE_IMPACT_REVIEW: 'MANAGE_IMPACT_REVIEW',
-});
-
-// 资料清除范围：ACCOUNT_DATA 若会留下无主摊主，预览须提示改选 ALL
-const CLEAR_SCOPE = Object.freeze({
-  ACCOUNT_DATA: 'ACCOUNT_DATA',
-  VENDOR_DATA: 'VENDOR_DATA',
-  ALL: 'ALL',
-});
-
-// 服务端稳定语义码（§6）。客户端按它决定展示文案与后续动作，不解析 msg
-const BIZ_CODE = Object.freeze({
-  VALIDATION_FAILED: 'VALIDATION_FAILED',
-  AUTH_REQUIRED: 'AUTH_REQUIRED',
-  PERMISSION_DENIED: 'PERMISSION_DENIED',
-  NOT_ELIGIBLE: 'NOT_ELIGIBLE',
-  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
-  UNVIEWABLE: 'UNVIEWABLE',
-  STATE_CONFLICT: 'STATE_CONFLICT',
-  IDEMPOTENCY_MISMATCH: 'IDEMPOTENCY_MISMATCH',
-  ALREADY_PROCESSED: 'ALREADY_PROCESSED',
-  WINDOW_CLOSED: 'WINDOW_CLOSED',
-  CONTEXT_EXPIRED: 'CONTEXT_EXPIRED',
-  TIME_INVALID: 'TIME_INVALID',
-  LOCATION_INVALID: 'LOCATION_INVALID',
-  LOCATION_TOO_FAR: 'LOCATION_TOO_FAR',
-  PROFILE_REQUIRED: 'PROFILE_REQUIRED',
-  NOT_NAVIGABLE: 'NOT_NAVIGABLE',
-  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
-});
-
-// 一期资料字段长度（§3），前端校验与后端同口径；超限报字段错误并保留原输入
-const PROFILE_LIMITS = Object.freeze({
-  VENDOR_NAME_MAX: 40,
-  REGULAR_ITEMS_MAX: 200,
-  PRICE_DESCRIPTION_MAX: 120,
-  ANNOUNCEMENT_MAX: 300,
-  FEEDBACK_DESCRIPTION_MAX: 300,
-  LOCATION_NAME_MAX: 80,
-});
-
-// 坐标链路统一 GCJ-02，不得混入 WGS-84 或 BD-09
-const COORDINATE_SYSTEM = 'gcj02';
-
-module.exports = {
-  AVAILABILITY,
-  SESSION_PHASE,
-  SESSION_PHASE_LABEL,
-  END_REASON,
-  PROFILE_REVIEW_STATUS,
-  PROFILE_STATE,
-  PROFILE_STATE_LABEL,
-  ELIGIBILITY_REASON,
-  ELIGIBILITY_REASON_LABEL,
-  FEEDBACK_TYPE,
-  FEEDBACK_TYPE_LABEL,
-  FEEDBACK_CASE_STATUS,
-  FEEDBACK_CASE_STATUS_LABEL,
-  FEEDBACK_REASON,
-  CAPABILITY,
-  CLEAR_SCOPE,
-  BIZ_CODE,
-  PROFILE_LIMITS,
-  COORDINATE_SYSTEM,
-};
+module.exports = Object.assign(
+  {},
+  require('./contracts/session'),
+  require('./contracts/profile'),
+  require('./contracts/feedback'),
+  require('./contracts/authorization'),
+  require('./contracts/clearance'),
+  require('./contracts/impact'),
+);

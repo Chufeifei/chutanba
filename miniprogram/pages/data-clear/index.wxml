@@ -1,7 +1,107 @@
 <view class="page-shell">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <text class="section-title">清除范围</text>
+      <picker
+        mode="selector"
+        range="{{scopeOptions}}"
+        range-key="label"
+        value="{{scopeIndex}}"
+        bindchange="onScopeChange"
+      >
+        <view class="picker-value">{{scopeOptions[scopeIndex].label}}</view>
+      </picker>
+      <view class="meta warn" wx:if="{{preview.scopeMismatchText}}">{{preview.scopeMismatchText}}</view>
+      <view class="hint">切换范围会重新读取可清除内容，请以当前显示的预览为准。</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">会被清除的内容</text>
+      <view class="meta" wx:if="{{preview.hasKinds}}">{{preview.kindLineText}}</view>
+      <view class="meta" wx:if="{{!preview.hasKinds}}">当前范围内没有可清除的资料。</view>
+      <view class="meta">{{preview.activeSession.text}}</view>
+      <view class="note-row" wx:for="{{preview.pending.notes}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{preview.hasRetention}}">
+      <text class="section-title">按规则继续保留</text>
+      <view class="item-row" wx:for="{{preview.retention}}" wx:key="kindLabel">
+        <view class="item-head">
+          <text class="item-title">{{item.kindLabel}}</text>
+          <text class="item-count" wx:if="{{item.countText}}">{{item.countText}}</text>
+        </view>
+        <view class="hint">{{item.basis}}</view>
+        <view class="meta">{{item.dueText}}</view>
+      </view>
+      <view class="hint">必要保留的记录不会被删除；「已隐藏」与「已清除」是两件事。</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">处理期限</text>
+      <view class="meta" wx:if="{{preview.dueText}}">最迟处理：{{preview.dueText}}</view>
+      <view class="meta">请求成立即生效，不以管理员受理为前提；非必要完整值会在 {{preview.dueDays}} 个自然日内处理。</view>
+      <view class="hint warn" wx:if="{{blockedText}}">{{blockedText}}</view>
+      <button
+        class="primary-button"
+        disabled="{{!canSubmit || submitPending}}"
+        bindtap="onPrimaryTap"
+      >{{submitPending ? '正在提交' : '提交清除请求'}}</button>
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+
+    <view class="surface-card">
+      <text class="section-title">处理进度</text>
+      <view class="meta" wx:if="{{requestsError}}">暂时无法读取处理进度，稍后重试。</view>
+      <view class="meta" wx:if="{{requests && !requests.hasRequests}}">还没有提交过清除请求。</view>
+      <view class="item-row" wx:for="{{requests.requests}}" wx:key="clearRequestId">
+        <view class="item-head">
+          <text class="item-title">{{item.statusLabel}}</text>
+          <text class="item-count">{{item.scopeLabel}}</text>
+        </view>
+        <view class="meta">请求成立：{{item.requestedText}}</view>
+        <view class="meta">最迟处理：{{item.dueText}}</view>
+        <view class="meta" wx:if="{{item.hasCompleted}}">完成于：{{item.completedText}}</view>
+        <view class="meta" wx:if="{{item.hasHidden}}">已隐藏：{{item.hiddenLineText}}</view>
+        <view class="meta" wx:if="{{item.hasProcessed}}">已清除：{{item.processedLineText}}</view>
+        <view class="meta warn" wx:if="{{item.overdue}}">{{item.overdueReason}}</view>
+        <block wx:if="{{item.hasFailures}}">
+          <view class="note-row" wx:for="{{item.failures}}" wx:for-item="fail" wx:key="kindLabel">
+            未处理：{{fail.kindLabel}}（{{fail.reason}}）
+          </view>
+        </block>
+        <block wx:if="{{item.hasRetained}}">
+          <view class="note-row" wx:for="{{item.retained}}" wx:for-item="keep" wx:key="kindLabel">
+            保留：{{keep.kindLabel}} · {{keep.dueText}}
+          </view>
+        </block>
+      </view>
+      <button
+        class="more-button"
+        wx:if="{{requests.nextCursor}}"
+        disabled="{{listLoading}}"
+        bindtap="onLoadMore"
+      >{{listLoading ? '正在加载' : '加载更多'}}</button>
+    </view>
+  </block>
+
+  <confirm-sheet
+    visible="{{confirmVisible}}"
+    title="{{confirmSheet.title}}"
+    description="{{confirmSheet.description}}"
+    confirm-text="{{confirmSheet.confirmText}}"
+    processing="{{submitPending}}"
+    bind:confirm="onConfirmSubmit"
+    bind:cancel="onConfirmCancel"
   />
 </view>

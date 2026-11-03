@@ -1,1 +1,76 @@
 /* 页面专属样式；通用样式与设计变量见 app.wxss */
+
+.picker-value {
+  margin-top: 16rpx;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  background: var(--color-bg);
+  font-size: 28rpx;
+  line-height: 44rpx;
+  color: var(--color-text);
+}
+
+.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+.meta.warn { color: var(--color-warning); }
+.hint { margin-top: 12rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
+.hint.warn { color: var(--color-warning); }
+
+.note-row {
+  margin-top: 12rpx;
+  padding: 14rpx 20rpx;
+  border-radius: 18rpx;
+  background: var(--color-neutral-soft);
+  font-size: 24rpx;
+  line-height: 36rpx;
+  color: var(--color-text-muted);
+}
+
+.item-row {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--color-border);
+}
+.item-head { display: flex; align-items: center; justify-content: space-between; }
+.item-title { font-size: 28rpx; font-weight: 500; color: var(--color-text); }
+.item-count { font-size: 24rpx; color: var(--color-text-hint); }
+
+.primary-button {
+  margin-top: 24rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  line-height: 88rpx;
+}
+.primary-button[disabled] { background: var(--color-neutral-soft); color: var(--color-text-hint); }
+
+.more-button {
+  margin-top: 24rpx;
+  height: 80rpx;
+  border-radius: 40rpx;
+  background: var(--color-neutral-soft);
+  color: var(--color-text);
+  font-size: 26rpx;
+  line-height: 80rpx;
+}
+
+.submit-message {
+  margin-top: 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 24rpx;
+  background: var(--color-warning-soft);
+  font-size: 26rpx;
+  line-height: 38rpx;
+  color: var(--color-warning);
+}
+
+.query-button {
+  margin-top: 16rpx;
+  height: 88rpx;
+  border-radius: 44rpx;
+  background: var(--color-brand);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  line-height: 88rpx;
+}
