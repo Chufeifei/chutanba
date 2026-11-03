@@ -33,3 +33,31 @@ W2 使用与 W1 同一 MySQL 实例的新建隔离库 `phase1_test_w2`，不重�
 ## W3 隔离库验证
 
 W3 使用同一 MySQL 实例的新建隔离库 `phase1_test_w3`，不重置 `phase1_test_w1`／`phase1_test_w2`，也不对应用库 `chutanba` 执行任何迁移。`0011` 只为资料审核管理队列新增 `ix_profile_status_submitted (review_status, submitted_at_ms, id)` 索引，不修改 `0001`–`0010`。集成用例同样只读取 `PHASE1_TEST_*`（`PHASE1_TEST_DATABASE=phase1_test_w3`），凭据缺失时跳过，不会回退到 `DB_*`。
+
+## W4 隔离库验证
+
+W4 无迁移，使用同一 MySQL 实例的新建隔离库 `phase1_test_w4`，不重置 `phase1_test_w1`／`w2`／`w3`，也不对应用库 `chutanba` 执行任何迁移。建库命令（`utf8mb4`，与 `w3` 一致）：
+
+```sql
+CREATE DATABASE phase1_test_w4 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+随后用 `DB_NAME=phase1_test_w4` 连跑两遍 `npm --prefix backend run migrate`（第二遍应全部 `skipped`），再运行集成用例：
+
+```powershell
+$env:PHASE1_TEST_DATABASE='phase1_test_w4'
+$env:PHASE1_TEST_HOST='...'; $env:PHASE1_TEST_PORT='...'
+$env:PHASE1_TEST_USER='...'; $env:PHASE1_TEST_PASSWORD='...'
+$env:LOCATION_CONTEXT_SECRET='w4-test-secret'
+node --test backend/test/w4-sessions-publication.integration.test.js
+```
+
+### 本机 TCP 回环被代理接管时
+
+若开着代理 TUN（如 Clash），集成测试会出现「连未监听端口立刻 `ECONNREFUSED`、连已监听端口 `ETIMEDOUT`」的现象，
+这是本机网络拦截而不是业务失败。加 `PHASE1_TEST_HTTP_PIPE=1` 改用 Windows 命名管道跑同一批断言：
+
+```powershell
+$env:PHASE1_TEST_HTTP_PIPE='1'
+node --test backend/test/w4-sessions-publication.integration.test.js
+```

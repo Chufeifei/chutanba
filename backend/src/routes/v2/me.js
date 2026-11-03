@@ -3,6 +3,8 @@ const express = require('express');
 const account = require('../../modules/account');
 const operation = require('../../modules/operation');
 const profile = require('../../modules/profile');
+const publication = require('../../modules/publication');
+const session = require('../../modules/session');
 const { requireIdentity } = require('../../middlewares/auth');
 const { success } = require('../../utils/response');
 
@@ -12,10 +14,25 @@ const router = express.Router();
 router.get('/', requireIdentity, async (req, res, next) => {
   try {
     const me = await account.getMe(req.identity);
-    if (me.vendorId === undefined) return success(res, me);
-    // 有摊主时合并资料状态；无摊主保持 W2 响应不变。
-    const profileContext = await profile.getSelfContext(Number(me.vendorId));
-    return success(res, { ...me, ...profileContext });
+    // 无摊主：只返回账号级字段与资料状态零值（prd Q4），不伪造工作台或空控制。
+    if (me.vendorId === undefined) return success(res, { ...me, profileState: 'NONE' });
+    // 有摊主时合并资料与公开限制。
+    const vendorId = Number(me.vendorId);
+    const profileContext = await profile.getSelfContext(vendorId);
+    const publicationContext = await publication.getSelfContext(vendorId);
+    return success(res, { ...me, ...profileContext, ...publicationContext });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+/** 一次性定位上下文：W4 只接受 OPEN/REFRESH，FEEDBACK 留给 W6。 */
+router.post('/location-contexts', requireIdentity, async (req, res, next) => {
+  try {
+    const result = await session.issueLocationContext(
+      req.identity, req.get('Idempotency-Key'), req.body,
+    );
+    return success(res, result, result && result.status === 'PROCESSING' ? 202 : 200);
   } catch (error) {
     return next(error);
   }

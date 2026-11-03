@@ -62,6 +62,10 @@ const env = Object.freeze({
     // 单次 HTTP 触发的时间预算，必须小于平台请求超时，避免被掐断留下半截状态。
     timeBudgetMs: readPositiveInteger('JOB_TIME_BUDGET_MS', 20000),
   },
+  locationContext: {
+    // 定位上下文令牌签名密钥：缺失时只影响签发接口（返回 503），不阻断既有读接口。
+    secret: process.env.LOCATION_CONTEXT_SECRET || null,
+  },
 });
 
 module.exports = env;
