@@ -22,6 +22,8 @@ const BIZ_CODES = Object.freeze({
   PROFILE_REQUIRED: { httpStatus: 422, message: '缺少可公开的生效资料' },
   NOT_NAVIGABLE: { httpStatus: 422, message: '当前不可导航' },
   SERVICE_UNAVAILABLE: { httpStatus: 503, message: '权威状态暂时无法确认' },
+  // 公开集合超过可返回上限时明确失败，不截断、不返回部分集合。
+  SNAPSHOT_TOO_LARGE: { httpStatus: 503, message: '当前公开集合规模超出可返回范围' },
   // 非一期契约码，仅用于未预期异常兜底，业务层不得主动使用。
   INTERNAL_ERROR: { httpStatus: 500, message: '服务器内部错误' },
 });

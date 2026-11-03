@@ -66,6 +66,14 @@ const env = Object.freeze({
     // 定位上下文令牌签名密钥：缺失时只影响签发接口（返回 503），不阻断既有读接口。
     secret: process.env.LOCATION_CONTEXT_SECRET || null,
   },
+  publicTokens: {
+    // 公开匿名会话与观察领取令牌签名密钥：缺失时写端点 503，读端点不受影响。
+    secret: process.env.PUBLIC_TOKEN_SECRET || null,
+    // 匿名会话令牌有效期，默认 30 分钟；只影响令牌复用，不授予权限。
+    sessionTtlMs: readPositiveInteger('PUBLIC_SESSION_TTL_MS', 30 * 60 * 1000),
+    // 公开集合单次可返回上限：超限明确报错，绝不截断冒充完整快照。
+    snapshotMax: readPositiveInteger('PUBLIC_SNAPSHOT_MAX', 200),
+  },
 });
 
 module.exports = env;

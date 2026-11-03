@@ -129,3 +129,15 @@ test('W3 adds the profile review queue index without altering earlier tables', (
   assert.ok(statements.some((statement) =>
     /ALTER TABLE cb_vendor_profile_version[\s\S]*ADD KEY ix_profile_status_submitted \(review_status, submitted_at_ms, id\)/i.test(statement)));
 });
+
+test('W5 adds navigation launch columns, unique ref and the session window index', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  assert.ok(statements.some((statement) => /ALTER TABLE cb_navigation_check[\s\S]*ADD COLUMN launched_at_ms BIGINT NULL/i.test(statement)));
+  assert.ok(statements.some((statement) => /ALTER TABLE cb_navigation_check[\s\S]*ADD COLUMN launch_ref CHAR\(32\)[^,\n]*NULL/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ADD UNIQUE KEY uq_navigation_launch_ref \(launch_ref\)/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ADD CONSTRAINT ck_navigation_launch CHECK \(launched_at_ms IS NULL OR launched_at_ms >= created_at_ms\)/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_vendor_session[\s\S]*ADD KEY ix_session_active_end \(ended_at_ms, planned_end_at_ms\)/i.test(statement)));
+});
