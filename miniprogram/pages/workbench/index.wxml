@@ -1,7 +1,94 @@
-<view class="page-shell">
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <view class="workbench-head">
+        <text class="workbench-title">本轮状态</text>
+        <phase-badge label="{{model.phaseLabel}}" tone="{{model.phaseTone}}" />
+      </view>
+      <view class="meta" wx:if="{{model.isOpen}}">开始于：{{model.startedText}}</view>
+      <view class="meta" wx:if="{{model.isOpen}}">预计收摊：{{model.plannedEndText}}</view>
+      <countdown
+        wx:if="{{model.isOpen}}"
+        text="{{model.remainingText}}"
+        label="剩余"
+        tone="{{model.phaseTone}}"
+      />
+      <view class="hint" wx:if="{{!model.isOpen}}">当前休息中，顾客看不到你的摊位。开摊需要先完成定位。</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">位置</text>
+      <view class="meta" wx:if="{{model.hasLocation}}">当前位置：{{model.location.locationName}}</view>
+      <view class="meta" wx:if="{{model.hasLocation}}">最后成功定位时间：{{model.location.locatedText}}</view>
+      <view class="meta" wx:if="{{!model.hasLocation}}">还没有成功定位过位置</view>
+      <view class="meta">前台同步于：{{syncedText}}</view>
+      <view class="hint">
+        位置只在开摊或刷新时取样一次，平台不会在后台持续跟踪你的位置；两个时间不是同一件事。
+      </view>
+      <view class="meta">位置名称（顾客看到的地址说明）</view>
+      <input
+        class="field-input"
+        value="{{locationName}}"
+        maxlength="80"
+        placeholder="例如：校门口第二个路口"
+        bindinput="onLocationNameInput"
+      />
+    </view>
+
+    <view class="surface-card" wx:if="{{model.restriction.hasRestriction}}">
+      <text class="section-title">当前限制</text>
+      <view class="limit-row" wx:for="{{model.restriction.notes}}" wx:key="*this">{{item}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{!model.isOpen && !model.eligibility.eligible}}">
+      <text class="section-title">暂时不能开摊</text>
+      <view class="meta">{{model.eligibility.reasonText}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{!model.isOpen}}">
+      <text class="section-title">预计收摊时间</text>
+      <picker
+        mode="selector"
+        range="{{cutoffOptions}}"
+        range-key="pickerText"
+        value="{{cutoffIndex}}"
+        bindchange="onCutoffChange"
+      >
+        <view class="picker-value">{{cutoffOptions[cutoffIndex].pickerText}}</view>
+      </picker>
+      <view class="hint">收摊时间由你确认，最长不超过 12 小时；开摊后仍以服务端记录的截止时刻为准。</view>
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+  </block>
+
+  <fixed-cta
+    wx:if="{{showContent}}"
+    primary-text="{{model.isOpen ? '刷新位置' : '定位开摊'}}"
+    secondary-text="{{model.isOpen ? '收摊' : ''}}"
+    processing="{{submitPending}}"
+    disabled="{{model.isOpen ? !canOperate : !canOpen}}"
+    bind:primary="onPrimaryTap"
+    bind:secondary="onSecondaryTap"
+  />
+
+  <confirm-sheet
+    visible="{{confirmVisible}}"
+    title="{{confirmSheet.title}}"
+    description="{{confirmSheet.description}}"
+    confirm-text="{{confirmSheet.confirmText}}"
+    processing="{{submitPending}}"
+    bind:confirm="onConfirmSubmit"
+    bind:cancel="onConfirmCancel"
   />
 </view>

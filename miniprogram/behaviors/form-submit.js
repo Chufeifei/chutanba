@@ -24,6 +24,8 @@ module.exports = Behavior({
     submitState: SUBMIT_STATE.IDLE,
     submitMessage: '',
     submitFields: [],
+    // 供 wxml 直接绑定的处理中标志：页面不必在业务状态字符串上做判断
+    submitPending: false,
   },
 
   methods: {
@@ -40,7 +42,12 @@ module.exports = Behavior({
       // 处理中禁止重复点击：重复提交会消耗一个新意图，产生第二条业务结果
       if (this.data.submitState === SUBMIT_STATE.PENDING) return null;
 
-      this.setData({ submitState: SUBMIT_STATE.PENDING, submitMessage: '', submitFields: [] });
+      this.setData({
+        submitState: SUBMIT_STATE.PENDING,
+        submitPending: true,
+        submitMessage: '',
+        submitFields: [],
+      });
 
       let result;
       try {
@@ -49,10 +56,13 @@ module.exports = Behavior({
         // submitter 自身抛错（如缺参数），按明确失败处理，不进入"未知"
         this.setData({
           submitState: SUBMIT_STATE.FAILED,
+          submitPending: false,
           submitMessage: (error && error.message) || '操作未能完成',
         });
         return null;
       }
+      // 处理中窗口就是 await 这一段，等待结束即解除处理中标志
+      this.setData({ submitPending: false });
 
       switch (result && result.outcome) {
         case WRITE_OUTCOME.SUCCEEDED:
@@ -95,7 +105,28 @@ module.exports = Behavior({
     },
 
     resetSubmitState() {
-      this.setData({ submitState: SUBMIT_STATE.IDLE, submitMessage: '', submitFields: [] });
+      this.setData({ submitState: SUBMIT_STATE.IDLE, submitPending: false, submitMessage: '', submitFields: [] });
+    },
+
+    /**
+     * 表单有未提交内容时给返回键加确认提示，避免误退丢失已填文字。
+     * 基础库不支持时静默跳过，不影响其余流程。
+     * @param {object} form 表单内容，全为空视为没有未提交内容
+     * @param {string} message 提示文案
+     */
+    applyLeaveGuard(form, message) {
+      if (!wx.enableAlertBeforeUnload || !wx.disableAlertBeforeUnload) return;
+      const dirty = Object.keys(form || {}).some((key) => String(form[key] || '').trim());
+      if (dirty) {
+        wx.enableAlertBeforeUnload({ message });
+      } else {
+        wx.disableAlertBeforeUnload();
+      }
+    },
+
+    /** 提交成功或主动放弃时解除返回键提示。 */
+    clearLeaveGuard() {
+      if (wx.disableAlertBeforeUnload) wx.disableAlertBeforeUnload();
     },
 
     isSubmitting() {

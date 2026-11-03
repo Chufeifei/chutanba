@@ -4,11 +4,11 @@
  * 入口可见性只由 store/identity 的 capabilities 决定，不在这里写"有 vendorId 就是摊主"。
  * 即使某个入口被隐藏，服务端仍会对直接请求重新鉴权（AC-13）—— 隐藏不是权限。
  *
- * 本页当前是**架构骨架**：只读 store、渲染入口，不含业务实现。
- * 架构说明见 docs/arch/miniprogram-architecture.md §6；路由与身份刷新属于后续开发。
+ * 本人快照来自 GET /me，进入本页时刷新一次；刷新失败保留旧快照，
+ * 公开浏览不受影响（需求第 2 节）。
  */
 const identityStore = require('../../store/identity');
-const { describeProfileState } = require('../../services/account');
+const { refreshIdentity, describeProfileState } = require('../../services/account');
 const { CAPABILITY } = require('../../config/contracts');
 const { VIEW_STATE, createViewState } = require('../../utils/view-state');
 
@@ -26,6 +26,13 @@ const ENTRY_DEFS = [
   },
 ];
 
+// 已交付页面的真实路由。未交付的入口不跳转，只给一句明确说明。
+const ENTRY_ROUTES = {
+  feedback: '/pages/feedback-candidates/index',
+  profile: '/pages/vendor-profile/index',
+  workbench: '/pages/workbench/index',
+};
+
 Page({
   data: {
     identified: false,
@@ -33,7 +40,7 @@ Page({
       title: '账号暂不可识别',
       description: '完成微信身份识别后可查看本人记录与操作入口',
     }),
-    profileStateLabel: '未提交',
+    profileStateLabel: '未申请',
     profileEligible: false,
     selfStopped: false,
     governancePaused: false,
@@ -49,6 +56,8 @@ Page({
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 1 });
     }
+    // 静默刷新：失败时保留已有快照，不把页面清空
+    refreshIdentity({ silent: true }).catch(() => null);
     this.renderIdentity();
   },
 
@@ -71,7 +80,11 @@ Page({
 
   onEntryTap(event) {
     const key = event.currentTarget.dataset.key;
-    // P3 接入各页路由后替换为真正的跳转
-    wx.showToast({ title: `${key} 页面开发中`, icon: 'none' });
+    const route = ENTRY_ROUTES[key];
+    if (!route) {
+      wx.showToast({ title: '该功能将在后续版本开放', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({ url: route });
   },
 });

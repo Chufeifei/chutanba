@@ -1,7 +1,56 @@
 <view class="page-shell">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
   />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <view class="section-title">资料状态：{{model.profileStateLabel}}</view>
+      <view class="section-note">{{model.stateHint}}</view>
+      <button
+        wx:if="{{model.canSubmit}}"
+        class="primary-button"
+        bindtap="onEditTap"
+      >{{model.submitEntryText}}</button>
+      <view class="hint" wx:else>资料审核期间不能重复提交，请等待审核结果。</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{model.hasActive}}">
+      <text class="section-title">当前生效资料</text>
+      <view class="meta">名称：{{model.activeProfile.vendorName}}</view>
+      <view class="meta">品类：{{model.activeProfile.categoryName}}</view>
+      <view class="meta">常卖内容：{{model.activeProfile.regularItemsText}}</view>
+      <view class="meta">价格说明：{{model.activeProfile.priceDescription}}</view>
+      <view class="meta">公告：{{model.activeProfile.announcement}}</view>
+      <view class="meta">生效时间：{{model.activeProfile.approvedText}}</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{model.hasPending}}">
+      <text class="section-title">本次待审修改</text>
+      <view class="meta">状态：{{model.pendingSubmission.reviewStatusLabel}}</view>
+      <view class="meta">提交时间：{{model.pendingSubmission.submittedText}}</view>
+      <view class="meta">名称：{{model.pendingSubmission.vendorName}}</view>
+      <view class="meta">品类：{{model.pendingSubmission.categoryName}}</view>
+      <view class="meta">常卖内容：{{model.pendingSubmission.regularItemsText}}</view>
+      <view class="meta">价格说明：{{model.pendingSubmission.priceDescription}}</view>
+      <view class="meta">公告：{{model.pendingSubmission.announcement}}</view>
+      <view class="hint">待审内容尚未生效，顾客看到的仍是当前生效资料。</view>
+    </view>
+
+    <view class="surface-card" wx:if="{{model.latestDecision}}">
+      <text class="section-title">最近审核结果</text>
+      <view class="meta">结果：{{model.latestDecision.reviewStatusLabel}}</view>
+      <view class="meta">时间：{{model.latestDecision.decidedText}}</view>
+      <view class="meta" wx:if="{{model.latestDecision.reason}}">原因：{{model.latestDecision.reason}}</view>
+    </view>
+
+    <view class="hint">
+      资料只包含名称、品类、常卖内容、价格说明与公告，不展示固定地址、图片与营业计划。
+    </view>
+  </block>
 </view>

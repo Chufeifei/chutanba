@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "摊主工作台",
-  "usingComponents": {}
+  "usingComponents": {
+    "phase-badge": "/components/phase-badge/index",
+    "countdown": "/components/countdown/index"
+  }
 }

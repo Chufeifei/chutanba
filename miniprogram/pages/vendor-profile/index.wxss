@@ -1,1 +1,4 @@
-/* 页面专属样式；通用样式与设计变量见 app.wxss */
+.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+.hint { margin-top: 16rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
+
+.primary-button { margin-top: 28rpx; height: 88rpx; border-radius: 44rpx; background: var(--color-brand); color: #FFFFFF; font-size: 30rpx; line-height: 88rpx; }

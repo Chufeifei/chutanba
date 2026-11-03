@@ -1,7 +1,97 @@
-<view class="page-shell">
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
   <state-view
+    wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
+
+  <block wx:if="{{showContent}}">
+    <view class="surface-card">
+      <text class="section-title">名称</text>
+      <input
+        class="field-input"
+        value="{{form.vendorName}}"
+        maxlength="{{limits.vendorName}}"
+        placeholder="给摊位起一个名字"
+        data-field="vendorName"
+        bindinput="onFieldInput"
+      />
+      <view class="counter">{{form.vendorName.length}}/{{limits.vendorName}}</view>
+      <view class="field-error" wx:if="{{fieldErrors.vendorName}}">{{fieldErrors.vendorName}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">品类</text>
+      <picker
+        mode="selector"
+        range="{{categoryOptions}}"
+        range-key="pickerText"
+        value="{{categoryIndex}}"
+        bindchange="onCategoryChange"
+      >
+        <view class="picker-value">{{categoryText}}</view>
+      </picker>
+      <view class="field-error" wx:if="{{fieldErrors.categoryCode}}">{{fieldErrors.categoryCode}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">常卖内容</text>
+      <textarea
+        class="desc-input"
+        value="{{form.regularItemsText}}"
+        maxlength="{{limits.regularItemsText}}"
+        placeholder="常卖的东西，用顿号分隔"
+        data-field="regularItemsText"
+        bindinput="onFieldInput"
+      />
+      <view class="counter">{{form.regularItemsText.length}}/{{limits.regularItemsText}}</view>
+      <view class="field-error" wx:if="{{fieldErrors.regularItemsText}}">{{fieldErrors.regularItemsText}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">价格说明</text>
+      <textarea
+        class="desc-input"
+        value="{{form.priceDescription}}"
+        maxlength="{{limits.priceDescription}}"
+        placeholder="价格区间、分量或计价方式"
+        data-field="priceDescription"
+        bindinput="onFieldInput"
+      />
+      <view class="counter">{{form.priceDescription.length}}/{{limits.priceDescription}}</view>
+      <view class="field-error" wx:if="{{fieldErrors.priceDescription}}">{{fieldErrors.priceDescription}}</view>
+    </view>
+
+    <view class="surface-card">
+      <text class="section-title">公告</text>
+      <textarea
+        class="desc-input"
+        value="{{form.announcement}}"
+        maxlength="{{limits.announcement}}"
+        placeholder="想告诉顾客的话，例如今日特供、出摊时间"
+        data-field="announcement"
+        bindinput="onFieldInput"
+      />
+      <view class="counter">{{form.announcement.length}}/{{limits.announcement}}</view>
+      <view class="field-error" wx:if="{{fieldErrors.announcement}}">{{fieldErrors.announcement}}</view>
+    </view>
+
+    <view class="hint">
+      资料修改需要重新审核，审核期间顾客看到的仍是当前生效资料。
+    </view>
+
+    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+  </block>
+
+  <fixed-cta
+    wx:if="{{showContent}}"
+    primary-text="{{submitting ? '正在提交…' : '提交审核'}}"
+    processing="{{submitting}}"
+    disabled="{{submitting}}"
+    bind:primary="onSubmit"
   />
 </view>

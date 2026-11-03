@@ -8,7 +8,7 @@
  * 真正的开摊 / 公开资格由服务端在写命令时按权威状态重新判定，
  * 客户端不能因为这里算出 true 就认为一定可以开摊。
  */
-const { PROFILE_REVIEW_STATUS } = require('../../config/contracts');
+const { PROFILE_STATE, PROFILE_STATE_LABEL } = require('../../config/contracts');
 
 /**
  * @param {object} raw GET /me 的 data
@@ -40,20 +40,15 @@ function toIdentitySnapshot(raw) {
   };
 }
 
-/** 资料状态的中文说明，供 P07 直接用。 */
+/**
+ * 资料状态的中文说明，供 P03／P07 直接用。
+ *
+ * 注意用的是 PROFILE_STATE（后端 deriveProfileState 的七值派生），
+ * 不是 PROFILE_REVIEW_STATUS（单次申请的审核结论）。两者混用会让
+ * /me 的 profileState 永远落到兜底分支，页面一直显示「未提交」。
+ */
 function describeProfileState(profileState) {
-  switch (profileState) {
-    case PROFILE_REVIEW_STATUS.PENDING:
-      return '审核中';
-    case PROFILE_REVIEW_STATUS.APPROVED:
-      return '已通过';
-    case PROFILE_REVIEW_STATUS.REJECTED:
-      return '未通过';
-    case PROFILE_REVIEW_STATUS.INVALIDATED:
-      return '已失效';
-    default:
-      return '未提交';
-  }
+  return PROFILE_STATE_LABEL[profileState] || PROFILE_STATE_LABEL[PROFILE_STATE.NONE];
 }
 
 module.exports = { toIdentitySnapshot, describeProfileState };

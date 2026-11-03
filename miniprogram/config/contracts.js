@@ -37,12 +37,50 @@ const END_REASON = Object.freeze({
   CORRECTION: 'CORRECTION',
 });
 
-// 资料审核状态：本人页面区分"首次待审/驳回/已生效/修改待审"
+// 资料审核状态：单次申请的审核结论（P07 的待审分区用它区分待审／已通过／未通过／已失效）
 const PROFILE_REVIEW_STATUS = Object.freeze({
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   REJECTED: 'REJECTED',
   INVALIDATED: 'INVALIDATED',
+});
+
+// 资料状态：后端 profile/mapper.js 的 deriveProfileState 七值派生。
+// 与 PROFILE_REVIEW_STATUS 不是一回事 —— 后者是单次申请的状态，
+// 这里是「本人当前处于什么资料阶段」，/me 与 /vendor/profile 返回的都是这一组。
+const PROFILE_STATE = Object.freeze({
+  NONE: 'NONE',
+  FIRST_PENDING: 'FIRST_PENDING',
+  FIRST_REJECTED: 'FIRST_REJECTED',
+  INVALIDATED: 'INVALIDATED',
+  UPDATE_PENDING: 'UPDATE_PENDING',
+  UPDATE_REJECTED: 'UPDATE_REJECTED',
+  ACTIVE: 'ACTIVE',
+});
+
+const PROFILE_STATE_LABEL = Object.freeze({
+  [PROFILE_STATE.NONE]: '未申请',
+  [PROFILE_STATE.FIRST_PENDING]: '审核中',
+  [PROFILE_STATE.FIRST_REJECTED]: '未通过',
+  [PROFILE_STATE.INVALIDATED]: '已失效',
+  [PROFILE_STATE.UPDATE_PENDING]: '修改审核中',
+  [PROFILE_STATE.UPDATE_REJECTED]: '修改未通过',
+  [PROFILE_STATE.ACTIVE]: '已生效',
+});
+
+// 开摊资格原因：服务端 profileEligibility.reasons 逐条返回，多条同时成立时全部返回
+const ELIGIBILITY_REASON = Object.freeze({
+  PROFILE_REQUIRED: 'PROFILE_REQUIRED',
+  SELF_STOPPED: 'SELF_STOPPED',
+  GOVERNANCE_PAUSED: 'GOVERNANCE_PAUSED',
+  SESSION_ACTIVE: 'SESSION_ACTIVE',
+});
+
+const ELIGIBILITY_REASON_LABEL = Object.freeze({
+  [ELIGIBILITY_REASON.PROFILE_REQUIRED]: '缺少已生效的摊主资料',
+  [ELIGIBILITY_REASON.SELF_STOPPED]: '你已停止公开',
+  [ELIGIBILITY_REASON.GOVERNANCE_PAUSED]: '当前处于治理暂停',
+  [ELIGIBILITY_REASON.SESSION_ACTIVE]: '当前正在营业',
 });
 
 // 现场反馈问题类型：一期只这三类，无照片、无一般举报
@@ -138,6 +176,10 @@ module.exports = {
   SESSION_PHASE_LABEL,
   END_REASON,
   PROFILE_REVIEW_STATUS,
+  PROFILE_STATE,
+  PROFILE_STATE_LABEL,
+  ELIGIBILITY_REASON,
+  ELIGIBILITY_REASON_LABEL,
   FEEDBACK_TYPE,
   FEEDBACK_TYPE_LABEL,
   FEEDBACK_CASE_STATUS,
