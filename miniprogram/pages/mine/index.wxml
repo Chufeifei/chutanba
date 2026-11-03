@@ -1,0 +1,34 @@
+<view class="page-shell with-tab-bar">
+  <view class="surface-card">
+    <view class="section-title">账号</view>
+    <view class="section-note" wx:if="{{identified}}">资料状态：{{profileStateLabel}}</view>
+    <view class="section-note" wx:else>账号暂不可识别，浏览摊位不受影响；提交反馈或管理资料时需要重新识别账号。</view>
+
+    <view class="limit-row" wx:if="{{selfStopped}}">本人已停止公开</view>
+    <view class="limit-row" wx:if="{{governancePaused}}">当前处于治理暂停</view>
+  </view>
+
+  <view class="surface-card" wx:if="{{entries.length}}">
+    <view class="section-title">功能入口</view>
+    <view
+      wx:for="{{entries}}"
+      wx:key="key"
+      class="entry-row"
+      data-key="{{item.key}}"
+      bindtap="onEntryTap"
+    >
+      <view class="entry-main">
+        <view class="entry-text">{{item.text}}</view>
+        <view class="entry-hint">{{item.hint}}</view>
+      </view>
+      <text class="entry-arrow">›</text>
+    </view>
+  </view>
+
+  <state-view
+    wx:if="{{!identified}}"
+    type="{{unidentifiedState.type}}"
+    title="{{unidentifiedState.title}}"
+    description="{{unidentifiedState.description}}"
+  />
+</view>

@@ -1,21 +1,39 @@
-const { get, post, put, remove } = require('../utils/request');
+/**
+ * 写命令统一包装。
+ *
+ * 为什么必须经这里：一期所有写接口都要求 Idempotency-Key（契约 §5）。
+ * 一旦某个写函数忘了传键，网络重试就可能产生第二条业务数据 ——
+ * 而这个错误在联调阶段往往看不出来。所以这里在开发期直接抛错，
+ * 而不是"没传就帮你生成一个"（那会让每次重试都是新意图）。
+ *
+ * 键的生命周期由 services/submission 管理：一次用户意图一个键，
+ * 超时后按同一个键查询结果，只有用户重新决定才换键。
+ */
+const { post, put, remove } = require('../utils/request');
 
-function idempotencyKey(prefix = 'wx') {
-  const safePrefix = String(prefix || 'wx').replace(/[^A-Za-z0-9._:-]/g, '-').slice(0, 20) || 'wx';
-  const random = `${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
-  return `${safePrefix}:${Date.now()}:${random}`.slice(0, 64);
+/**
+ * @param {function} method  utils/request 的 post/put/remove
+ * @param {string} path      取自 config/endpoints.js
+ * @param {object} payload
+ * @param {object} options   { idempotencyKey }
+ */
+function withIdempotency(method, path, payload, options = {}) {
+  if (!options || !options.idempotencyKey) {
+    throw new TypeError(`写接口 ${path} 必须提供 idempotencyKey`);
+  }
+  return method(path, payload, { idempotencyKey: options.idempotencyKey });
 }
 
-function withIdempotency(method, path, data = {}, prefix, options = {}) {
-  const key = options.idempotencyKey || data.idempotencyKey || idempotencyKey(prefix);
-  const payload = data && typeof data === 'object' && !Array.isArray(data)
-    ? { ...data, idempotencyKey: data.idempotencyKey || key }
-    : data;
-  return method(path, payload, {
-    ...options,
-    idempotencyKey: key,
-    header: { ...(options.header || {}), 'Idempotency-Key': key, 'X-Request-Id': key },
-  });
+function writePost(path, payload, options) {
+  return withIdempotency(post, path, payload, options);
 }
 
-module.exports = { get, post, put, remove, idempotencyKey, withIdempotency };
+function writePut(path, payload, options) {
+  return withIdempotency(put, path, payload, options);
+}
+
+function writeDelete(path, payload, options) {
+  return withIdempotency(remove, path, payload, options);
+}
+
+module.exports = { withIdempotency, writePost, writePut, writeDelete };

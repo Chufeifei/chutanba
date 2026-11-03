@@ -1,0 +1,7 @@
+<view class="page-shell">
+  <state-view
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+  />
+</view>

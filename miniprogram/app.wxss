@@ -1,22 +1,53 @@
+/*
+ * 全局设计变量与基础类。
+ *
+ * 规则（.trellis/spec/frontend/directory-structure.md 第六节）：
+ * 颜色统一在这里定义，页面与组件不得重复写十六进制色值。
+ */
 page {
+  --color-bg: #FAF8F5;
+  --color-surface: #FFFFFF;
+  --color-text: #1F1F1F;
+  --color-text-muted: #6B6B6B;
+  --color-text-hint: #9A9691;
+  --color-border: #F0ECE8;
+  --color-brand: #FF7A45;
+  --color-brand-soft: #FFF1EB;
+  --color-warning: #B26A00;
+  --color-warning-soft: #FFF4E0;
+  --color-neutral-soft: #F3F1EF;
+  --color-success: #1D9E75;
+  --color-success-soft: #E1F5EE;
+  --radius-card: 32rpx;
+  --radius-sheet: 48rpx;
+  --space-page: 32rpx;
+
   min-height: 100%;
-  background: #FAF8F5;
-  color: #1F1F1F;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: "Sarasa Gothic SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 button { font-family: inherit; }
 button::after { border: 0; }
 
-.page-shell { min-height: 100vh; padding: 32rpx; padding-bottom: calc(32rpx + env(safe-area-inset-bottom)); box-sizing: border-box; }
+.page-shell { min-height: 100vh; padding: var(--space-page); padding-bottom: calc(var(--space-page) + env(safe-area-inset-bottom)); box-sizing: border-box; }
 .page-shell.with-fixed-cta { padding-bottom: calc(168rpx + env(safe-area-inset-bottom)); }
-.surface-card { padding: 32rpx; border-radius: 32rpx; background: #FFFFFF; box-sizing: border-box; }
+.page-shell.with-tab-bar { padding-bottom: calc(160rpx + env(safe-area-inset-bottom)); }
+
+.surface-card { padding: 32rpx; border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; }
 .surface-card + .surface-card { margin-top: 32rpx; }
-.surface-sheet { border-radius: 48rpx 48rpx 0 0; background: #FFFFFF; }
-.surface-hero { border-radius: 52rpx; background: #FFFFFF; }
+.surface-sheet { border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; background: var(--color-surface); }
+.surface-hero { border-radius: 52rpx; background: var(--color-surface); }
+
 .space-x16 { margin-top: 32rpx; }
-.text-primary { color: #1F1F1F; }
-.text-secondary { color: #6B6B6B; }
-.text-brand { color: #FF7A45; }
-.bg-brand { background: #FF7A45; color: #FFFFFF; }
+.text-primary { color: var(--color-text); }
+.text-secondary { color: var(--color-text-muted); }
+.text-hint { color: var(--color-text-hint); }
+.text-brand { color: var(--color-brand); }
+.bg-brand { background: var(--color-brand); color: #FFFFFF; }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+.section-title { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
+.section-note { margin-top: 12rpx; font-size: 26rpx; line-height: 40rpx; color: var(--color-text-muted); }
+.divider { height: 1rpx; background: var(--color-border); }
