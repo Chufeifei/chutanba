@@ -169,7 +169,12 @@ test('开摊入参白名单与 ID 归一化', () => {
     expectedVendorVersion: 3,
     extra: true,
   }), 'VALIDATION_FAILED');
-  assertBiz(() => schema.normalizeIssueContext({ purpose: 'FEEDBACK', targetId: '1' }), 'VALIDATION_FAILED');
+  // W6 起 FEEDBACK 是合法用途（顾客侧现场反馈），这里改为断言未定义用途仍被拒绝。
+  assert.deepEqual(
+    schema.normalizeIssueContext({ purpose: 'FEEDBACK', targetId: '1' }),
+    { purpose: 'FEEDBACK', targetId: '1' },
+  );
+  assertBiz(() => schema.normalizeIssueContext({ purpose: 'ARBITRARY', targetId: '1' }), 'VALIDATION_FAILED');
   assert.deepEqual(schema.normalizeAttemptFinish({ outcome: 'CANCELLED' }), { outcome: 'CANCELLED' });
   assertBiz(() => schema.normalizeAttemptFinish({ outcome: 'SUCCEEDED' }), 'VALIDATION_FAILED');
 });

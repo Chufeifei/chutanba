@@ -93,3 +93,24 @@ node backend/scripts/seed-demo-public-vendors.js --reset   # 先清理上次的 
 脚本自带护栏：拒绝在 `DB_NAME=chutanba` 上执行，且只清理 `vendor_code` 以 `DEMO` 开头的对象。
 写入后公开集合应有 `DEMO0001`、`DEMO0002`、`DEMO0003` 三个摊位；`DEMO0004` 为已收摊，
 只在详情返回 `RESTING`，且响应不含任何坐标。
+
+## W6 隔离库验证
+
+W6 无迁移（`0003` 已覆盖观察、待审事项与事实表），使用同一 MySQL 实例的新建隔离库
+`phase1_test_w6`，不重置 `phase1_test_w1`～`w5`，也不对应用库执行任何迁移：
+
+```sql
+CREATE DATABASE phase1_test_w6 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+```powershell
+$env:PHASE1_TEST_DATABASE='phase1_test_w6'
+$env:PHASE1_TEST_HOST='...'; $env:PHASE1_TEST_PORT='...'
+$env:PHASE1_TEST_USER='...'; $env:PHASE1_TEST_PASSWORD='...'
+$env:PHASE1_TEST_HTTP_PIPE='1'
+node --test backend/test/w6-feedback.integration.test.js
+```
+
+用例覆盖：领取一次绑定与同键回放、他人领取 `STATE_CONFLICT`、候选项窗口内可见/关闭后消失、
+300 米内受理与超距 `LOCATION_TOO_FAR`、结束后 30 分钟 `WINDOW_CLOSED`、他人观察 404、
+同摊主同事件日不同轮次合并为同一事项且各自保留原轮次与位置、本人记录与详情不含坐标。

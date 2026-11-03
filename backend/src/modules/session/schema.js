@@ -51,10 +51,13 @@ function normalizeAttemptFinish(body) {
   return { outcome: body.outcome };
 }
 
+const CONTEXT_PURPOSES = ['OPEN', 'REFRESH', 'FEEDBACK'];
+
 function normalizeIssueContext(body) {
   assertAllowedKeys(body, ['purpose', 'targetId']);
-  // FEEDBACK 属于 W6 现场反馈，W4 只开放开摊与刷新两种用途。
-  if (body.purpose !== 'OPEN' && body.purpose !== 'REFRESH') throw invalid('purpose');
+  // 三种用途的目标不同：OPEN/REFRESH 是摊主自己的开摊尝试与轮次，FEEDBACK 是本人已领取的观察。
+  // 目标归属由 service 按用途分别校验，这里只做枚举与形状。
+  if (!CONTEXT_PURPOSES.includes(body.purpose)) throw invalid('purpose');
   return { purpose: body.purpose, targetId: assertPathId(body.targetId, 'targetId') };
 }
 

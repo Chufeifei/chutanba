@@ -62,6 +62,31 @@ function reloadIssued({ accountId, purpose, targetId, key }) {
   };
 }
 
+/**
+ * 顾客侧 FEEDBACK 用途：没有摊主身份，不能走 lockOwnedVendor；
+ * 只校验观察属于本人且受理窗口未关闭。观察域以惰性 require 引入，
+ * 因为反馈域依赖本域的时间口径，顶层 require 会形成循环依赖。
+ */
+async function executeFeedbackIssue(connection, { actorId, input, key }) {
+  // eslint-disable-next-line global-require
+  const observation = require('../../observation');
+  const occurredAtMs = await nowMs(connection);
+  await observation.assertFeedbackContextTarget(connection, {
+    accountId: actorId,
+    observationId: input.targetId,
+    nowMs: occurredAtMs,
+  });
+  const issued = await locationContext.issueInTransaction(connection, {
+    accountId: actorId,
+    purpose: input.purpose,
+    targetId: input.targetId,
+    key,
+    nowMs: occurredAtMs,
+  });
+  const { contextRef, ...payload } = issued;
+  return { payload, resultRef: contextRef };
+}
+
 async function issueLocationContext(identity, key, body) {
   const actor = await account.resolveAccount(identity);
   const input = schema.normalizeIssueContext(body);
@@ -72,10 +97,15 @@ async function issueLocationContext(identity, key, body) {
     key,
     request: input,
     execute: async (connection) => {
-      const vendor = await lockOwnedVendor(connection, actor.id);
-      const executed = await executeIssue(connection, {
-        actorId: actor.id, vendor, input, key,
-      });
+      let executed;
+      if (input.purpose === 'FEEDBACK') {
+        executed = await executeFeedbackIssue(connection, { actorId: actor.id, input, key });
+      } else {
+        const vendor = await lockOwnedVendor(connection, actor.id);
+        executed = await executeIssue(connection, {
+          actorId: actor.id, vendor, input, key,
+        });
+      }
       payload = executed.payload;
       return { resultRef: executed.resultRef };
     },
