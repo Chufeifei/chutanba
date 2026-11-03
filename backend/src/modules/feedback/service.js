@@ -14,6 +14,7 @@ const account = require('../account');
 const operation = require('../operation');
 const observation = require('../observation');
 const locationContext = require('../location-context');
+const retention = require('../retention');
 const { shanghaiDateKey, MAX_LOCATION_AGE_MS } = require('../session');
 const repository = require('./repository');
 const mapper = require('./mapper');
@@ -127,6 +128,17 @@ async function submitInTransaction(connection, { actor, input, atMs }) {
   });
   await repository.bumpCase(connection, caseId);
 
+  // 未结反馈事项阻止相关位置按期限清理：挂起由事实所属域登记，
+  // 保留域只管期限，不反查别人的表。
+  await retention.openHoldInTransaction(connection, {
+    targetType: retention.TARGET_TYPE.LOCATION_VERSION,
+    targetId: Number(loaded.observation.location_version_id),
+    sourceType: retention.SOURCE_TYPE.FEEDBACK_CASE,
+    sourceId: caseId,
+    basis: '未结现场反馈事项',
+    openedAtMs: atMs,
+  });
+
   return {
     payload: mapper.toSubmitResult({
       factId, caseId, acceptedAtMs: atMs, eligibleUntilMs: loaded.eligibleUntilMs,
@@ -197,4 +209,27 @@ async function getMyFeedback(identity, factId) {
   });
 }
 
-module.exports = { submitFeedback, listMyFeedback, getMyFeedback, MAX_DISTANCE_M };
+/**
+ * 某事项涉及的位置版本：影响申诉要挂起这些位置的保留。
+ * 位置属本域的事实表，外部只能通过这个只读方法拿到清单。
+ */
+async function findLocationIdsByCaseIdInTransaction(connection, caseId) {
+  return repository.findLocationIdsByCaseId(connection, caseId);
+}
+
+/**
+ * 摊主的反馈事项清单（状态、结案时刻、事实条数）：
+ * 保留期说明要按事项分别给出依据与到期时间，清除域只读不改。
+ */
+async function listCaseRetentionInTransaction(connection, { vendorId }) {
+  return repository.listCasesForVendor(connection, { vendorId });
+}
+
+module.exports = {
+  submitFeedback,
+  listMyFeedback,
+  getMyFeedback,
+  findLocationIdsByCaseIdInTransaction,
+  listCaseRetentionInTransaction,
+  MAX_DISTANCE_M,
+};

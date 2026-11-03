@@ -1,7 +1,9 @@
 /**
  * 资料域唯一写库方：全部参数化、显式列，不开事务、不做权限或业务判断。
  * 事务连接由 service 通过 withTransaction 统一传入。
+ * 清除相关写库方另存 clearance.js，本文件只做汇总转出。
  */
+const clearance = require('./clearance');
 
 /** 首次提交按账号行串行化，避免并发创建两条摊主身份。 */
 async function lockAccount(connection, accountId) {
@@ -245,4 +247,5 @@ module.exports = {
   findLatestVersionNoForUpdate, findPendingVersionForUpdate, findPendingVersion,
   findVersionById, findVersionByIdForUpdate, insertPendingVersion, markVersionDecided,
   insertReviewEvent, findReviewEvent, findReviewHistory, findLatestDecidedVersion, findReviewQueue,
+  ...clearance,
 };

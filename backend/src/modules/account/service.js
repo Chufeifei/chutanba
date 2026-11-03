@@ -85,4 +85,24 @@ async function getMe(identity) {
   }
 }
 
-module.exports = { resolveAccount, getMe };
+/**
+ * 清空非必要账号资料：只提供事务内入口，由清除域在自己已打开的事务里调用。
+ * 重复执行不产生额外改动（已是空值时不改写），保证清理批次可重跑。
+ */
+async function clearProfileInTransaction(connection, { accountId, nowMs }) {
+  return repository.clearProfileFields(connection, { accountId, nowMs });
+}
+
+/**
+ * 锁账号行并读回版本：清除请求要在锁内比对账号版本，避免并发清除互相覆盖。
+ */
+async function lockAccountInTransaction(connection, { accountId }) {
+  return repository.lockAccount(connection, accountId);
+}
+
+module.exports = {
+  resolveAccount,
+  getMe,
+  clearProfileInTransaction,
+  lockAccountInTransaction,
+};

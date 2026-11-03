@@ -1,7 +1,10 @@
 /**
  * 营业域唯一写库方：只写 SQL、只返回数据库行，不开事务、不做业务判断。
  * 所有方法复用调用方传入的 connection；锁顺序由 service 保证（摊主 → 轮次 → 位置 → 尝试 → 控制行）。
+ * 清除相关写库方另存 clearance.js，本文件只做汇总转出。
  */
+const clearance = require('./clearance');
+
 const VENDOR_COLUMNS = `id, account_id, lifecycle_status, active_profile_version_id,
   current_session_id, state_version, last_selected_clock_min`;
 const SESSION_COLUMNS = `id, vendor_id, profile_version_id, started_at_ms, planned_end_at_ms, ended_at_ms,
@@ -225,11 +228,11 @@ async function listSessionsByRange(connection, { vendorId, fromMs, toMs }) {
   return rows;
 }
 
-
 module.exports = {
   lockAccount, findVendorById, findVendorByAccount, updateVendorAfterOpen, clearVendorSession,
   bumpVendorState, insertOpenAttempt, findOpenAttemptById, updateAttemptStatus,
   findSessionById, insertSession, endSessionRow, bumpSessionVersion,
   findOpenLocation, findFirstLocation, findLocationById, maxLocationVersion,
   stopOpenLocations, insertLocation, insertOpenDay, listOpenDays, countOpenDays, listSessionsByRange,
+  ...clearance,
 };

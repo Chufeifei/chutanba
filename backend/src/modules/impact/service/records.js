@@ -7,11 +7,11 @@
  * 复核期限：文档未给具体天数，本期取 30 个上海自然日（UTC+8 无夏令时，按毫秒相加
  * 即同一钟点）；如需调整只改 IMPACT_REVIEW_WINDOW_MS 一处。
  */
-const { withTransaction } = require('../../db/transaction');
-const { DomainError } = require('../../domain/errors');
-const account = require('../account');
-const repository = require('./repository');
-const mapper = require('./mapper');
+const { withTransaction } = require('../../../db/transaction');
+const { DomainError } = require('../../../domain/errors');
+const account = require('../../account');
+const repository = require('../repository');
+const mapper = require('../mapper');
 
 const DAY_MS = 86_400_000;
 const IMPACT_REVIEW_WINDOW_MS = 30 * DAY_MS;
@@ -97,6 +97,15 @@ async function findImpactIdBySource(connection, { sourceType, sourceId }) {
   return row ? Number(row.id) : null;
 }
 
+/** 摊主的已成立影响数量：清除预览要说明哪些处理历史不会被删除。 */
+async function countRecordsByVendorInTransaction(connection, { vendorId }) {
+  return repository.countRecordsByVendor(connection, vendorId);
+}
+
 module.exports = {
-  recordInTransaction, listMyImpacts, findImpactIdBySource, IMPACT_REVIEW_WINDOW_MS,
+  recordInTransaction,
+  listMyImpacts,
+  findImpactIdBySource,
+  countRecordsByVendorInTransaction,
+  IMPACT_REVIEW_WINDOW_MS,
 };

@@ -110,6 +110,29 @@ async function findFactForReporter(connection, { factId, reporterAccountId }) {
   return rows[0] || null;
 }
 
+/** 某事项涉及的全部位置版本：影响申诉要挂起这些位置的保留。 */
+async function findLocationIdsByCaseId(connection, caseId) {
+  const [rows] = await connection.execute(
+    'SELECT DISTINCT location_version_id FROM cb_feedback_fact WHERE case_id = ?',
+    [caseId],
+  );
+  return rows.map((row) => Number(row.location_version_id));
+}
+
+/** 摊主的反馈事项清单：保留期说明要按事项分别给出依据与到期时间。 */
+async function listCasesForVendor(connection, { vendorId }) {
+  const [rows] = await connection.execute(
+    `SELECT c.id, c.status, c.closed_at_ms, COUNT(f.id) AS fact_count
+     FROM cb_feedback_case c
+     LEFT JOIN cb_feedback_fact f ON f.case_id = c.id
+     WHERE c.vendor_id = ?
+     GROUP BY c.id, c.status, c.closed_at_ms
+     ORDER BY c.id ASC`,
+    [vendorId],
+  );
+  return rows;
+}
+
 module.exports = {
   findFactByDedupe,
   insertFact,
@@ -118,4 +141,6 @@ module.exports = {
   bumpCase,
   listFacts,
   findFactForReporter,
+  findLocationIdsByCaseId,
+  listCasesForVendor,
 };

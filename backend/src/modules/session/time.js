@@ -52,6 +52,18 @@ function addDays(dateKey, days) {
 }
 
 /** 恰好落在 30 分钟点时保持不变，只有越过边界才前进一格。 */
+/**
+ * 「自某时刻起 N 个上海自然日」：R-08 口径为 [起始时刻, 第 N 日相同本地钟点)。
+ * 走当地日历日推进再回到同一钟点，不把天数折算成固定毫秒常量；
+ * 跨月、跨年与闰日都由日历推进兜住。
+ */
+function addShanghaiDays(ms, days) {
+  const atMs = assertSafeMs(ms, 'ms');
+  if (!Number.isInteger(days)) throw new TypeError('自然日天数必须是整数');
+  const targetKey = addDays(shanghaiDateKey(atMs), days);
+  return clockOnDate(targetKey, shanghaiClockMin(atMs));
+}
+
 function roundUpToHalfHour(ms) {
   return Math.ceil(assertSafeMs(ms, 'ms') / HALF_HOUR_MS) * HALF_HOUR_MS;
 }
@@ -124,6 +136,7 @@ module.exports = {
   shanghaiClockMin,
   clockOnDate,
   addDays,
+  addShanghaiDays,
   roundUpToHalfHour,
   buildOpenTimeCandidates,
   validatePlannedEnd,

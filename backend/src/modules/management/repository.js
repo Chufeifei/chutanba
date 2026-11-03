@@ -141,11 +141,27 @@ async function insertAction(connection, {
   return Number(result.insertId);
 }
 
+/**
+ * 摊主的管理处理记录数量与最近一次生效时刻：
+ * 管理与治理审计按事件发生后 1095 个自然日保留，清除预览要按它给出到期时间。
+ */
+async function countActionsByVendor(connection, vendorId) {
+  const [rows] = await connection.execute(
+    'SELECT COUNT(*) AS total, MAX(effective_at_ms) AS latest_at_ms FROM cb_management_action WHERE vendor_id = ?',
+    [vendorId],
+  );
+  return {
+    count: Number(rows[0].total),
+    latestAtMs: rows[0].latest_at_ms === null ? null : Number(rows[0].latest_at_ms),
+  };
+}
+
 module.exports = {
   findActiveRoleCodes,
   countPendingProfileReviews,
   countPendingFeedbackCases,
   countPendingImpactReviews,
+  countActionsByVendor,
   searchVendors,
   findVendorById,
   findSession,

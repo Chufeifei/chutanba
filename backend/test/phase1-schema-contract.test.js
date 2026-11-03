@@ -147,3 +147,15 @@ test('W7 adds the per-fact decision reason text without touching existing column
   assert.ok(statements.some((statement) =>
     /ALTER TABLE cb_feedback_fact_decision[\s\S]*ADD COLUMN reason_text VARCHAR\(500\) NULL/i.test(statement)));
 });
+
+test('W8 adds retention hold uniqueness and clearance status whitelists', () => {
+  const statements = loadPhase1Migrations().flatMap(({ statements: items }) => items);
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_retention_hold[\s\S]*ADD UNIQUE KEY uq_retention_target_source \(target_type, target_id, source_type, source_id\)/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_vendor_impact_review_request[\s\S]*ADD UNIQUE KEY uq_impact_review_pending \(pending_impact_record_id\)/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_data_clear_request[\s\S]*ADD CONSTRAINT ck_clear_status CHECK \(status IN \('QUEUED','IN_PROGRESS','COMPLETED','PARTIAL_FAILED'\)\)/i.test(statement)));
+  assert.ok(statements.some((statement) =>
+    /ALTER TABLE cb_vendor_impact_record[\s\S]*ADD CONSTRAINT ck_impact_record_status CHECK \(status IN \('ACTIVE','REVOKED'\)\)/i.test(statement)));
+});

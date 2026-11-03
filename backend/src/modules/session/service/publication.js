@@ -25,6 +25,49 @@ async function currentSnapshot(connection, vendorId) {
   return mapper.toControlSnapshot(controls, Number(vendor.state_version));
 }
 
+/**
+ * 本人停止公开的事务内入口：结束当前轮次 + 写本人停止列，同一事务同一时刻。
+ *
+ * 本人点「停止公开」（W4）与本人提交清除请求（W8）走同一段逻辑：
+ * 需求出处 prd 第 116 行「清除范围包含当前生效的摊主公开资料时，先立即按本人停止公开处理」。
+ * 调用方必须先锁摊主行；本函数只做状态变更与审计。
+ */
+async function applySelfStopInTransaction(connection, {
+  vendor, actorAccountId, operationId, occurredAtMs,
+}) {
+  const vendorId = Number(vendor.id);
+  const controls = await publication.getControlsInTransaction(connection, vendorId);
+  // 已经停止：不重复结束轮次、不重复写审计。
+  if (controls.selfStoppedAtMs !== null) return { changed: false, controls, endedSessionId: null };
+  const ended = await endCurrentSessionInTransaction(connection, {
+    vendor, actorAccountId, operationId, occurredAtMs, reason: 'SELF_STOP',
+  });
+  const fresh = await repository.findVendorById(connection, vendorId);
+  await publication.setSelfStoppedInTransaction(connection, {
+    vendorId,
+    vendorStateVersion: Number(fresh.state_version),
+    expectedSelfVersion: controls.selfVersion,
+    stoppedAtMs: occurredAtMs,
+  });
+  await repository.bumpVendorState(connection, { vendorId, nowMs: occurredAtMs });
+  await audit.record(connection, {
+    actionCode: 'PUBLICATION_SELF_STOPPED',
+    actorAccountId,
+    targetType: 'VENDOR',
+    targetId: vendorId,
+    occurredAtMs,
+    resultCode: 'SUCCESS',
+    operationId,
+    retentionClass: 'GENERAL',
+  });
+  const freshControls = await publication.getControlsInTransaction(connection, vendorId);
+  return {
+    changed: true,
+    controls: freshControls,
+    endedSessionId: ended ? ended.row.id : null,
+  };
+}
+
 async function executeStop(connection, { actorId, input, operationId }) {
   const occurredAtMs = await nowMs(connection);
   const vendor = await lockOwnedVendor(connection, actorId);
@@ -38,29 +81,11 @@ async function executeStop(connection, { actorId, input, operationId }) {
     };
   }
   if (input.expectedSelfVersion !== controls.selfVersion) throw conflict('publication', controls.selfVersion);
-  const ended = await endCurrentSessionInTransaction(connection, {
-    vendor, actorAccountId: actorId, operationId, occurredAtMs, reason: 'SELF_STOP',
-  });
-  const fresh = await repository.findVendorById(connection, vendorId);
-  await publication.setSelfStoppedInTransaction(connection, {
-    vendorId,
-    vendorStateVersion: Number(fresh.state_version),
-    expectedSelfVersion: controls.selfVersion,
-    stoppedAtMs: occurredAtMs,
-  });
-  await repository.bumpVendorState(connection, { vendorId, nowMs: occurredAtMs });
-  await audit.record(connection, {
-    actionCode: 'PUBLICATION_SELF_STOPPED',
-    actorAccountId: actorId,
-    targetType: 'VENDOR',
-    targetId: vendorId,
-    occurredAtMs,
-    resultCode: 'SUCCESS',
-    operationId,
-    retentionClass: 'GENERAL',
+  const applied = await applySelfStopInTransaction(connection, {
+    vendor, actorAccountId: actorId, operationId, occurredAtMs,
   });
   const payload = await currentSnapshot(connection, vendorId);
-  if (ended) payload.endedSessionId = String(ended.row.id);
+  if (applied.endedSessionId) payload.endedSessionId = String(applied.endedSessionId);
   return { payload, resultRef: `pb:${vendorId}` };
 }
 
@@ -142,4 +167,4 @@ function resumeSelfPublication(identity, key, body) {
   return mutatePublication(identity, key, body, { operationType: OPERATION_RESUME, execute: executeResume });
 }
 
-module.exports = { stopSelfPublication, resumeSelfPublication };
+module.exports = { stopSelfPublication, resumeSelfPublication, applySelfStopInTransaction };

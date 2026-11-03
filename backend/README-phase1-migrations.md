@@ -142,3 +142,33 @@ node --test backend/test/w7-management-review.integration.test.js
 管理端点为 `/management/context`、`/management/field-feedback`（含 `/{id}/decision`）、
 `/management/sessions/{id}/corrections`、`/management/vendors`（含治理上下文与治理决定）。
 本地联调需要 `ALLOW_DEV_IDENTITY=true`，并先调用一次 `GET /me`——部署名单授权在该请求内同步。
+
+## W8 隔离库验证
+
+W8 新增迁移 `0014`（保留挂起唯一键、复核申请「同一影响只留一份未结复核」生成列＋唯一键、
+清除与复核状态枚举 CHECK），验证使用新库 `phase1_test_w8`，不重置其他隔离库，也不对应用库执行迁移：
+
+```sql
+CREATE DATABASE phase1_test_w8 CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+```
+
+```powershell
+$env:DB_NAME='phase1_test_w8'; npm --prefix backend run migrate   # 0001-0014
+$env:PHASE1_TEST_DATABASE='phase1_test_w8'
+$env:PHASE1_TEST_HOST='...'; $env:PHASE1_TEST_PORT='...'
+$env:PHASE1_TEST_USER='...'; $env:PHASE1_TEST_PASSWORD='...'
+$env:PHASE1_TEST_HTTP_PIPE='1'
+node --test backend/test/w8-clearance-retention.integration.test.js
+```
+
+用例自带 `FIELD_REVIEWER_OPENIDS=w8-it-reviewer` 与 `ADMIN_OPENIDS=w8-it-admin`，覆盖：
+本人端点 401 与管理端点 403、清除预览只读不写数据、`ACCOUNT_DATA` 范围升级被拒且不留请求行、
+清除成立即结束当前轮次并停公开并冻结待审资料、公开集合立即移除且恢复公开报 `PROFILE_REQUIRED`、
+同一幂等键回放同一清除请求、清理批次三类分别表述且重复执行不二次改写、超期可见、
+未结反馈事项阻断位置清理并在结案后写「结束时刻 + 30 自然日」延期、
+影响复核的本人申请与并发冲突、管理决定只改影响状态且不撤销治理暂停、复核留痕与越权 404/403。
+
+管理复核端点为 `GET /management/impact-reviews`、`/{id}`、`POST /management/impact-reviews/{id}/decision`；
+本人端点为 `GET /me/data-clear-preview`、`POST /me/data-clear-requests`、
+`GET /me/data-clear-requests[/{id}]`、`POST /me/impact-reviews`、`GET /me/impact-reviews[/{id}]`。
+清理批次没有 HTTP 入口，调度属 W12；本包只交付 `modules/clearance` 的 `runCleanup` 领域方法与幂等语义。

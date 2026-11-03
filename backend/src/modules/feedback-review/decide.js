@@ -13,6 +13,7 @@ const authorization = require('../authorization');
 const audit = require('../audit');
 const impact = require('../impact');
 const operation = require('../operation');
+const retention = require('../retention');
 const repository = require('./repository');
 const mapper = require('./mapper');
 const schema = require('./schema');
@@ -94,6 +95,14 @@ async function executeDecision(connection, {
     closedAtMs: occurredAtMs,
   });
   if (closed === 0) throw new DomainError('ALREADY_PROCESSED', '该事项已有结论');
+
+  // 事项已结束：关闭本事项开出的保留挂起并写延期截止（结束时刻 + 30 上海自然日），
+  // 与位置自身的 180 日基础期限取较晚者。影响申诉开出的挂起不受影响。
+  await retention.closeHoldsInTransaction(connection, {
+    sourceType: retention.SOURCE_TYPE.FEEDBACK_CASE,
+    sourceId: Number(caseId),
+    closedAtMs: occurredAtMs,
+  });
 
   let impactRecordId = null;
   if (status === 'CONFIRMED') {

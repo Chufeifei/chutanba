@@ -211,6 +211,11 @@ async function decideGovernance(identity, vendorId, key, body) {
   return unwrap(outcome, payload);
 }
 
+/** 管理处理记录的数量与最近生效时刻：清除预览要按 1095 日审计期限给出到期时间。 */
+async function countActionsByVendorInTransaction(connection, { vendorId }) {
+  return repository.countActionsByVendor(connection, vendorId);
+}
+
 module.exports = {
   getContext,
   listVendors,
@@ -218,4 +223,5 @@ module.exports = {
   decideGovernance,
   recordActionInTransaction,
   findActionByTargetInTransaction,
+  countActionsByVendorInTransaction,
 };
