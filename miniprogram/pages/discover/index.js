@@ -13,6 +13,7 @@ const { CATEGORY_ITEMS } = require('../../config/categories');
 const timing = require('../../config/timing');
 const discover = require('../../services/discover');
 const liveRefresh = require('../../behaviors/live-refresh');
+const branchStates = require('../../mock/branch-states');
 
 Page({
   behaviors: [liveRefresh],
@@ -38,8 +39,13 @@ Page({
 
   onLoad() {
     this._alive = true;
+    this._failureKind = 'UNKNOWN';
     this.setupLiveRefresh({
-      fetcher: () => this.fetchVendors(),
+      fetcher: () => this.fetchVendors().catch((error) => {
+        // 错误进入时统一归一成 kind，失败判定只读分类结果，不再散落比较字段
+        this._failureKind = branchStates.resolveFailureKind(error);
+        throw error;
+      }),
       intervalMs: timing.PUBLIC_POLL_MS,
       onResult: (result) => this.applyResult(result),
       onFailure: (viewState) => this.applyFailure(viewState),
@@ -57,10 +63,18 @@ Page({
     // 授权期间用户可能已经离开本页
     if (!this._alive) return;
     this._viewerLocation = resolved.location;
+    // 统一分类：定位结论归一成标准 kind，分类结果（stateKey）驱动 17 分支态，
+    // 不比较页面文案；locationHint 文案仍由既有映射给出，语义不变
+    const kind = resolved.location
+      ? 'UNKNOWN'
+      : branchStates.resolveFailureKind({
+          data: { kind: resolved.denied ? 'LOCATION_DENIED' : 'LOCATION_UNAVAILABLE' },
+        });
+    const stateKey = branchStates.stateKeyOfKind(kind);
     // 顾客坐标只留在 this._viewerLocation（内存），不进 data：
     // 地图中心由摊主地标决定，蓝点靠 show-location 由原生层渲染
     this.setData({
-      locationHint: discover.locationHintOf(resolved),
+      locationHint: stateKey === 'locationHint' ? discover.locationHintOf(resolved) : '',
       canShowLocation: Boolean(resolved.location),
     });
     if (resolved.location) this.refreshLiveNow({ force: true });
@@ -106,11 +120,16 @@ Page({
   },
 
   applyFailure(viewState) {
-    // 已经显示了内容就进 stale（禁用新导航），不要把列表清空伪装成空结果
+    // 18 分支：统一分类结果 stateKey === 'viewState' 时按整页/stale 置位，
+    // 已有内容就进 stale（禁用新导航），不要把列表清空伪装成空结果
+    const stateKey = branchStates.stateKeyOfKind(this._failureKind);
+    const hasContent = this.data.vendors.length > 0;
     this.setData({
-      syncStale: this.data.vendors.length > 0,
-      viewState: this.data.vendors.length > 0
-        ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
+      syncStale: hasContent,
+      viewState: stateKey === 'viewState'
+        ? (hasContent
+          ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
+          : viewState)
         : viewState,
     });
   },

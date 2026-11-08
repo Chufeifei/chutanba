@@ -1,5 +1,5 @@
 /**
- * 管理端治理与审计（契约 §5.4）。
+ * 管理端治理（契约 §5.4）。
  *
  * 治理暂停 / 解除只由 ADMIN / SUPER_ADMIN 执行；服务端逐次校验，
  * P17 的入口可见性不构成权限（AC-13）。
@@ -26,14 +26,8 @@ function decideGovernance(vendorId, { action, reason, expectedGovernanceVersion 
   }, options);
 }
 
-/** 仅 SUPER_ADMIN 可读，默认脱敏。 */
-function listAuditEvents({ actionCode, cursor, limit } = {}) {
-  return get(MANAGEMENT.AUDIT_EVENTS, { actionCode, cursor, limit });
-}
-
 module.exports = {
   listGovernanceVendors,
   getGovernanceContext,
   decideGovernance,
-  listAuditEvents,
 };

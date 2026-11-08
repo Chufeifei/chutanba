@@ -1,5 +1,5 @@
 <view class="page-shell">
-  <state-view
+  <c-state-hero
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
@@ -49,14 +49,14 @@
       <view class="meta">{{preview.dueDays}} 个自然日内处理</view>
       <view class="hint warn" wx:if="{{blockedText}}">{{blockedText}}</view>
       <button
-        class="primary-button"
+        class="btn-primary primary-button"
         disabled="{{!canSubmit || submitPending}}"
         bindtap="onPrimaryTap"
       >{{submitPending ? '正在提交' : '提交清除请求'}}</button>
     </view>
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
-    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+    <button class="btn-secondary query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
 
     <view class="card">
       <text class="section-title">处理进度</text>
@@ -75,7 +75,7 @@
         <view class="meta warn" wx:if="{{item.overdue}}">{{item.overdueReason}}</view>
         <block wx:if="{{item.hasFailures}}">
           <view class="note-row" wx:for="{{item.failures}}" wx:for-item="fail" wx:key="kindLabel">
-            未处理：{{fail.kindLabel}}（{{fail.reason}}）
+            {{fail.kindLabel}} 暂未处理
           </view>
         </block>
         <block wx:if="{{item.hasRetained}}">
@@ -85,7 +85,7 @@
         </block>
       </view>
       <button
-        class="more-button"
+        class="btn-secondary more-button"
         wx:if="{{requests.nextCursor}}"
         disabled="{{listLoading}}"
         bindtap="onLoadMore"

@@ -1,33 +1,54 @@
 <view class="page-shell has-cta">
-  <!-- 待审申请卡 -->
-  <view class="card">
-    <view class="row-between">
-      <text class="field-label">申请人</text>
-      <text class="field-value">—</text>
-    </view>
-    <view class="field-row row-between">
-      <text class="field-label">提交时间</text>
-      <text class="field-value">—</text>
-    </view>
-    <view class="divider"></view>
-    <view class="field-block">
-      <text class="field-label">本次修改内容</text>
-      <text class="field-value">—</text>
-    </view>
+  <view wx:if="{{viewState === 'loading'}}" class="card">
+    <text class="field-label">正在加载</text>
+  </view>
+  <view wx:elif="{{viewState === 'failed'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <button class="btn-secondary cta-btn" bindtap="onReloadTap">重试</button>
+  </view>
+  <view wx:elif="{{viewState === 'empty'}}" class="card">
+    <text class="field-label">暂无待处理任务</text>
   </view>
 
-  <!-- 处理原因输入 + 历史审核结果卡内脚注 -->
-  <view class="card">
-    <text class="field-label">处理原因</text>
-    <view class="reason-input">
-      <text class="reason-placeholder">填写处理原因</text>
+  <block wx:elif="{{viewState === 'content'}}">
+    <!-- 待审申请卡 -->
+    <view class="card">
+      <view class="row-between">
+        <text class="field-label">申请人</text>
+        <text class="field-value">{{detail.applicant}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">提交时间</text>
+        <text class="field-value">{{detail.submittedAtText}}</text>
+      </view>
+      <view class="divider"></view>
+      <view class="field-block">
+        <text class="field-label">本次修改内容</text>
+        <text class="field-value">{{detail.contentText}}</text>
+      </view>
     </view>
-    <view class="card-footnote">历史审核结果：暂无</view>
+
+    <!-- 处理原因 + 历史审核结果 -->
+    <view class="card">
+      <text class="field-label">处理原因</text>
+      <textarea class="reason-input" value="{{reason}}" bindinput="onReasonInput" placeholder="填写处理原因" maxlength="500"></textarea>
+      <view class="card-footnote">历史审核结果：{{detail.historyText}}</view>
+    </view>
+  </block>
+
+  <view wx:if="{{processing}}" class="card">
+    <text class="field-label">正在处理，请稍候</text>
+  </view>
+  <view wx:elif="{{done}}" class="card">
+    <text class="field-label">已提交</text>
+  </view>
+  <view wx:if="{{notice}}" class="card">
+    <text class="field-label">{{notice}}</text>
   </view>
 
   <!-- 底部 CTA -->
   <view class="cta-bar">
-    <button class="btn-primary cta-btn" hover-class="cta-hover" bindtap="onApproveTap">通过</button>
-    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onRejectTap">驳回</button>
+    <button class="btn-primary cta-btn" hover-class="cta-hover" data-version="{{detail.taskVersion}}" disabled="{{viewState !== 'content' || busy || processing || done}}" bindtap="onApproveTap">通过</button>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover" data-version="{{detail.taskVersion}}" disabled="{{viewState !== 'content' || busy || processing || done}}" bindtap="onRejectTap">驳回</button>
   </view>
 </view>

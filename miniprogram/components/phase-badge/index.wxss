@@ -8,8 +8,8 @@
   --color-warning-soft: #FAEAD8;
   --color-warning: #D4A574;
 }
-.phase-badge { display: inline-flex; align-items: center; height: 40rpx; padding: 0 16rpx; border-radius: 20rpx; background: var(--color-neutral-soft); }
-.phase-dot { width: 12rpx; height: 12rpx; margin-right: 8rpx; border-radius: 50%; background: var(--color-text-hint); }
+.phase-badge { display: inline-flex; align-items: center; height: 40rpx; padding: 0 16rpx; border-radius: var(--radius-chip); background: var(--color-neutral-soft); }
+.phase-dot { width: 12rpx; height: 12rpx; margin-right: 8rpx; border-radius: var(--radius-pill); background: var(--color-text-hint); }
 .phase-text { font-size: 22rpx; line-height: 40rpx; color: var(--color-text-muted); }
 
 .tone-success { background: var(--color-success-soft); }

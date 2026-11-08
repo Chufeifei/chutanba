@@ -1,14 +1,11 @@
+@import "../../../styles/component-tokens.wxss";
+
 /*
- * status-chip 样式。色值一律 var(--...)，单一真相源为 app.wxss 的 page 变量区。
- * 样式隔离风险：自定义组件默认 styleIsolation=isolated，page 上的 CSS 变量
- * 不会可靠继承到组件根节点；本轮「未接线」状态下 var(--...) 会取空值
- * （不报编译错，但胶囊底色/文字色/圆角会视觉失效）。
- * 接线前提（二选一，本轮均不执行，留待终审裁决）：
- *   A) 组件根节点显式重声明所需 --变量（内联色值，会重建色值副本，不推荐）；
- *   B) 在本文件首行引入 C2 的 styles/component-tokens.wxss token 片段
- *      （相对路径 ../../styles/component-tokens.wxss），并给根节点挂
- *      .c-token-host 类，变量即定义于根节点并向子节点继承。
- * 本轮不含真实引入指令、不写死任何色值，避免未接线时编译失败。
+ * status-chip 样式。色值一律 var(--...)，变量由 component-tokens.wxss 单一真相源提供。
+ * 自定义组件默认 styleIsolation=isolated，page 上的变量不会继承到组件根节点：
+ * 首行 @import token 片段后，根节点挂 .c-token-host，变量即定义于根节点并向内继承。
+ * tone 三态（neutral 默认 / success / warning）全部取 var(--color-*)；
+ * 不写死任何色值，圆角只取 var(--radius-chip)。
  */
 .c-status-chip {
   display: inline-flex;
@@ -20,8 +17,21 @@
   padding: 0 24rpx;
   border-radius: var(--radius-chip);
   background: var(--color-neutral-soft);
-  overflow: hidden; /* 文字不得飘出胶囊 */
+  overflow: visible; /* 文字不出框由 __text 的 ellipsis 保证；放开裁剪以承载透明热区 */
   box-sizing: border-box;
+  position: relative;
+}
+/* 透明扩展热区：视觉 68rpx 高不变，实际可点区域 ≥88rpx */
+.c-status-chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  min-width: 88rpx;
+  height: 100%;
+  min-height: 88rpx;
+  transform: translate(-50%, -50%);
 }
 .c-status-chip__text {
   display: block;
@@ -34,6 +44,13 @@
   text-overflow: ellipsis; /* 超长单行省略，不撑破胶囊 */
   color: var(--color-text-muted);
 }
+/* 三态色值全部走 token，与工作台 status-point / phase-badge 同口径 */
+.c-status-chip.tone-success { background: var(--color-success-soft); }
+.c-status-chip.tone-success .c-status-chip__text { color: var(--color-success); }
+.c-status-chip.tone-warning { background: var(--color-warning-soft); }
+.c-status-chip.tone-warning .c-status-chip__text { color: var(--color-warning); }
+
+.c-status-chip.is-fluid { width: 100%; }
 .c-status-chip.is-active {
   background: var(--color-brand);
 }

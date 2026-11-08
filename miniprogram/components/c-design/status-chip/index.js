@@ -12,6 +12,8 @@ Component({
     active: { type: Boolean, value: false },
     disabled: { type: Boolean, value: false },
     value: { type: null, value: null }, // 透传值，类型不限（null = 任意类型）
+    tone: { type: String, value: 'neutral' }, // neutral | success | warning，三态色值走 token
+    fluid: { type: Boolean, value: false }, // true 时撑满父容器，用于一行均分的多胶囊场景
   },
 
   methods: {

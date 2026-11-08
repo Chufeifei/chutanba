@@ -1,14 +1,11 @@
+@import "../../../styles/component-tokens.wxss";
+
 /*
- * state-hero 样式。色值一律 var(--...)，单一真相源为 app.wxss 的 page 变量区。
- * 样式隔离风险：自定义组件默认 styleIsolation=isolated，page 上的 CSS 变量
- * 不会可靠继承到组件根节点；本轮「未接线」状态下 var(--...) 会取空值
- * （不报编译错，但白卡/文案色/几何色块/圆角会视觉失效）。
- * 接线前提（二选一，本轮均不执行，留待终审裁决）：
- *   A) 组件根节点显式重声明所需 --变量（内联色值，会重建色值副本，不推荐）；
- *   B) 在本文件首行引入 C2 的 styles/component-tokens.wxss token 片段
- *      （相对路径 ../../styles/component-tokens.wxss），并给根节点挂
- *      .c-token-host 类，变量即定义于根节点并向子节点继承。
- * 本轮不含真实引入指令、不写死任何色值，避免未接线时编译失败。
+ * state-hero 样式。色值一律 var(--...)，单一真相源为首行 @import 的
+ * miniprogram/styles/component-tokens.wxss 的 .c-token-host 变量声明。
+ * 组件默认 styleIsolation=isolated，page 上的 CSS 变量不会继承到组件根节点；
+ * 根节点挂 .c-token-host 后变量定义于根节点并向子节点继承，结果与隔离级别无关。
+ * 本文件不写死任何十六进制色值；border-radius 一律走 var(--radius-*) 或 0。
  */
 .c-state-hero {
   width: 686rpx;
@@ -59,7 +56,7 @@
   top: 4rpx;
   width: 28rpx;
   height: 28rpx;
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   background: var(--color-brand);
 }
 /* 枚举只切换兜底几何配色，不改结构 */

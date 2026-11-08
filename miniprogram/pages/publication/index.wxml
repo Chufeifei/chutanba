@@ -1,5 +1,5 @@
 <view class="page-shell">
-  <state-view
+  <c-state-hero
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
@@ -22,9 +22,9 @@
       <text class="section-title">本人公开选择</text>
       <view class="state-line">{{model.self.statusText}}</view>
       <view class="state-line" wx:if="{{model.self.stopped}}">停止于 {{model.self.stoppedText}}</view>
-      <button class="inline-btn" wx:if="{{model.self.canStop}}" disabled="{{submitPending}}" bindtap="onStopTap">停止公开</button>
-      <button class="inline-btn" wx:if="{{model.self.canResume}}" disabled="{{submitPending}}" bindtap="onResumeTap">恢复公开</button>
-      <button class="inline-btn" wx:if="{{!model.self.canStop && !model.self.canResume}}" disabled>暂不可恢复公开</button>
+      <button class="btn-primary inline-btn" wx:if="{{model.self.canStop}}" disabled="{{submitPending}}" bindtap="onStopTap">停止公开</button>
+      <button class="btn-primary inline-btn" wx:if="{{model.self.canResume}}" disabled="{{submitPending}}" bindtap="onResumeTap">恢复公开</button>
+      <button class="btn-primary inline-btn" wx:if="{{!model.self.canStop && !model.self.canResume}}" disabled>暂不可恢复公开</button>
     </view>
 
     <view class="card">
@@ -41,7 +41,7 @@
     </view>
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
-    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+    <button class="btn-secondary query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
   </block>
 
   <confirm-sheet

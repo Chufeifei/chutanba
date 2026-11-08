@@ -9,24 +9,21 @@
  */
 const identityStore = require('../../store/identity');
 const { refreshIdentity, describeProfileState } = require('../../services/account');
+const openDays = require('../../services/open-days');
+const feedback = require('../../services/feedback');
 const { CAPABILITY } = require('../../config/contracts');
 const { VIEW_STATE, createViewState } = require('../../utils/view-state');
 
 // 入口到能力的映射：有能力才显示，能力来自服务端 /me，不来自客户端推断
 const ENTRY_DEFS = [
-  { key: 'feedback', text: '现场反馈', hint: '查看可反馈的营业轮次与已提交记录', capability: CAPABILITY.SUBMIT_FEEDBACK },
-  { key: 'profile', text: '摊主资料', hint: '提交或修改基本资料，查看审核结果', capability: CAPABILITY.MANAGE_PROFILE },
-  { key: 'workbench', text: '摊主工作台', hint: '定位开摊、刷新位置、收摊', capability: CAPABILITY.OPERATE_SESSION },
-  { key: 'publication', text: '公开与资料处理', hint: '停止或恢复公开、处理个人资料', capability: CAPABILITY.CONTROL_PUBLICATION },
-  {
-    key: 'management',
-    text: '管理入口',
-    hint: '资料审核、现场复核、治理与人工复核',
-    capability: CAPABILITY.MANAGE_PROFILE_REVIEW,
-  },
+  { key: 'feedback', text: '现场反馈', capability: CAPABILITY.SUBMIT_FEEDBACK },
+  { key: 'profile', text: '摊主资料', capability: CAPABILITY.MANAGE_PROFILE },
+  { key: 'workbench', text: '摊主工作台', capability: CAPABILITY.OPERATE_SESSION },
+  { key: 'publication', text: '公开与资料处理', capability: CAPABILITY.CONTROL_PUBLICATION },
+  { key: 'management', text: '管理入口', capability: CAPABILITY.MANAGE_PROFILE_REVIEW },
 ];
 
-// 已交付页面的真实路由。未交付的入口不跳转，只给一句明确说明。
+// 已交付页面的真实路由，逐条对应 app.json 的 pages / subPackages
 const ENTRY_ROUTES = {
   feedback: '/pages/feedback-candidates/index',
   profile: '/pages/vendor-profile/index',
@@ -34,6 +31,9 @@ const ENTRY_ROUTES = {
   publication: '/pages/publication/index',
   management: '/packageManagement/pages/index/index',
 };
+
+// 治理能力单独落在白卡列表下方，只由能力位决定是否可见
+const GOVERNANCE_KEY = 'management';
 
 Page({
   data: {
@@ -47,9 +47,10 @@ Page({
     selfStopped: false,
     governancePaused: false,
     entries: [],
-    // 数据小卡字段：一期 /me 未下发统计值，确定值 0，待统计接口接入后由 renderIdentity 覆写
-    statOpenDays: 0,
-    statFeedbackCount: 0,
+    showGovernance: false,
+    // 两枚小卡取只读域接口的真实值，未取到前显示 —，不以 0 起步
+    statOpenDays: '—',
+    statFeedbackCount: '—',
   },
 
   onLoad() {
@@ -58,11 +59,22 @@ Page({
   },
 
   onShow() {
+    // 与 discover.onShow 同口径读取视图偏好，让三态闭环在两页写法一致：
+    // 「我的」恒为 selected=2，偏好只回填内存态、不改写持久化，
+    // 从地图切到本页再回首页时 discover.onShow 仍按原偏好恢复，不漂移。
+    const app = getApp();
+    const preferred = wx.getStorageSync('preferredViewMode')
+      || (app.globalData && app.globalData.viewMode)
+      || 'list';
+    if (!app.globalData) app.globalData = {};
+    app.globalData.viewMode = preferred === 'map' ? 'map' : 'list';
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
       this.getTabBar().setData({ selected: 2 });
     }
-    // 静默刷新：失败时保留已有快照，不把页面清空
-    refreshIdentity({ silent: true }).catch(() => null);
+    // 静默刷新：失败时保留已有快照，不把页面清空；成功后再取两枚小卡的值
+    refreshIdentity({ silent: true })
+      .then(() => this.loadStats())
+      .catch(() => null);
     this.renderIdentity();
   },
 
@@ -73,23 +85,40 @@ Page({
 
   renderIdentity() {
     const snapshot = identityStore.getSnapshot();
+    const visible = ENTRY_DEFS.filter((entry) => identityStore.hasCapability(entry.capability));
     this.setData({
       identified: Boolean(snapshot),
       profileStateLabel: describeProfileState(snapshot && snapshot.profileState),
       profileEligible: Boolean(snapshot && snapshot.profileEligible),
       selfStopped: Boolean(snapshot && snapshot.selfStopped),
       governancePaused: Boolean(snapshot && snapshot.governancePaused),
-      entries: ENTRY_DEFS.filter((entry) => identityStore.hasCapability(entry.capability)),
+      entries: visible.filter((entry) => entry.key !== GOVERNANCE_KEY),
+      showGovernance: visible.some((entry) => entry.key === GOVERNANCE_KEY),
     });
+  },
+
+  /** 两枚小卡各取一个只读域接口的真实值；读取失败保留当前显示，不回退成占位数字。 */
+  async loadStats() {
+    const snapshot = identityStore.getSnapshot();
+    if (!snapshot || !snapshot.accountId) return;
+    try {
+      const result = await openDays.loadOpenDays();
+      this.setData({ statOpenDays: result.model ? result.model.totalDays : 0 });
+    } catch (error) {
+      // 读取失败保留已有值
+    }
+    try {
+      const page = await feedback.loadMyRecords();
+      this.setData({ statFeedbackCount: page.records.length });
+    } catch (error) {
+      // 读取失败保留已有值
+    }
   },
 
   onEntryTap(event) {
     const key = event.currentTarget.dataset.key;
     const route = ENTRY_ROUTES[key];
-    if (!route) {
-      wx.showToast({ title: '暂不可用', icon: 'none' });
-      return;
-    }
+    if (!route) return;
     wx.navigateTo({ url: route });
   },
 

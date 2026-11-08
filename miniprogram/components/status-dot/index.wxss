@@ -9,7 +9,7 @@
   --status-dot-negative: #C15B3E;
 }
 .status-row { display: inline-flex; align-items: center; gap: 12rpx; color: var(--color-text-muted); font-size: 26rpx; line-height: 36rpx; }
-.status-dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: var(--color-text-hint); flex: none; }
+.status-dot { width: 16rpx; height: 16rpx; border-radius: var(--radius-pill); background: var(--color-text-hint); flex: none; }
 .status-positive .status-dot { background: var(--color-success); }
 .status-warning .status-dot { background: var(--color-warning); }
 .status-negative .status-dot { background: var(--status-dot-negative); }

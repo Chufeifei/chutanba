@@ -8,8 +8,8 @@
  */
 const { formatMoment, formatOpenDate, formatCount } = require('../../utils/formatter');
 
-// 需求 F04 的跨日说明：累计出摊按日记录
-const NOTICE_TEXT = '累计出摊按日记录';
+// 列表顶部展示提示文案
+const NOTICE_TEXT = '按日汇总';
 
 function toDayItem(row) {
   const source = row || {};

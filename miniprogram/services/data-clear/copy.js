@@ -7,7 +7,7 @@
  */
 const TIP = Object.freeze({
   PREVIEW_FAILED: '暂时无法获取可清除范围，请稍后重试',
-  NEED_EXPLICIT_ALL: '当前账号仍有摊主资料，请改选「账号资料与摊主资料全部」后再提交',
+  NEED_EXPLICIT_ALL: '请改选全部资料',
   ACCOUNT_VERSION_FAILED: '无法确认账号最新状态，请重试',
   SUBMITTED: '清除请求已成立',
   KEEP_OLD_SCOPE: '请先查看清除范围再提交',
@@ -21,9 +21,9 @@ function previewHint(preview) {
 
 /** 请求成立后的确认文案：成立时刻 + 最迟处理时刻，不用"已完成"。 */
 function submittedText(model) {
-  const parts = ['请求已成立，清除会按范围逐步处理。'];
+  const parts = ['请求已成立'];
   if (model && model.retention.length) {
-    parts.push('标注为必要保留的记录不会删除，页面会逐条说明依据。');
+    parts.push('部分记录需保留');
   }
   return parts.join('');
 }

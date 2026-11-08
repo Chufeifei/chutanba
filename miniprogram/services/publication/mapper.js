@@ -17,14 +17,14 @@ function toSelfSection({ stopped, stoppedAtMs, activeProfileAvailable }) {
     statusText: stopped ? '你已停止公开' : '你正在公开',
     stoppedText: stopped ? formatMoment(stoppedAtMs) : '',
     hint: stopped
-      ? '停止期间顾客看不到你的摊位，也不能开摊。'
-      : '只有你主动停止或管理治理限制才会隐藏摊位。',
+      ? '摊位暂不展示'
+      : '摊位展示中',
     actionText: stopped ? '恢复公开' : '停止公开',
     // 停止任何时候都可点；恢复需要已生效资料，否则服务端会 PROFILE_REQUIRED
     canStop: !stopped,
     canResume: stopped && activeProfileAvailable,
     resumeBlockedText: stopped && !activeProfileAvailable
-      ? '当前没有生效中的摊主资料，先补齐资料并通过审核才能恢复公开。'
+      ? '请先补齐资料'
       : '',
   };
 }
@@ -34,7 +34,7 @@ function toGovernanceSection({ paused, pausedAtMs }) {
     paused,
     statusText: paused ? '当前处于治理暂停' : '没有治理限制',
     pausedText: paused ? formatMoment(pausedAtMs) : '',
-    hint: '治理限制只能由管理处理；你在这里执行任何操作都不会解除它。',
+    hint: '治理限制由管理处理',
   };
 }
 
@@ -49,7 +49,7 @@ function toProfileSection(profileModel) {
     stateLabel: PROFILE_STATE_LABEL[state] || PROFILE_STATE_LABEL[PROFILE_STATE.NONE],
     // 只有 ACTIVE 才算"有生效资料"；其余状态都要先补齐并过审
     needsProfile: state !== PROFILE_STATE.ACTIVE,
-    hint: state === PROFILE_STATE.ACTIVE ? '' : '资料未生效前不能开摊，也不能恢复公开。',
+    hint: state === PROFILE_STATE.ACTIVE ? '' : '资料未生效',
   };
 }
 
@@ -78,7 +78,7 @@ function toPublicationModel(raw, profileModel) {
     profile: toProfileSection(profileModel),
     // 两项同时生效时必须明说它们不会互相解除
     bothLimitedText: stopped && paused
-      ? '本人停止与治理暂停同时生效，解除其中一项不会解除另一项。'
+      ? '两项限制同时生效'
       : '',
   };
 }

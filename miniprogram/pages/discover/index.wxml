@@ -25,9 +25,8 @@
   <view class="notice-bar warn" wx:if="{{syncStale}}">状态未更新</view>
 
   <!-- 03 空状态 / 18 加载失败：686×400rpx 白卡（插画 + 主文案 + 说明 + 重新加载） -->
-  <state-view
+  <c-state-hero
     wx:if="{{!hasContent}}"
-    class="state-hero"
     type="{{viewState.type}}"
     title="{{viewState.type === 'retryable-error' ? '暂时没能加载' : (viewState.type === 'empty' ? '附近还没有摊位' : viewState.title)}}"
     description="{{viewState.type === 'retryable-error' ? '请重新加载' : (viewState.type === 'empty' ? '换个品类，或稍后再来看看' : viewState.description)}}"

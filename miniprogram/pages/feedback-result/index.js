@@ -34,7 +34,10 @@ Page({
     if (!feedbackId) {
       if (!fromSubmit) {
         this.setData({
-          viewState: createViewState(VIEW_STATE.TERMINAL_ERROR, { description: '缺少反馈标识' }),
+          viewState: createViewState(VIEW_STATE.TERMINAL_ERROR, {
+            description: '缺少反馈标识',
+            actionText: '返回详情',
+          }),
         });
       }
       return;

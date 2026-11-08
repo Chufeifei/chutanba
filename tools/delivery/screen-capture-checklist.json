@@ -1,0 +1,456 @@
+{
+  "meta": {
+    "title": "出摊吧 · 一期 MVP ｜ 23 屏逐屏截图比对清单",
+    "package": "TOOL-2 / Phase 5 / T47",
+    "designFileId": "743864343511294",
+    "designFileUrl": "https://ardot.tencent.com/file/743864343511294",
+    "snapshot": "tools/design-snapshot.json",
+    "snapshotVersion": "2026-11-08.1",
+    "manifest": "tools/design-parity-manifest.json",
+    "screenCount": 23,
+    "routeCount": 18,
+    "branchScreenCount": 7,
+    "branchScreens": ["17", "18", "19", "20", "21", "22", "23"],
+    "statusLegend": "pending = 待截图比对；本轮不产生任何 pass/fail 实测结论",
+    "note": "全部 23 屏 status 一律为 pending。本清单是『待执行截图比对计划』，仅列出需要核对的视觉点与期望 token，未附任何真实截图、未记录任何比对结果，不得虚构真实截图结果。",
+    "limitation": "本轮无微信开发者工具与真机，静态自检 PASS 不代表像素级或真机验收；像素级比对须在设计稿画布与真机截图之间人工执行后回填。",
+    "expectedTokensGuide": "每屏 expectedTokens 覆盖三类：色值(color) / 圆角(radius) / 按钮规格(button)，并要求参考稿旧色值零残留(legacyColorsForbidden)。完整 token 基线见 designTokenBaseline。",
+    "designTokenBaseline": {
+      "colors": {
+        "background": "#FAF6EE",
+        "primary": "#E07856",
+        "vending": "#87A878",
+        "closingSoon": "#D4A574",
+        "textPrimary": "#5C5A55",
+        "textSecondary": "#8A877F",
+        "white": "#FFFFFF",
+        "lightOrange": "#FDEDE5",
+        "honeyLight": "#FAEAD8"
+      },
+      "radius": {
+        "card": "32rpx",
+        "primaryButton": "52rpx",
+        "secondaryButton": "44rpx",
+        "capsule": "36rpx",
+        "pill": "72rpx"
+      },
+      "buttonSizes": {
+        "primary": { "width": "686rpx", "height": "104rpx" },
+        "secondary": { "width": "686rpx", "height": "88rpx" }
+      },
+      "fontSizes": {
+        "homeTitle": "56rpx",
+        "subtitle": "26rpx",
+        "cardName": "34rpx",
+        "description": "26rpx",
+        "status": "24rpx"
+      },
+      "legacyColorsForbidden": ["#FF7A45", "#FAF8F5", "#1D9E75", "#B26A00", "#34C759", "#E54D42", "#D85F32"]
+    }
+  },
+  "screens": [
+    {
+      "screen": "01",
+      "name": "01 首页 · 列表（顾客）",
+      "route": "pages/discover/index",
+      "nodeId": "3:55",
+      "hasTabBar": true,
+      "stateBranch": false,
+      "capturePoints": ["页头标题与副标题", "定位与结果行", "摊位卡 老周糖水铺 / 阿琴煎饼 / 巷口烤薯 的状态徽章", "地图找摊入口", "底部 TabBar 列表/地图/我的 三态（列表选中）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "02",
+      "name": "02 首页 · 地图（顾客）",
+      "route": "pages/discover/index",
+      "nodeId": "3:75",
+      "hasTabBar": true,
+      "stateBranch": false,
+      "capturePoints": ["页头标题与副标题", "示意地图（须标注为非真实坐标）", "底部 TabBar · 地图激活态", "列表/地图视图切换一致性"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "03",
+      "name": "03 首页 · 空状态（顾客）",
+      "route": "pages/discover/index",
+      "nodeId": "3:108",
+      "hasTabBar": true,
+      "stateBranch": false,
+      "capturePoints": ["页头标题与副标题", "空状态区（图形 + 中性短文案）", "底部 TabBar · 列表选中态", "空态不出现业务规则解释文案"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "04",
+      "name": "04 摊位详情 · 出摊中（顾客）",
+      "route": "pages/vendor-detail/index",
+      "nodeId": "3:128",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar 返回与标题", "平台默认品类视觉", "审核通过的基本资料", "当前位置卡", "出摊中状态徽章 #87A878", "CTA 导航前往（主按钮 52rpx）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "05",
+      "name": "05 摊位详情 · 休息中（顾客）",
+      "route": "pages/vendor-detail/index",
+      "nodeId": "3:149",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "平台默认品类视觉（休息态）", "休息中状态卡", "休息引导文案", "CTA 导航不可用（禁用态，色值与描边规格）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "06",
+      "name": "06 导航前复核 · 准备收摊（顾客）",
+      "route": "pages/vendor-detail/index",
+      "nodeId": "3:166",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "复核结果卡", "准备收摊提示卡（状态徽章 #D4A574）", "CTA 双按钮（仍要导航 主 / 暂不前往 次）", "CTA 区高度 120rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "07",
+      "name": "07 简易现场状态反馈（顾客）",
+      "route": "pages/feedback-form/index",
+      "nodeId": "3:185",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "页面切换（现场反馈 / 候选记录）", "反馈对象", "问题分组标题", "现场状态选项（Chip 圆角 36rpx）", "位置证据卡", "补充说明输入", "CTA 提交反馈（主按钮）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "08",
+      "name": "08 我的 · 个人中心",
+      "route": "pages/mine/index",
+      "nodeId": "3:204",
+      "hasTabBar": true,
+      "stateBranch": false,
+      "capturePoints": ["页头标题", "账号卡", "当前身份", "数据小卡", "功能入口列表", "底部 TabBar · 我的激活态"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "09",
+      "name": "09 摊主工作台 · 休息中",
+      "route": "pages/workbench/index",
+      "nodeId": "3:227",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "状态卡 · 休息中", "数据小卡", "出摊日记录文字链", "今日记录空态卡", "CTA 一键开摊（主按钮）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "10",
+      "name": "10 开摊 · 确认本轮预计收摊时间",
+      "route": "pages/workbench/index",
+      "nodeId": "3:248",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "时间选择卡", "定位说明卡", "CTA 确认并定位开摊（主按钮 52rpx）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "11",
+      "name": "11 摊主工作台 · 出摊中/准备收摊",
+      "route": "pages/workbench/index",
+      "nodeId": "3:268",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "状态卡 · 出摊中 / 准备收摊 双态徽章", "数据小卡", "当前位置卡", "出摊日记录", "CTA 双按钮（收摊 主 / 手动收摊 次）", "CTA 区 120rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "12",
+      "name": "12 摊主资料与人工审核结果",
+      "route": "pages/vendor-profile/index",
+      "nodeId": "3:288",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "审核结果卡", "基本资料表单", "CTA 提交审核（主按钮）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "13",
+      "name": "13 摊主资料与处理记录 · 停止公开/清除",
+      "route": "pages/publication/index",
+      "nodeId": "3:309",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "本人停止公开状态卡", "本人处理记录", "无 CTA（内容区结束）"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "14",
+      "name": "14 管理 · 资料人工审核",
+      "route": "packageManagement/pages/profile-review/index",
+      "nodeId": "3:330",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "待审申请卡", "处理原因输入", "本次修改内容", "CTA 双按钮（通过 主 / 驳回 次）", "CTA 区 120rpx", "分包页标题与返回路径"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "15",
+      "name": "15 管理 · 现场纠错与治理暂停公开",
+      "route": "packageManagement/pages/field-review/index",
+      "nodeId": "3:348",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "反馈详情卡", "核实状态", "补充说明与处理记录", "CTA 双按钮（结束错误营业 主 / 治理暂停公开 次）", "CTA 区 120rpx", "分包页权限态视觉"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "16",
+      "name": "16 我的 → 现场反馈（二级页）",
+      "route": "pages/feedback-candidates/index",
+      "nodeId": "3:454",
+      "hasTabBar": false,
+      "stateBranch": false,
+      "capturePoints": ["NavBar", "页面切换", "5 条记录卡（待反馈入口 / 阿琴煎饼 / 老周糖水铺 / 城南梨汤 / 巷口烤薯）", "列表结束提示", "无 CTA 区"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "17",
+      "name": "17 首页 · 定位拒绝",
+      "route": "pages/discover/index",
+      "nodeId": "3:616",
+      "hasTabBar": true,
+      "stateBranch": true,
+      "stateKey": "locationHint",
+      "trigger": "定位授权被拒",
+      "expectedState": "locationHint 置位（定位被拒）：出现定位提示条与授权引导，列表仍可浏览全部摊位；不出现『拒绝定位仍可浏览全部摊位』等规则解释文案",
+      "entry": "首页 → 首次进入触发 wx.getLocation 授权弹窗 → 点『拒绝』；或系统设置中关闭定位后重进首页",
+      "exit": "授权后重新加载（重新定位成功）",
+      "capturePoints": ["页头标题与副标题", "定位提示条 / 授权引导卡", "3 张摊位卡仍可浏览（老周糖水铺 / 阿琴煎饼 / 巷口烤薯）", "重新定位入口", "底部 TabBar 列表选中态"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "18",
+      "name": "18 首页 · 加载失败",
+      "route": "pages/discover/index",
+      "nodeId": "3:638",
+      "hasTabBar": true,
+      "stateBranch": true,
+      "stateKey": "viewState",
+      "trigger": "列表请求失败",
+      "expectedState": "viewState=retryable-error（暂未加载）：整页状态卡 + 重新加载按钮，中性短状态，无业务规则解释文案",
+      "entry": "首页 → 断网 / 列表接口返回失败（NETWORK_ERROR 归一）触发加载失败",
+      "exit": "重新加载成功回到列表",
+      "capturePoints": ["页头标题与副标题", "加载失败区（整页状态卡 200 高）", "重新加载按钮", "底部 TabBar 列表选中态"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "19",
+      "name": "19 详情 · 导航复核失败",
+      "route": "pages/vendor-detail/index",
+      "nodeId": "3:656",
+      "hasTabBar": false,
+      "stateBranch": true,
+      "stateKey": "navReviewFailure",
+      "trigger": "导航复核未过",
+      "expectedState": "navReviewFailure=true（复核未通过）：复核提示条 + 导航与复核资料卡，CTA 可重新复核",
+      "entry": "摊位详情页 → 点击『导航前往』→ 导航复核未通过（NAVIGATION_REVIEW_BLOCKED）",
+      "exit": "复核通过继续导航",
+      "capturePoints": ["NavBar", "复核失败提示条（64 高）", "导航与复核资料卡", "CTA 双按钮（重新复核 主 / 返回详情 次）", "CTA 区 120rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "20",
+      "name": "20 详情 · 不可查看",
+      "route": "pages/vendor-detail/index",
+      "nodeId": "3:672",
+      "hasTabBar": false,
+      "stateBranch": true,
+      "stateKey": "viewState",
+      "trigger": "当前不可查看",
+      "expectedState": "viewState=terminal-error（当前不可查看）：不可查看卡 + 返回入口，终态不可在该页内恢复",
+      "entry": "摊位详情页 → 摊位已停止公开 / 下架 / 无访问权限（terminal-error）",
+      "exit": "重新进入可用详情",
+      "capturePoints": ["NavBar", "不可查看卡", "CTA 返回首页（主按钮 52rpx）", "CTA 区 76rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "21",
+      "name": "21 现场反馈 · 提交成功",
+      "route": "pages/feedback-result/index",
+      "nodeId": "3:692",
+      "hasTabBar": false,
+      "stateBranch": true,
+      "stateKey": "fromSubmit",
+      "trigger": "反馈提交完成",
+      "expectedState": "fromSubmit=true（反馈已提交）：提交成功区 + 本次反馈结果卡，来自 202 轮询确认的终态",
+      "entry": "反馈表单 → 提交反馈 → 返回 202 → 轮询至终态 → 进入结果页",
+      "exit": "离开结果页",
+      "capturePoints": ["NavBar", "提交成功区（250 高）", "本次反馈结果卡", "CTA 双按钮（查看我的反馈记录 主 / 返回详情 次）", "CTA 区 120rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "22",
+      "name": "22 摊主资料 · 审核中",
+      "route": "pages/vendor-profile/index",
+      "nodeId": "3:712",
+      "hasTabBar": false,
+      "stateBranch": true,
+      "stateKey": "hasPending",
+      "trigger": "资料审核中",
+      "expectedState": "hasPending=true（审核中）：审核状态卡 + 资料对照卡，CTA 呈禁用态『审核中不可修改』",
+      "entry": "摊主资料页 → 已提交审核且审核未出结果（PROFILE_REVIEW_PENDING）",
+      "exit": "审核结束",
+      "capturePoints": ["NavBar", "审核状态卡", "资料对照卡", "CTA 审核中不可修改（禁用态色值与描边）", "CTA 区 76rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    },
+    {
+      "screen": "23",
+      "name": "23 现场反馈 · 定位失败",
+      "route": "pages/feedback-form/index",
+      "nodeId": "3:731",
+      "hasTabBar": false,
+      "stateBranch": true,
+      "stateKey": "locationFailed",
+      "trigger": "定位未取得",
+      "expectedState": "locationFailed=true（定位失败）：位置证据色块 + 重新定位入口，表单仍可填写，不写死失败文案",
+      "entry": "反馈表单 → 定位未取得 / 坐标无效（LOCATION_INVALID 归一）",
+      "exit": "定位成功回表单",
+      "capturePoints": ["NavBar", "页面切换", "反馈对象", "现场状态选项", "位置证据色块（180 高）", "描述输入", "CTA 双按钮（重新定位 主 / 返回详情 次）", "CTA 区 120rpx"],
+      "expectedTokens": {
+        "color": "背景 #FAF6EE / 主色 #E07856 / 出摊中 #87A878 / 准备收摊 #D4A574 / 主文字 #5C5A55 / 次文字 #8A877F / 浅橙 #FDEDE5",
+        "radius": "卡片 32rpx / 主按钮 52rpx / 次按钮 44rpx / 胶囊 36rpx / TabBar Pill 72rpx",
+        "button": "主按钮 686rpx×104rpx 实底 / 次按钮 686rpx×88rpx 描边 / 双按钮 CTA 区 120rpx",
+        "legacyColorsForbidden": true
+      },
+      "status": "pending"
+    }
+  ]
+}

@@ -1,42 +1,83 @@
 <view class="page-shell has-cta">
-  <!-- 反馈详情卡 -->
-  <view class="card">
-    <view class="row-between">
-      <text class="field-label">反馈对象</text>
-      <text class="field-value">—</text>
-    </view>
-    <view class="field-row row-between">
-      <text class="field-label">反馈类型</text>
-      <text class="field-value">未出摊</text>
-    </view>
-    <view class="field-row row-between">
-      <text class="field-label">提交时间</text>
-      <text class="field-value">—</text>
-    </view>
-  </view>
+  <state-view
+    wx:if="{{!showContent}}"
+    type="{{viewState.type}}"
+    title="{{viewState.title}}"
+    description="{{viewState.description}}"
+    action-text="{{viewState.actionText}}"
+    bind:action="onStateAction"
+  />
 
-  <!-- 核实状态：一行两枚并排胶囊，选中态实心 -->
-  <view class="verify-block">
-    <text class="field-label">核实状态</text>
-    <view class="verify-row">
-      <view class="chip {{verifyState === 'CONFIRMED' ? 'active' : ''}}" data-state="CONFIRMED" bindtap="onVerifyTap">属实</view>
-      <view class="chip {{verifyState === 'DENIED' ? 'active' : ''}}" data-state="DENIED" bindtap="onVerifyTap">不属实</view>
+  <!-- 入口未带事项编号时给出可辨识空态之外的返回入口 -->
+  <view wx:if="{{missingCase}}" class="back-bar" bindtap="onBack">返回管理首页</view>
+
+  <block wx:if="{{showContent}}">
+    <view class="back-bar" bindtap="onBack">返回</view>
+
+    <!-- 反馈详情卡 -->
+    <view class="card">
+      <view class="row-between">
+        <text class="field-label">反馈对象</text>
+        <text class="field-value">{{detail.vendorText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">反馈类型</text>
+        <text class="field-value">{{detail.typeText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">提交时间</text>
+        <text class="field-value">{{detail.openedText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">当前状态</text>
+        <text class="field-value">{{detail.statusText}}</text>
+      </view>
     </view>
-  </view>
 
-  <!-- 顾客补充说明与处理记录合并成一张卡 -->
-  <view class="card">
-    <text class="field-label">顾客补充说明</text>
-    <view class="block-body">暂无</view>
-    <view class="divider"></view>
-    <text class="field-label">处理记录</text>
-    <view class="block-body">暂无</view>
-    <view class="block-body">暂无</view>
-  </view>
+    <!-- 逐事实结论列表：每条事实独立可选结论 -->
+    <view class="card fact-card">
+      <text class="field-label">逐事实结论</text>
+      <view wx:if="{{!facts.length}}" class="block-body">暂无</view>
+      <block wx:for="{{facts}}" wx:key="factId">
+        <view class="fact-item">
+          <text class="fact-text">{{item.text}}</text>
+          <view class="fact-options">
+            <view class="fact-option {{item.result === 'CONFIRM' ? 'active' : ''}}" data-fact-id="{{item.factId}}" data-result="CONFIRM" bindtap="onFactResultTap">属实</view>
+            <view class="fact-option {{item.result === 'NOT_CONFIRM' ? 'active' : ''}}" data-fact-id="{{item.factId}}" data-result="NOT_CONFIRM" bindtap="onFactResultTap">不属实</view>
+          </view>
+        </view>
+      </block>
+    </view>
 
-  <!-- 底部 CTA -->
-  <view class="cta-bar">
-    <button class="btn-primary cta-btn" hover-class="cta-hover" bindtap="onSubmitTap">提交处理</button>
-    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onRejectTap">驳回</button>
-  </view>
+    <!-- 顾客补充说明与处理记录 -->
+    <view class="card">
+      <text class="field-label">顾客补充说明</text>
+      <view class="block-body">{{detail.supplementText}}</view>
+      <view class="divider"></view>
+      <text class="field-label">处理记录</text>
+      <view class="block-body">{{detail.recordText}}</view>
+      <view class="block-body">{{detail.openedText}}</view>
+    </view>
+
+    <!-- 当前轮次区：目标轮次、依据，与历史事实分区 -->
+    <view class="card">
+      <view class="row-between">
+        <text class="field-label">当前轮次</text>
+        <text class="field-value">{{detail.currentSessionText}}</text>
+      </view>
+      <view class="field-row">
+        <text class="field-label">当前异常依据</text>
+        <input class="reason-input" value="{{reason}}" placeholder="请填写" bindinput="onReasonInput" />
+      </view>
+    </view>
+
+    <view class="notice" wx:if="{{notice}}">{{notice}}</view>
+
+    <!-- 底部动作栏：两个动作分别触发，各自独立写 -->
+    <view class="cta-bar">
+      <button class="btn-primary cta-btn" hover-class="cta-hover" disabled="{{busy || pendingAction}}" bindtap="onDecisionTap">提交核实结论</button>
+      <button class="btn-secondary cta-btn" hover-class="cta-hover" disabled="{{busy || pendingAction}}" bindtap="onCorrectionTap">纠错当前轮次</button>
+      <button class="btn-secondary cta-btn" hover-class="cta-hover" wx:if="{{pendingAction}}" bindtap="onQueryOutcome">查看最新结果</button>
+    </view>
+  </block>
 </view>

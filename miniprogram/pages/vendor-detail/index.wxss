@@ -13,11 +13,11 @@
 
 /* 04 当前位置卡：188rpx 地图色块 + 地址距离行 */
 .location-card { margin-top: var(--space-gap); }
-.location-map { width: 100%; height: 188rpx; border-radius: 24rpx; background: linear-gradient(135deg, var(--color-success-soft), var(--color-brand-soft)); }
+.location-map { width: 100%; height: 188rpx; border-radius: var(--radius-card); background: linear-gradient(135deg, var(--color-success-soft), var(--color-brand-soft)); }
 .location-line { margin-top: 16rpx; font-size: 26rpx; color: var(--color-text-muted); }
 
 /* 06/19 蜜色提示条：48px≈96rpx / 64px≈128rpx */
-.review-bar { display: flex; align-items: center; height: 96rpx; margin-bottom: var(--space-gap); padding: 0 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); color: var(--color-warning); font-size: 28rpx; box-sizing: border-box; }
+.review-bar { display: flex; align-items: center; height: 96rpx; margin-bottom: var(--space-gap); padding: 0 24rpx; border-radius: var(--radius-card); background: var(--color-warning-soft); color: var(--color-warning); font-size: 28rpx; box-sizing: border-box; }
 .review-bar.is-lg { height: 128rpx; }
 .review-card { margin-top: 0; }
 .review-title { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
@@ -28,5 +28,5 @@
 .bottom-cta.is-disabled { background: var(--color-neutral-soft); color: var(--color-text-muted); }
 
 /* 局部同步态 */
-.notice-bar { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
+.notice-bar { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: var(--radius-card); background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
 .notice-bar.warn { background: var(--color-warning-soft); color: var(--color-warning); }

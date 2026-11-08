@@ -12,6 +12,7 @@ const timing = require('../../config/timing');
 const detailService = require('../../services/detail');
 const navigation = require('../../services/navigation');
 const liveRefresh = require('../../behaviors/live-refresh');
+const branchStates = require('../../mock/branch-states');
 
 Page({
   behaviors: [liveRefresh],
@@ -35,6 +36,9 @@ Page({
     // 页面参数来自 navigateTo，全是字符串且可能被篡改，必须先校验
     const vendorId = String((query && query.vendorId) || '').trim();
     this._vendorId = vendorId;
+    this._failureKind = 'UNKNOWN';
+    // 列表导航小按钮带 intent=navigate：详情就绪后直接发起本次复核
+    this._autoNavigate = String((query && query.intent) || '') === 'navigate';
     if (!vendorId) {
       this.setData({
         viewState: createViewState(VIEW_STATE.TERMINAL_ERROR, { description: '缺少摊位标识，请返回重新进入' }),
@@ -42,7 +46,11 @@ Page({
       return;
     }
     this.setupLiveRefresh({
-      fetcher: () => detailService.loadDetail(vendorId),
+      fetcher: () => detailService.loadDetail(vendorId).catch((error) => {
+        // 错误进入时统一归一成 kind，失败判定只读分类结果，不再散落比较字段
+        this._failureKind = branchStates.resolveFailureKind(error);
+        throw error;
+      }),
       intervalMs: timing.PUBLIC_POLL_MS,
       onResult: (detail) => this.applyDetail(detail),
       onFailure: (viewState) => this.applyFailure(viewState),
@@ -50,6 +58,8 @@ Page({
   },
 
   applyDetail(detail) {
+    const autoNavigate = this._autoNavigate;
+    this._autoNavigate = false;
     if (detail.availability === AVAILABILITY.UNVIEWABLE) {
       // 本人停止或治理暂停：不给资料快照，避免"不可查看"退化成"资料只读"
       this.setData({
@@ -72,13 +82,19 @@ Page({
       navReviewMessage: '',
       viewState: createViewState(VIEW_STATE.CONTENT),
     });
+    // 从列表导航入口进入：详情就绪且仍在营业时，按同一复核链路发起本次导航
+    if (autoNavigate && this.data.isOpen) this.onNavigate();
   },
 
   applyFailure(viewState) {
+    // 统一分类结果 stateKey === 'viewState' 时按整页/stale 置位，语义不变
+    const stateKey = branchStates.stateKeyOfKind(this._failureKind);
     this.setData({
       syncStale: Boolean(this.data.detail),
-      viewState: this.data.detail
-        ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
+      viewState: stateKey === 'viewState'
+        ? (this.data.detail
+          ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
+          : viewState)
         : viewState,
     });
   },
@@ -100,12 +116,18 @@ Page({
   },
 
   applyNavigation(result) {
+    // 统一分类：把导航结论归一成标准 kind，19 分支态由分类结果（stateKey）驱动，
+    // 不再直接对服务返回的原始字符串做失败判定
+    const kind = branchStates.resolveFailureKind({ data: { kind: result.kind } });
+    // 与 applyFailure 链路共用同一分类字段，屏 19 失败判定与整页失败同源
+    this._failureKind = kind;
+    const stateKey = branchStates.stateKeyOfKind(this._failureKind);
     if (result.kind === 'NEED_CONFIRM') {
       this.setData({ confirmVisible: true, confirmSheet: result.sheet, navReviewFailure: false, navReviewMessage: '' });
       return;
     }
     this.setData({ confirmVisible: false });
-    if (result.kind === 'BLOCKED') {
+    if (stateKey === 'navReviewFailure') {
       // 失败原因只取第一个短句：长规则解释压到 ≤12 字，别整句丢掉
       const message = String(result.message || '复核未通过').split(/[，。；、]/)[0];
       this.setData({
@@ -138,11 +160,13 @@ Page({
   },
 
   onRetryReview() {
+    this._failureKind = 'UNKNOWN';
     this.setData({ navReviewFailure: false, navReviewMessage: '' });
     this.onNavigate();
   },
 
   onReviewBack() {
+    this._failureKind = 'UNKNOWN';
     this.setData({ navReviewFailure: false, navReviewMessage: '' });
   },
 

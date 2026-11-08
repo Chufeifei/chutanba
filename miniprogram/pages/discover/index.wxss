@@ -6,12 +6,24 @@
 .header-picker { display: block; margin: 16rpx -32rpx 0; }
 
 /* 17 定位拒绝：343×36 一行提示条 */
-.location-bar { display: flex; align-items: center; justify-content: space-between; height: 72rpx; margin-bottom: 16rpx; padding: 0 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); box-sizing: border-box; }
+.location-bar { display: flex; align-items: center; justify-content: space-between; height: 72rpx; margin-bottom: 16rpx; padding: 0 24rpx; border-radius: var(--radius-card); background: var(--color-warning-soft); box-sizing: border-box; }
 .location-bar-text { font-size: 24rpx; color: var(--color-warning); }
-.location-bar-action { margin: 0; padding: 0 16rpx; height: 48rpx; line-height: 48rpx; font-size: 24rpx; color: var(--color-brand); background: transparent; border-radius: 24rpx; }
+.location-bar-action { margin: 0; padding: 0 16rpx; height: 48rpx; line-height: 48rpx; font-size: 24rpx; color: var(--color-brand); background: transparent; border-radius: var(--radius-card); position: relative; }
+/* 透明扩展热区：视觉 48rpx 高不变，实际可点区域 ≥88rpx */
+.location-bar-action::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  min-width: 88rpx;
+  height: 100%;
+  min-height: 88rpx;
+  transform: translate(-50%, -50%);
+}
 
 /* 局部同步态 */
-.notice-bar { margin-bottom: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
+.notice-bar { margin-bottom: 24rpx; padding: 20rpx 24rpx; border-radius: var(--radius-card); background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
 .notice-bar.warn { background: var(--color-warning-soft); color: var(--color-warning); }
 
 /* 03 / 18 白卡：686×400rpx */
@@ -21,7 +33,7 @@
 .vendor-list { display: block; }
 .vendor-card-slot { display: block; border-radius: var(--radius-card); overflow: hidden; }
 .vendor-card-slot + .vendor-card-slot { margin-top: var(--space-gap); }
-.map-entry { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 88rpx; margin-top: 24rpx; padding: 16rpx 24rpx; border-radius: 44rpx; background: var(--color-brand-soft); color: var(--color-brand); box-sizing: border-box; }
+.map-entry { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 88rpx; margin-top: 24rpx; padding: 16rpx 24rpx; border-radius: var(--radius-button); background: var(--color-brand-soft); color: var(--color-brand); box-sizing: border-box; }
 .map-entry-main { display: flex; align-items: center; font-size: 30rpx; }
 .map-entry-arrow { margin-left: 8rpx; font-size: 36rpx; }
 .map-entry-sub { margin-top: 4rpx; font-size: 24rpx; color: var(--color-text-muted); }

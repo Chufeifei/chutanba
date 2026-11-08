@@ -1,5 +1,5 @@
 <view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
-  <state-view
+  <c-state-hero
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
@@ -28,7 +28,7 @@
 
   <fixed-cta
     wx:if="{{showContent}}"
-    primary-text="查看我的反馈"
+    primary-text="查看我的反馈记录"
     secondary-text="返回详情"
     bind:primary="onOpenRecords"
     bind:secondary="onStateAction"

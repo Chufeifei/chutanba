@@ -43,7 +43,8 @@ Component({
       }
 
       // home -> 列表视图；map -> 地图视图；两者都以 discover 为落点
-      const mode = tab.key === 'map' ? 'map' : 'list';
+      // 视图意图直接取 TABS 声明的 viewMode，避免 key 硬编码与声明分叉
+      const mode = tab.viewMode || 'list';
       this.persistViewMode(mode);
 
       const current = getCurrentPages().slice(-1)[0];

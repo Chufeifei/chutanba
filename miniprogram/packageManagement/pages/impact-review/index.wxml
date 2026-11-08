@@ -1,20 +1,80 @@
-<view class="page-shell">
-  <view class="card">
-    <view class="row-between">
-      <text class="field-label">复核状态</text>
-      <text class="field-value">待处理</text>
+<view class="page-shell has-cta">
+  <!-- 返回栏由原生 navigationBar 提供，本页无 TabBar -->
+
+  <!-- 加载中 -->
+  <view wx:if="{{viewState === 'loading'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+  </view>
+
+  <!-- 失败态 -->
+  <view wx:if="{{viewState === 'failed'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onReloadTap">重试</button>
+  </view>
+
+  <!-- 空态 -->
+  <view wx:if="{{viewState === 'empty'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onReloadTap">重新加载</button>
+  </view>
+
+  <!-- 列表态：复核任务详情 + 处理原因 -->
+  <block wx:if="{{viewState === 'content' && detail}}">
+    <view class="card">
+      <view class="row-between">
+        <text class="field-label">复核状态</text>
+        <text class="field-value">{{detail.statusText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">申请人</text>
+        <text class="field-value">{{detail.applicant}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">提交时间</text>
+        <text class="field-value">{{detail.submittedAtText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">复核事项</text>
+        <text class="field-value">{{detail.subjectText}}</text>
+      </view>
+      <view class="divider"></view>
+      <view class="field-row row-between">
+        <text class="field-label">影响来源</text>
+        <text class="field-value">{{detail.sourceText}}</text>
+      </view>
+      <view class="field-row row-between">
+        <text class="field-label">影响摘要</text>
+        <text class="field-value">{{detail.impactText}}</text>
+      </view>
     </view>
-    <view class="field-row row-between">
-      <text class="field-label">申请人</text>
-      <text class="field-value">—</text>
+
+    <view class="card">
+      <text class="field-label">处理原因</text>
+      <textarea class="reason-input" value="{{reason}}" bindinput="onReasonInput"
+                placeholder="请填写处理原因" maxlength="500"></textarea>
+      <view class="card-footnote">处理记录：{{detail.recordText}}</view>
     </view>
-    <view class="field-row row-between">
-      <text class="field-label">提交时间</text>
-      <text class="field-value">—</text>
-    </view>
-    <view class="field-row row-between">
-      <text class="field-label">复核事项</text>
-      <text class="field-value">资料争议</text>
-    </view>
+  </block>
+
+  <!-- 提交中：按原键轮询，不重发 -->
+  <view wx:if="{{viewState === 'processing'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <view class="state-action" bindtap="onQueryTap">查看最新结果</view>
+  </view>
+
+  <!-- 结果态 -->
+  <view wx:if="{{viewState === 'done'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <view class="state-action" bindtap="onBackTap">返回列表</view>
+  </view>
+
+  <!-- 底部 CTA：决定按钮携带 GET 详情取到的 taskVersion -->
+  <view class="cta-bar" wx:if="{{viewState === 'content' && detail}}">
+    <button class="btn-primary cta-btn" hover-class="cta-hover"
+            data-version="{{detail.taskVersion}}"
+            bindtap="onApproveTap">通过</button>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover"
+            data-version="{{detail.taskVersion}}"
+            bindtap="onRejectTap">驳回</button>
   </view>
 </view>

@@ -46,7 +46,7 @@ function toActiveSessionSection(raw) {
   return {
     hasActiveSession: true,
     willEnd: Boolean(source.willEnd),
-    text: `当前有一轮营业正在进行（${formatMoment(source.startedAtMs)} 开始），请求成立时会立即结束这一轮。`,
+    text: `当前有一轮营业正在进行，${formatMoment(source.startedAtMs)} 开始`,
   };
 }
 

@@ -1,24 +1,62 @@
 <view class="page-shell">
-  <view class="card">
-    <view class="row-between">
-      <text class="field-label">当前状态</text>
-      <text class="field-value">待处理</text>
-    </view>
-    <navigator class="entry-row row-between" url="/packageManagement/pages/profile-review/index" hover-class="entry-hover">
-      <text class="field-label">资料审核</text>
-      <text class="field-value">—</text>
-    </navigator>
-    <navigator class="entry-row row-between" url="/packageManagement/pages/field-review/index" hover-class="entry-hover">
-      <text class="field-label">现场复核</text>
-      <text class="field-value">—</text>
-    </navigator>
-    <navigator class="entry-row row-between" url="/packageManagement/pages/governance/index" hover-class="entry-hover">
-      <text class="field-label">治理处理</text>
-      <text class="field-value">—</text>
-    </navigator>
-    <navigator class="entry-row row-between" url="/packageManagement/pages/impact-review/index" hover-class="entry-hover">
-      <text class="field-label">资料复核</text>
-      <text class="field-value">—</text>
-    </navigator>
+  <view wx:if="{{viewState === 'loading'}}" class="card">
+    <text class="field-label">正在加载</text>
   </view>
+  <view wx:elif="{{viewState === 'failed'}}" class="card">
+    <text class="field-label">{{tip}}</text>
+    <button class="btn-secondary cta-btn" bindtap="onReloadTap">重试</button>
+  </view>
+  <block wx:else>
+    <view class="card">
+      <view class="row-between">
+        <text class="field-label">当前状态</text>
+        <text class="field-value">{{statusText}}</text>
+      </view>
+      <!-- 资料审核：目标页 onLoad 读 options.id，取任务列表首项 submissionId -->
+      <navigator wx:if="{{profileEntryId}}" class="entry-row row-between" url="/packageManagement/pages/profile-review/index?id={{profileEntryId}}" hover-class="entry-hover">
+        <text class="field-label">资料审核</text>
+        <text class="field-value">{{counts.profileReviews}}</text>
+      </navigator>
+      <view wx:else class="entry-row row-between">
+        <text class="field-label">资料审核</text>
+        <text class="field-value">暂无待处理</text>
+      </view>
+      <!-- 现场复核：目标页 onLoad 读 query.caseId，取现场反馈列表首项 caseId -->
+      <navigator wx:if="{{fieldEntryId}}" class="entry-row row-between" url="/packageManagement/pages/field-review/index?caseId={{fieldEntryId}}" hover-class="entry-hover">
+        <text class="field-label">现场复核</text>
+        <text class="field-value">{{counts.fieldFeedback}}</text>
+      </navigator>
+      <view wx:else class="entry-row row-between">
+        <text class="field-label">现场复核</text>
+        <text class="field-value">暂无待处理</text>
+      </view>
+      <!-- 治理处理：目标页 onLoad 读 options.vendorId，取治理列表首项 vendorId -->
+      <navigator wx:if="{{governanceVendorId}}" class="entry-row row-between" url="/packageManagement/pages/governance/index?vendorId={{governanceVendorId}}" hover-class="entry-hover">
+        <text class="field-label">治理处理</text>
+        <text class="field-value">—</text>
+      </navigator>
+      <view wx:else class="entry-row row-between">
+        <text class="field-label">治理处理</text>
+        <text class="field-value">暂无待处理</text>
+      </view>
+      <!-- 资料复核：目标页 onLoad 读 options.id，取影响复核列表首项 impactReviewId -->
+      <navigator wx:if="{{impactEntryId}}" class="entry-row row-between" url="/packageManagement/pages/impact-review/index?id={{impactEntryId}}" hover-class="entry-hover">
+        <text class="field-label">资料复核</text>
+        <text class="field-value">{{counts.impactReviews}}</text>
+      </navigator>
+      <view wx:else class="entry-row row-between">
+        <text class="field-label">资料复核</text>
+        <text class="field-value">暂无待处理</text>
+      </view>
+    </view>
+    <view wx:if="{{isEmpty}}" class="card">
+      <text class="field-label">暂无待处理任务</text>
+    </view>
+    <view wx:if="{{tasks.length}}" class="card">
+      <view class="row-between" wx:for="{{tasks}}" wx:key="id">
+        <text class="field-label">{{item.name}}</text>
+        <text class="field-value">待处理</text>
+      </view>
+    </view>
+  </block>
 </view>

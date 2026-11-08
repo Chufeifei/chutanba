@@ -69,7 +69,6 @@ const MANAGEMENT = {
   IMPACT_REVIEWS: `${BASE}/management/impact-reviews`,
   IMPACT_REVIEW_DETAIL: (reviewId) => `${BASE}/management/impact-reviews/${reviewId}`,
   IMPACT_REVIEW_DECISION: (reviewId) => `${BASE}/management/impact-reviews/${reviewId}/decision`,
-  AUDIT_EVENTS: `${BASE}/management/audit-events`,
 };
 
 module.exports = { BASE, PUBLIC, ME, VENDOR, MANAGEMENT };

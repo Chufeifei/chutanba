@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "填写现场反馈",
-  "usingComponents": {}
+  "usingComponents": {
+    "c-status-chip": "/components/c-design/status-chip/index"
+  }
 }

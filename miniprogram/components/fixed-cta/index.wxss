@@ -3,10 +3,11 @@
   --color-brand: #E07856;
   --color-brand-soft: #FDEDE5;
   --color-surface: #FFFFFF;
+  --color-text: #5C5A55;
 }
 .cta-spacer { height: calc(152rpx + env(safe-area-inset-bottom)); }
 .fixed-cta { position: fixed; z-index: 900; left: 0; right: 0; bottom: 0; display: flex; gap: 24rpx; padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.98); box-shadow: 0 -8rpx 32rpx rgba(31,31,31,0.06); box-sizing: border-box; }
 .fixed-cta button { margin: 0; font-size: 30rpx; }
-.cta-primary { flex: 1; height: 104rpx; border-radius: 52rpx; line-height: 104rpx; background: var(--color-brand); color: var(--color-surface); }
-.cta-primary[disabled] { background: var(--color-brand-soft); color: var(--color-surface); }
-.cta-secondary { align-self: center; min-width: 192rpx; height: 88rpx; border-radius: 44rpx; line-height: 88rpx; background: var(--color-brand-soft); color: var(--color-brand); }
+.cta-primary { flex: 1; height: 104rpx; border-radius: var(--radius-button); line-height: 104rpx; background: var(--color-brand); color: var(--color-surface); }
+.cta-primary[disabled] { background: var(--color-brand-soft); color: var(--color-text); }
+.cta-secondary { align-self: center; min-width: 192rpx; height: 88rpx; border-radius: var(--radius-secondary); line-height: 88rpx; background: var(--color-brand-soft); color: var(--color-brand); }

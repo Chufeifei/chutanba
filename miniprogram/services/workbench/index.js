@@ -23,7 +23,7 @@ const ACTION = copy.ACTION;
 
 const NO_VENDOR_COPY = Object.freeze({
   title: '还不是摊主',
-  description: '先提交摊主资料并通过审核，才能在这里开摊。',
+  description: '请先提交摊主资料',
   actionText: '去申请资料',
 });
 

@@ -3,6 +3,8 @@
   "enablePullDownRefresh": true,
   "usingComponents": {
     "category-picker": "/components/category-picker/index",
-    "vendor-card": "/components/vendor-card/index"
+    "vendor-card": "/components/vendor-card/index",
+    "c-nav-button": "/components/c-design/nav-button/index",
+    "c-state-hero": "/components/c-design/state-hero/index"
   }
 }

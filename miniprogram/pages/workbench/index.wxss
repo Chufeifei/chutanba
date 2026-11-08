@@ -6,8 +6,9 @@
 .status-card { min-height: 240rpx; display: flex; align-items: center; justify-content: space-between; }
 .status-left { display: flex; flex-direction: column; gap: 12rpx; min-width: 0; }
 .status-head { display: flex; align-items: center; gap: 12rpx; }
-.status-point { width: 12rpx; height: 12rpx; border-radius: 50%; background: var(--color-text-hint); flex: none; }
-.status-point.on { background: var(--color-success); }
+.status-point { width: 12rpx; height: 12rpx; border-radius: var(--radius-pill); background: var(--color-text-hint); flex: none; }
+.status-point.success { background: var(--color-success); }
+.status-point.warning { background: var(--color-warning); }
 .status-name { font-size: 44rpx; font-weight: 600; color: var(--color-text); }
 .status-sub { font-size: 26rpx; color: var(--color-text-muted); }
 .status-tags { display: flex; align-items: center; gap: 16rpx; margin-top: 8rpx; }

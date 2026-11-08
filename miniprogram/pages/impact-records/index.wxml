@@ -1,5 +1,6 @@
 <view class="page-shell">
   <state-view
+    class="state-hero"
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
@@ -29,7 +30,7 @@
         <view class="hint" wx:if="{{item.unavailableText}}">{{item.unavailableText}}</view>
 
         <button
-          class="link-button"
+          class="btn-secondary link-button"
           wx:if="{{item.reviewable && activeId !== item.impactRecordId}}"
           data-id="{{item.impactRecordId}}"
           bindtap="onReviewTap"
@@ -44,15 +45,15 @@
             bindinput="onReasonInput"
           />
           <view class="field-error" wx:if="{{form.error}}">{{form.error}}</view>
-          <button class="primary-button" disabled="{{submitPending}}" bindtap="onSubmitTap">
+          <button class="btn-primary primary-button" disabled="{{submitPending}}" bindtap="onSubmitTap">
             {{submitPending ? '正在提交' : '提交复核申请'}}
           </button>
-          <button class="link-button" disabled="{{submitPending}}" bindtap="onCancelTap">取消</button>
+          <button class="btn-secondary link-button" disabled="{{submitPending}}" bindtap="onCancelTap">取消</button>
         </view>
       </view>
 
       <button
-        class="more-button"
+        class="btn-secondary more-button"
         wx:if="{{records.nextCursor}}"
         disabled="{{listLoading}}"
         bindtap="onLoadMore"
@@ -60,7 +61,7 @@
     </view>
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
-    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+    <button class="btn-secondary query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
 
     <view class="card" wx:if="{{reviews.hasReviews}}">
       <text class="section-title">我的复核申请</text>

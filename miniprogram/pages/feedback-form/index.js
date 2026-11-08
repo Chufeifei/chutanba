@@ -9,6 +9,7 @@ const { QUERY_OUTCOME } = require('../../services/submission');
 const feedback = require('../../services/feedback');
 const formSubmit = require('../../behaviors/form-submit');
 const location = require('../../utils/location');
+const branchStates = require('../../mock/branch-states');
 
 Page({
   behaviors: [formSubmit],
@@ -90,10 +91,13 @@ Page({
   async onRelocate() {
     try {
       await location.getCurrentLocation();
+      // 与 onSubmit 共用同一分类字段：重新定位成功后复位，不留旧错误态
+      this._failureKind = 'UNKNOWN';
       this.setData({ locationFailed: false });
     } catch (error) {
-      // 仍不可用时保留失败态，仅给轻量提示
-      void error;
+      // 统一分类：定位类失败由分类结果驱动 23 分支态（locationFailed）置位
+      this._failureKind = branchStates.resolveFailureKind(error);
+      this.setData({ locationFailed: branchStates.isLocationFailure(this._failureKind) });
       wx.showToast({ title: '仍无法获取位置', icon: 'none' });
     }
   },
@@ -106,7 +110,7 @@ Page({
       return;
     }
     if (this.isSubmitting()) return;
-    this._locationFailed = false;
+    this._failureKind = 'UNKNOWN';
     this.setData({ submitting: true, unknownVisible: false, cannotSubmit: false });
     try {
       const result = await this.runFormSubmit({
@@ -119,8 +123,9 @@ Page({
               description: this.data.description,
             });
           } catch (error) {
-            // 定位失败以 ApiError.data.locationFailure 明确透出；只记录标识，错误原样抛回 form-submit
-            this._locationFailed = Boolean(error && error.data && error.data.locationFailure);
+            // 统一分类：错误来源归一成标准 kind（含 data.locationFailure / data.kind /
+            // bizCode 等结构化标识），页面只读分类结果，不再直接读结构化字段
+            this._failureKind = branchStates.resolveFailureKind(error);
             throw error;
           }
         },
@@ -131,7 +136,8 @@ Page({
     } finally {
       this.setData({
         submitting: false,
-        locationFailed: Boolean(this._locationFailed),
+        // 屏 23 置位：由统一分类结果驱动 locationFailed 标识
+        locationFailed: branchStates.isLocationFailure(this._failureKind),
       });
     }
   },

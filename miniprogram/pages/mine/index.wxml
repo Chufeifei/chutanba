@@ -48,6 +48,12 @@
     </view>
   </view>
 
+  <!-- 底部治理入口：仅服务端下发管理能力时可见 -->
+  <view class="card governance-entry" wx:if="{{showGovernance}}" data-key="management" bindtap="onEntryTap">
+    <text class="entry-label">管理入口</text>
+    <text class="entry-arrow">›</text>
+  </view>
+
   <state-view
     wx:if="{{!identified}}"
     type="{{unidentifiedState.type}}"

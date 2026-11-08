@@ -1,4 +1,19 @@
 /* 页面专属样式；色值一律走 app.wxss 变量 */
+.page-shell.has-cta { padding-bottom: calc(272rpx + env(safe-area-inset-bottom)); }
+
 .field-row { margin-top: 24rpx; }
 .field-label { font-size: 28rpx; color: var(--color-text); }
 .field-value { font-size: 26rpx; color: var(--color-text-muted); }
+
+/* 卡内分隔线、脚注与处理原因输入：色值一律走变量 */
+.card .divider { margin: 24rpx 0; }
+.card-footnote { margin-top: 24rpx; font-size: 26rpx; line-height: 40rpx; color: var(--color-text-muted); }
+.reason-input { margin-top: 12rpx; padding: 16rpx 0; border-bottom: 1rpx solid var(--color-border); font-size: 28rpx; color: var(--color-text); }
+/* 状态卡内的文字动作 */
+.state-action { margin-top: 24rpx; font-size: 28rpx; color: var(--color-brand); }
+
+/* 底部 CTA：页面内唯一固定栏 */
+.cta-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 16rpx; padding: 16rpx var(--space-page) calc(16rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--color-border); background: var(--color-surface); box-sizing: border-box; }
+/* 原生 button 重置：尺寸完全由规格语义类决定 */
+.cta-btn { margin: 0; padding: 0; line-height: normal; }
+.cta-hover { opacity: 0.85; }

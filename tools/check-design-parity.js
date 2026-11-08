@@ -17,14 +17,19 @@
  *   (--json)，产出 A 版没有的增量：一致、可回归、可量化的静态基线。
  *   本脚本不替代像素级视觉验收或真机渲染，只提供不被人工比对主观性影响的基线。
  *   C13（设计稿快照锚点）为后续追加，规则源为 manifest.acceptance.checks 的 C13 条目，
- *   用于避免云端画布改版后本地规则清单静默过期；下方编号对齐说明仍只描述原 C01~C12。
+ *   用于避免云端画布改版后本地规则清单静默过期。Phase 5 / T45–T46 再追加 C14~C16
+ *   （组件接线完整性 / 管理分包写操作契约 / 分支态可达性），共 16 条检查。
+ *   C07 判定同步纠偏：不再只认文件内 --x: 声明，改为识别指向真实且含 --x: 声明的
+ *   @import（见 c07FindViolations 与 C07 负向自测）；原「有 var(--) 无 --x: 即 warning」
+ *   的口径已过期。
  *
- * 关于 manifest 与本任务 12 条检查编号的对齐（透明说明，便于终审复核）：
- *   本任务逐条给出的 C01~C12 实现细则为准（含「只扫 wxml / js 记 warning /
- *   非规格圆角列 warning / 有 var(--) 无 --x: 记 warning」等精确判定）。
+ * 关于 manifest 与本任务 16 条检查编号的对齐（透明说明，便于终审复核）：
+ *   本任务逐条给出的 C01~C16 实现细则为准（含「只扫 wxml / js 记 warning /
+ *   非规格圆角列 warning / 有 var(--) 且既无 --x: 声明也无有效 @import 才记 warning /
+ *   C14~C16 真实扫描目录与代码」等精确判定）。
  *   每条检查的 severity 与 rule 文本，取自 manifest.acceptance.checks 中语义
  *   对应的条目（按 description 关键字匹配，故与 manifest 的字母编号存在错位）；
- *   找不到对应条目的（C10 screenToRoute 覆盖、C11 app.wxss 色值齐全）按工具默认
+ *   找不到对应条目的（如 C10 screenToRoute 覆盖、C11 app.wxss 色值齐全）按工具默认
  *   P1 并在输出中注明。所有判定数据（色值、字体、禁用串、路由、token、按钮
  *   尺寸、扫描范围）一律从 manifest 读取；manifest 缺失或字段不符即如实报错，
  *   绝不凭空造规则、绝不因结果难看而放宽规则。
@@ -257,6 +262,39 @@ function ruleRefsOf(ruleText, manifest) {
 }
 
 // ---------------------------------------------------------------------------
+// C07 判定核心（T46 纠偏）：输入 [{rel, text}]，返回「不合规」命中数组。
+// 合规 = 未使用 var(--)，或①文件内含 --x: 声明，或②含 @import 且其指向的文件
+// 真实存在并含 --x: 声明。两者都无即不合规（上层据此记 WARN），绝非恒 PASS。
+// @import 目标用 safeRead 实读磁盘，不写死常量；该函数亦导出供内存负向自测复用。
+// ---------------------------------------------------------------------------
+function c07FindViolations(entries) {
+  const declRe = /--[A-Za-z0-9_-]+\s*:/;
+  const importRe = /@import\s+["']([^"']+)["']\s*;/g;
+  const occ = [];
+  for (const e of entries) {
+    const text = e && e.text;
+    if (typeof text !== 'string' || !/var\(--/.test(text)) continue;
+    if (declRe.test(text)) continue;                 // 条件①：文件内自带 --x: 声明
+    let compliant = false;
+    importRe.lastIndex = 0;
+    let m;
+    while ((m = importRe.exec(text)) !== null) {
+      let target = m[1];
+      if (!/\.wxss$/i.test(target)) target += '.wxss'; // WXSS @import 允许省略 .wxss 扩展名
+      const resolved = path.posix.normalize(
+        path.posix.join(path.posix.dirname(e.rel), target.split(path.sep).join('/'))
+      );
+      const imported = safeRead(resolved);
+      if (imported !== null && declRe.test(imported)) { compliant = true; break; } // 条件②
+    }
+    if (!compliant) {
+      occ.push({ file: e.rel, line: 1, term: '使用 var(--) 但既无 --x: 声明，也无指向含 --x: 声明文件的有效 @import' });
+    }
+  }
+  return occ;
+}
+
+// ---------------------------------------------------------------------------
 // manifest 完整性校验：缺失或字段不符 -> 如实报错，不编造任何规则/结果。
 // ---------------------------------------------------------------------------
 function validateManifest(m) {
@@ -301,10 +339,12 @@ function validateManifest(m) {
 }
 
 // ---------------------------------------------------------------------------
-// 13 条检查定义。severity 优先取 manifest.acceptance.checks 语义对应条目，
+// 16 条检查定义。severity 优先取 manifest.acceptance.checks 语义对应条目，
 // 缺失时取工具默认并注明。判定数据一律来自 manifest。
 // C13 为设计稿快照锚点：把云端画布的结构基线（tools/design-snapshot.json）
 // 与 manifest.meta.designRef 的版本声明对齐，避免画布改版后规则清单静默过期。
+// C14~C16 为 Phase 5 / T45–T46 追加：组件接线完整性、管理分包写操作契约、
+// 分支态可达性，均真实扫描目录与代码，不写死 PASS。
 // ---------------------------------------------------------------------------
 const CHECK_DEFS = [
   { id: 'C01', title: '参考稿旧色值零残留', kw: '旧色值', basis: 'forbidden.legacyColors', defaultSev: 'P0' },
@@ -319,7 +359,10 @@ const CHECK_DEFS = [
   { id: 'C10', title: 'screenToRoute 覆盖 01~23', kw: 'screenToRoute 覆盖', basis: 'screenToRoute', defaultSev: 'P1' },
   { id: 'C11', title: 'app.wxss 变量区色值齐全', kw: '色值齐全', basis: 'designTokens.colors', defaultSev: 'P1' },
   { id: 'C12', title: '按钮规格', kw: '按钮规格', basis: 'designTokens.buttonSizes', defaultSev: 'P1' },
-  { id: 'C13', title: '设计稿快照锚点一致', kw: '设计稿快照', basis: 'meta.designRef + tools/design-snapshot.json', defaultSev: 'P1' }
+  { id: 'C13', title: '设计稿快照锚点一致', kw: '设计稿快照', basis: 'meta.designRef + tools/design-snapshot.json', defaultSev: 'P1' },
+  { id: 'C14', title: '组件接线完整性', kw: '组件接线', basis: 'usingComponents + 组件 properties / 页面 wxml', defaultSev: 'P1' },
+  { id: 'C15', title: '管理分包写操作契约', kw: '管理分包写操作', basis: 'miniprogram/services/management/**', defaultSev: 'P1' },
+  { id: 'C16', title: '分支态可达性', kw: '分支态可达', basis: 'mock/branch-states.js + screenToRoute + 页面置位字段', defaultSev: 'P1' }
 ];
 
 function runChecks(manifest, scanned, byExt) {
@@ -367,6 +410,23 @@ function runChecks(manifest, scanned, byExt) {
   {
     const def = CHECK_DEFS[2], c = ctx(def);
     const wxmlOcc = findOccurrences(byExt.wxml, forbidden.ruleExplanations);
+    // utils/** 被 scanExclude 排除，但 view-state.js 的 description 会经 wxml 上屏；
+    // 单独纳入 FAIL 判定，堵住规则说明从扫描盲区漏出的路径。
+    const VIEW_STATE_REL = 'miniprogram/utils/view-state.js';
+    const viewStateLines = getLines(VIEW_STATE_REL);
+    if (viewStateLines !== null) {
+      for (const term of (forbidden.ruleExplanations || [])) {
+        if (!term) continue;
+        for (let i = 0; i < viewStateLines.length; i++) {
+          if (viewStateLines[i].indexOf(term) !== -1) {
+            wxmlOcc.push({
+              file: VIEW_STATE_REL, line: i + 1, term: term,
+              snippet: viewStateLines[i].trim().slice(0, 80)
+            });
+          }
+        }
+      }
+    }
     const jsOcc = findOccurrences(byExt.js, forbidden.ruleExplanations);
     const ev = [];
     for (const o of wxmlOcc.slice(0, 5)) ev.push(occEvidence(o, '[wxml-FAIL]'));
@@ -430,25 +490,22 @@ function runChecks(manifest, scanned, byExt) {
       occ.slice(0, 5).map(function (o) { return occEvidence(o); }), c.notes));
   }
 
-  // C07 组件根节点变量声明：components/*/index.wxss 有 var(--) 但文件内无 --x: 声明记 warning
+  // C07 组件根节点变量声明（T46 纠偏）：使用 var(--) 的组件 wxss，
+  // ①文件内含 --x: 声明，或②含 @import 且其指向的文件真实存在并含 --x: 声明，即合规；
+  // 两者都无仍记 WARN。判定核心 c07FindViolations 真实读 @import 目标，绝不恒 PASS。
   {
     const def = CHECK_DEFS[6], c = ctx(def);
-    const compRe = /^miniprogram\/components\/[^/]+\/index\.wxss$/;
+    const compRe = /^miniprogram\/components\/(?:[^/]+\/)+index\.wxss$/;
     const compFiles = scanned.filter(function (f) { return compRe.test(f); });
-    const declRe = /--[A-Za-z0-9_-]+\s*:/;
-    const occ = [];
+    const entries = [];
     for (const f of compFiles) {
       const text = safeRead(f);
-      if (text === null) continue;
-      if (/var\(--/.test(text) && !declRe.test(text)) {
-        occ.push({ file: f, line: 1, term: '使用了 var(--) 但文件内无 --x: 变量声明' });
-      }
+      if (text !== null) entries.push({ rel: f, text: text });
     }
-    c.notes.push('命中条件：文件含 var(--) 且不含形如 --x: 的变量声明；仅记 warning');
-    const hasCDesign = fs.existsSync(path.join(ROOT, 'miniprogram/components/c-design'));
-    if (!hasCDesign) {
-      c.notes.push('manifest 对应 rule 指向 miniprogram/components/c-design/**（当前该目录不存在）；本检查按 C5 任务细则覆盖通用组件目录');
-    }
+    const occ = c07FindViolations(entries);
+    c.notes.push('合规判定：使用 var(--) 的组件 wxss，满足①文件内含 --x: 声明，或②含 @import 且被导入文件真实存在并含 --x: 声明，即合规；两者都无才记 WARN');
+    c.notes.push('@import 路径按组件 wxss 所在目录 resolve（可省略 .wxss 扩展名），被导入内容实读校验，不写死常量');
+    c.notes.push('扫描 ' + compFiles.length + ' 个组件 index.wxss；负向自测证明删掉 @import 与声明后仍判 WARN');
     results.push(makeResult(def, c.severity, c.rule, c.refs,
       occ.length ? 'WARN' : 'PASS', occ.length,
       occ.slice(0, 5).map(function (o) { return occEvidence(o); }), c.notes));
@@ -662,6 +719,198 @@ function runChecks(manifest, scanned, byExt) {
       occ.slice(0, 5).map(function (o) { return o.file + ':' + o.line + ' | ' + o.term; }), c.notes));
   }
 
+  // C14 组件接线完整性：usingComponents 路径指向真实四件套；组件 properties 与 wxml 传入属性匹配
+  {
+    const def = CHECK_DEFS[13], c = ctx(def);
+    const occ = [];
+    const FOUR = ['index.js', 'index.json', 'index.wxml', 'index.wxss'];
+    // 框架 / 事件 / dataset 属性不属于组件自定义 properties，予以放行
+    const FRAMEWORK_ATTR = /^(wx:|bind|catch|capture-|class$|style$|id$|slot$|data-|aria-|generic:|hidden$|animation$|hover-)/;
+    const registrations = [];
+    const seenDir = {};
+    for (const jf of byExt.json) {
+      const obj = safeJson(jf);
+      if (!obj || !obj.usingComponents || typeof obj.usingComponents !== 'object') continue;
+      const text = safeRead(jf) || '';
+      for (const name of Object.keys(obj.usingComponents)) {
+        const cp = obj.usingComponents[name];
+        if (typeof cp !== 'string') continue;
+        let base;
+        if (cp.charAt(0) === '/') base = 'miniprogram' + cp;
+        else base = path.posix.normalize(path.posix.join(path.posix.dirname(jf), cp));
+        const dir = path.posix.dirname(base);
+        const line = lineAt(text, text.indexOf(cp));
+        for (const fn of FOUR) {
+          const rel = dir + '/' + fn;
+          let ok = false;
+          try { ok = fs.existsSync(path.join(ROOT, rel)); } catch (e) { noteFileWarning(rel, e); }
+          if (!ok) occ.push({ file: jf, line: line, term: '组件 ' + name + ' 四件套缺 ' + fn + ' -> ' + rel });
+        }
+        if (!seenDir[dir]) {
+          seenDir[dir] = true;
+          registrations.push({ tag: name, dir: dir, jsRel: dir + '/index.js' });
+        }
+      }
+    }
+    // 组件 properties 与 wxml 传入属性匹配（kebab-case 等价 camelCase）
+    const wxmlTexts = [];
+    for (const f of byExt.wxml) {
+      const t = safeRead(f);
+      if (t !== null) wxmlTexts.push({ file: f, text: t });
+    }
+    for (const reg of registrations) {
+      const jsText = safeRead(reg.jsRel) || '';
+      const props = {};
+      const pm = /properties\s*:\s*\{/.exec(jsText);
+      if (pm) {
+        const open = pm.index + pm[0].length - 1; // 指向 properties 对象的 '{'
+        let depth = 0, end = -1;
+        for (let i = open; i < jsText.length; i++) {
+          if (jsText[i] === '{') depth++;
+          else if (jsText[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+        }
+        if (end > open) {
+          const kre = /(?:^|[,{\s])([A-Za-z_$][\w$]*)\s*:\s*\{/g;
+          let km;
+          while ((km = kre.exec(jsText.slice(open + 1, end))) !== null) props[km[1]] = true;
+        }
+      }
+      const tagRe = new RegExp('<' + escRe(reg.tag) + '\\b([\\s\\S]*?)/?>', 'g');
+      let tm;
+      for (const w of wxmlTexts) {
+        tagRe.lastIndex = 0;
+        while ((tm = tagRe.exec(w.text)) !== null) {
+          const are = /([A-Za-z_:][\w:.-]*)\s*(?:=\s*(?:"[^"]*"|'[^']*'|\{\{[\s\S]*?\}\}))?/g;
+          let am;
+          while ((am = are.exec(tm[1])) !== null) {
+            const raw = am[1];
+            if (FRAMEWORK_ATTR.test(raw)) continue;
+            const camel = raw.replace(/-([a-z])/g, function (_, ch) { return ch.toUpperCase(); });
+            if (!props[raw] && !props[camel]) {
+              occ.push({ file: w.file, line: lineAt(w.text, tm.index), term: '<' + reg.tag + '> 传入未声明属性 ' + raw + '（组件 properties 无对应项）' });
+            }
+          }
+        }
+      }
+    }
+    c.notes.push('真实扫描 byExt.json 的 usingComponents：解析路径后逐个校验 index.js/json/wxml/wxss 四件套存在');
+    c.notes.push('真实扫描 byExt.wxml 中 <tag> 标签自定义属性，校验其在该组件 properties 中声明（kebab→camel 等价、框架/事件/data 属性放行）');
+    c.notes.push('注册组件目录 ' + registrations.length + ' 个，扫描 wxml ' + wxmlTexts.length + ' 个');
+    results.push(makeResult(def, c.severity, c.rule, c.refs,
+      occ.length ? 'FAIL' : 'PASS', occ.length,
+      occ.slice(0, 5).map(function (o) { return o.file + ':' + o.line + ' | ' + o.term; }), c.notes));
+  }
+
+  // C15 管理分包写操作契约：写操作均经 runWrite、无裸 /api/v2、无 listAuditEvents
+  {
+    const def = CHECK_DEFS[14], c = ctx(def);
+    const mgmtRe = /^miniprogram\/services\/management\/.*\.js$/;
+    const mgmtFiles = scanned.filter(function (f) { return mgmtRe.test(f); });
+    const occ = [];
+    // 规则 2/3：裸 /api/v2 路径与幽灵端点 listAuditEvents（真实字符串扫描）
+    for (const o of findOccurrences(mgmtFiles, ['/api/v2', 'listAuditEvents'])) {
+      occ.push({ file: o.file, line: o.line, term: 'management 层出现禁用项 ' + o.term });
+    }
+    // 规则 1：非读动词的 api 写调用须落在 runWrite(...) 括号区间内
+    const READ_VERBS = /^(get|list|load|query|fetch|read)/i;
+    const aliasRe = /const\s+([A-Za-z_$][\w$]*Api)\s*=\s*require\(['"][^'"]*\/api\//g;
+    function parenBlockEnd(text, open) {
+      let depth = 0;
+      for (let i = open; i < text.length; i++) {
+        if (text[i] === '(') depth++;
+        else if (text[i] === ')') { depth--; if (depth === 0) return i; }
+      }
+      return -1;
+    }
+    for (const f of mgmtFiles) {
+      const text = safeRead(f);
+      if (text === null) continue;
+      const aliases = [];
+      let am2;
+      aliasRe.lastIndex = 0;
+      while ((am2 = aliasRe.exec(text)) !== null) aliases.push(am2[1]);
+      if (!aliases.length) continue;   // 无 api 引用的文件（如 common.js）不含写调用
+      const ranges = [];
+      const rwRe = /\brunWrite\s*\(/g;
+      let rm;
+      while ((rm = rwRe.exec(text)) !== null) {
+        const open = text.indexOf('(', rm.index);
+        const end = parenBlockEnd(text, open);
+        if (end > open) ranges.push([open, end]);
+      }
+      const callRe = new RegExp('\\b(?:' + aliases.map(escRe).join('|') + ')\\.([A-Za-z_$][\\w$]*)\\s*\\(', 'g');
+      let fileHasWrite = false;
+      let cm;
+      while ((cm = callRe.exec(text)) !== null) {
+        const method = cm[1];
+        if (READ_VERBS.test(method)) continue;   // 读方法不在写契约范围
+        fileHasWrite = true;
+        const pos = cm.index;
+        const inRunWrite = ranges.some(function (r) { return pos >= r[0] && pos <= r[1]; });
+        if (!inRunWrite) {
+          occ.push({ file: f, line: lineAt(text, pos), term: '写调用 ' + cm[0].replace(/\s*\(\s*$/, '') + ' 未落在 services/submission.runWrite(...) 内' });
+        }
+      }
+      if (fileHasWrite && !/require\(['"]\.\.\/submission['"]\)/.test(text)) {
+        occ.push({ file: f, line: 1, term: '含写调用但未从 services/submission 引入 runWrite' });
+      }
+    }
+    c.notes.push('真实扫描 ' + mgmtFiles.length + ' 个 management/**/*.js：/api/v2 与 listAuditEvents 字面量零命中；非读动词 api 写调用须落在 runWrite(...) 括号区间内');
+    c.notes.push('读方法(get/list/load/query/fetch/read 前缀)不计写；runWrite 区间由圆括号深度匹配得到，不写死 PASS');
+    results.push(makeResult(def, c.severity, c.rule, c.refs,
+      occ.length ? 'FAIL' : 'PASS', occ.length,
+      occ.slice(0, 5).map(function (o) { return o.file + ':' + o.line + ' | ' + o.term; }), c.notes));
+  }
+
+  // C16 分支态可达性：7 个异常分支态(17–23)置位字段与 mock/branch-states.js 的 stateKey 对应
+  {
+    const def = CHECK_DEFS[15], c = ctx(def);
+    const BRANCH_REL = 'miniprogram/mock/branch-states.js';
+    const occ = [];
+    const branchText = safeRead(BRANCH_REL);
+    if (branchText === null) {
+      occ.push({ file: BRANCH_REL, line: 1, term: '分支态定义文件缺失或不可读' });
+    } else {
+      // 真实解析 BRANCH_STATES = [ ... ]; 内每个对象的 screen / route / stateKey
+      const arrStart = branchText.indexOf('BRANCH_STATES');
+      const open = arrStart >= 0 ? branchText.indexOf('[', arrStart) : -1;
+      const close = open >= 0 ? branchText.indexOf('\n];', open) : -1;
+      const body = (open >= 0 && close > open) ? branchText.slice(open + 1, close) : '';
+      const entries = [];
+      const objRe = /\{\s*screen:\s*'([^']+)'\s*,\s*route:\s*'([^']+)'\s*,\s*stateKey:\s*'([^']+)'/g;
+      let om;
+      while ((om = objRe.exec(body)) !== null) entries.push({ screen: om[1], route: om[2], stateKey: om[3] });
+      if (entries.length !== 7) occ.push({ file: BRANCH_REL, line: 1, term: 'BRANCH_STATES 异常分支数 ' + entries.length + ' ≠ 7' });
+      const got = entries.map(function (e) { return e.screen; });
+      for (let i = 17; i <= 23; i++) {
+        if (got.indexOf(String(i)) === -1) occ.push({ file: BRANCH_REL, line: 1, term: '缺少异常分支态 ' + i });
+      }
+      for (const e of entries) {
+        const mapped = (manifest.screenToRoute || {})[e.screen];
+        if (!mapped || String(mapped.route) !== String(e.route)) {
+          occ.push({ file: MANIFEST_REL, line: s2rLine, term: '屏 ' + e.screen + ' route=' + e.route + ' ≠ screenToRoute=' + (mapped && mapped.route) });
+        }
+        const jsRel = 'miniprogram/' + e.route + '.js';
+        const pageText = (safeRead(jsRel) || '') + '\n' + (safeRead('miniprogram/' + e.route + '.wxml') || '');
+        // 置位字段与 stateKey 对应：stateKey 须在该屏 route 的页面代码中真实可达
+        if (pageText.indexOf(e.stateKey) === -1) {
+          occ.push({ file: jsRel, line: 1, term: '屏 ' + e.screen + ' 置位字段 ' + e.stateKey + ' 在页面 ' + e.route + ' 不可达' });
+        }
+        // 统一承载字段 screenToRoute.stateField 亦须在页面可达
+        const carrier = mapped && mapped.stateField;
+        if (carrier && pageText.indexOf(carrier) === -1) {
+          occ.push({ file: jsRel, line: 1, term: '屏 ' + e.screen + ' 统一承载字段 ' + carrier + ' 在页面 ' + e.route + ' 不可达' });
+        }
+      }
+    }
+    c.notes.push('真实解析 mock/branch-states.js 的 BRANCH_STATES（screen/route/stateKey），校验 17–23 共 7 态齐备');
+    c.notes.push('逐屏核对 route 等于 screenToRoute.route，且 stateKey 与 screenToRoute.stateField 在该屏 route 的页面 js/wxml 中可达');
+    c.notes.push('口径：stateField 是页面级统一状态载体 viewState，stateKey 是各异常分支的具体置位键，二者由页面代码建立对应；不改代码、不改状态枚举');
+    results.push(makeResult(def, c.severity, c.rule, c.refs,
+      occ.length ? 'FAIL' : 'PASS', occ.length,
+      occ.slice(0, 5).map(function (o) { return o.file + ':' + o.line + ' | ' + o.term; }), c.notes));
+  }
+
   return results;
 }
 
@@ -826,4 +1075,7 @@ function main() {
   process.exitCode = summary.exitCode;
 }
 
-main();
+if (require.main === module) main();
+
+// 导出 C07 判定核心，供 node -e 在内存中做负向自测（不落临时文件、绝不恒 PASS）
+module.exports = { c07FindViolations: c07FindViolations };

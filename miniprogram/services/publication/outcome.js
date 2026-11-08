@@ -45,7 +45,7 @@ function toOutcomeView(action, result) {
   if (result && result.bizCode === BIZ_CODE.PROFILE_REQUIRED) {
     return {
       kind: 'profile-required',
-      message: '当前没有生效中的摊主资料，先补齐资料并通过审核才能恢复公开。',
+      message: '请先补齐资料',
       reload: true,
       unknownVisible: false,
     };

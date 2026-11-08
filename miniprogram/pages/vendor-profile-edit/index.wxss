@@ -5,4 +5,4 @@
 .counter { margin-top: 8rpx; font-size: 22rpx; text-align: right; color: var(--color-text-hint); }
 .field-error { margin-top: 8rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-warning); }
 .submit-message { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: var(--radius-card); background: var(--color-warning-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-warning); }
-.query-button { margin-top: 16rpx; height: 88rpx; border-radius: var(--radius-card); background: var(--color-brand-soft); color: var(--color-brand); font-size: 28rpx; line-height: 88rpx; }
+.query-button { margin: 16rpx auto 0; }

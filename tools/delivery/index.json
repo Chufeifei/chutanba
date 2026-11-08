@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "title": "出摊吧 · 一期 MVP ｜ 交付索引",
+    "package": "TOOL-3 / 交付资产岗",
+    "designFileId": "743864343511294",
+    "designFileUrl": "https://ardot.tencent.com/file/743864343511294",
+    "snapshotVersion": "2026-11-08.1",
+    "scope": "一期 MVP 设计落地交付资产汇总；本轮只做增量收尾与交付索引，不改动设计稿、路由注册与既有目录结构。",
+    "deliverableCount": 7,
+    "disclaimer": "静态自检通过不代表像素级视觉验收或真机渲染，未完成项见 knownDeviations。"
+  },
+  "deliverables": [
+    {
+      "id": "D01",
+      "name": "云端画布设计稿",
+      "kind": "画布",
+      "locator": "https://ardot.tencent.com/file/743864343511294",
+      "note": "23 屏参考稿布局对齐版；设计稿本体存于云端画布，项目内不复制像素与图片资源。"
+    },
+    {
+      "id": "D02",
+      "name": "18 路由小程序代码",
+      "kind": "代码",
+      "locator": "miniprogram/app.json 注册的 13 个主包页面与管理分包 5 页",
+      "note": "一期全部页面、组件、服务与样式增量落地，主包与分包合计路由数固定为 18。"
+    },
+    {
+      "id": "D03",
+      "name": "静态自检工具链",
+      "kind": "工具",
+      "locator": "tools/check-design-parity.js --json 与 tools/design-parity-manifest.json",
+      "note": "16 项检查，覆盖参考稿旧值、色值、圆角、按钮规格、组件接线、分支态可达性、管理写操作契约与画布锚点一致性。"
+    },
+    {
+      "id": "D04",
+      "name": "画布结构快照锚点",
+      "kind": "快照",
+      "locator": "tools/design-snapshot.json",
+      "note": "离线版本锚点，记录 23 屏骨架与节点结构；画布改版须重导快照并递增版本，否则锚点检查判不一致。"
+    },
+    {
+      "id": "D05",
+      "name": "逐屏截图比对清单",
+      "kind": "清单",
+      "locator": "tools/delivery/screen-capture-checklist.json",
+      "note": "23 屏逐屏视觉核对点与期望规格，全部条目待执行，本轮不产生任何实测结论。"
+    },
+    {
+      "id": "D06",
+      "name": "真机验收清单",
+      "kind": "清单",
+      "locator": "tools/delivery/device-acceptance-checklist.json",
+      "note": "20 项编译、自定义底栏三态、定位、分支态、反馈轮询、管理权限与包体积场景，全部待在开发者工具与真机执行。"
+    },
+    {
+      "id": "D07",
+      "name": "需求变更对比表",
+      "kind": "文档",
+      "locator": "tools/delivery/change-comparison.json",
+      "note": "业务需求方视角的 8 项结构化 before / after 对比，与代码实现、库表结构、状态枚举、接口路径彻底解耦。"
+    }
+  ],
+  "gate": {
+    "command": "node tools/check-design-parity.js --json",
+    "executed": true,
+    "verdict": "PASS",
+    "score": 100,
+    "p0Fail": 0,
+    "baselineStale": false,
+    "checkCount": 16,
+    "passCount": 16,
+    "failCount": 0,
+    "c07": {
+      "status": "PASS",
+      "hits": 0,
+      "title": "组件根节点变量声明"
+    },
+    "note": "以实跑输出为准；P0 缺陷 0、基线未过期、16 项全通过，C07 命中 0，较基线无退步。"
+  },
+  "previewReadiness": {
+    "projectPolicy": "已有小程序工程只做增量，不重建脚手架；不改动路由注册与既有目录结构。",
+    "flow": "基础校验（静态自检、语法检查与 JSON 解析）通过后走应用预览卡进行预览，预览不是发布上线。",
+    "publish": "本轮不执行发布；上线须待真机与像素级验收、后台未挂载能力补齐后另行走发布流程。",
+    "prerequisites": [
+      "静态自检结果为 PASS",
+      "改动的 JS 语法检查与新建 JSON 解析全部通过",
+      "交付资产齐备且索引与实际文件一致"
+    ]
+  },
+  "knownDeviations": [
+    {
+      "id": "KD-01",
+      "title": "纠错不发写",
+      "detail": "currentSession.version 详情未返回，导致现场纠错当前无法发起写操作；需后端补齐当前轮次详情返回。",
+      "impact": "管理端当前营业纠错动作暂不可用",
+      "status": "待后端",
+      "action": "另开后端任务补齐详情返回后再联调"
+    },
+    {
+      "id": "KD-02",
+      "title": "治理空列表取首项",
+      "detail": "治理页 vendorId 为空列表时取首项兜底，可能选中非目标摊主。",
+      "impact": "治理操作目标可能不精确",
+      "status": "待确认",
+      "action": "由产品与后端确认空列表的处理口径"
+    },
+    {
+      "id": "KD-03",
+      "title": "后端工厂路由未挂载",
+      "detail": "后端有 3 个未挂载的 create*Router 工厂路由，对应能力不可用。",
+      "impact": "相关管理读取与写操作依赖的后台能力缺失",
+      "status": "待后端",
+      "action": "需另开后端任务完成路由装配与联调"
+    },
+    {
+      "id": "KD-04",
+      "title": "屏 21 成功区保留原结构",
+      "detail": "反馈结果页第 21 屏成功区按裁决保留页面原结构，未替换为复用组件。",
+      "impact": "该屏与其他空错成功态页面的实现方式不一致",
+      "status": "按裁决保留",
+      "action": "如需统一，后续单独评审"
+    },
+    {
+      "id": "KD-05",
+      "title": "根节点色值副本",
+      "detail": "6 份根节点色值变量副本仍与单一真相源并存，待约束规则修正后统一收敛。",
+      "impact": "调色时可能产生视觉漂移",
+      "status": "待收敛",
+      "action": "规则修正后统一删除副本"
+    },
+    {
+      "id": "KD-06",
+      "title": "无真机与像素级验收",
+      "detail": "本轮无微信开发者工具编译、真机渲染与像素级截图比对，静态自检 PASS 不代表视觉与运行时验收。",
+      "impact": "视觉与运行时结论未回填",
+      "status": "待执行",
+      "action": "按截图比对清单与真机验收清单执行后回填"
+    },
+    {
+      "id": "KD-07",
+      "title": "规则清单与工具编号按关键字映射",
+      "detail": "规则清单的检查编号与工具的检查编号并非一一对应，工具按描述关键字取严重级；其中「屏号到路由覆盖」「全局色值齐全」两条无语义对应条目，使用工具默认严重级；规则清单里「状态视图覆盖值完整」「字号阶梯」两条暂未在工具中实现。",
+      "impact": "清单与实际检查项的对应关系需要人工核对，不能只看编号",
+      "status": "已知限制",
+      "action": "后续统一两侧编号并补齐未实现的两条检查"
+    },
+    {
+      "id": "KD-08",
+      "title": "门禁结论以 P0 为准",
+      "detail": "静态自检的 verdict 只由 P0 失败数决定；P1 级检查失败时分数会下降但 verdict 仍可能为 PASS。",
+      "impact": "只读取 verdict 会漏掉规格类退化，需同时看分数与非 PASS 项",
+      "status": "已知限制",
+      "action": "验收时同时核对 score、p0Fail 与非 PASS 明细"
+    }
+  ]
+}

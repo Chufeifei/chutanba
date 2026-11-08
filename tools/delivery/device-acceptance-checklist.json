@@ -1,0 +1,217 @@
+{
+  "meta": {
+    "title": "出摊吧 · 一期 MVP ｜ 微信开发者工具 / 真机验收清单",
+    "package": "TOOL-2 / Phase 5 / T48",
+    "designFileId": "743864343511294",
+    "snapshotVersion": "2026-11-08.1",
+    "snapshot": "tools/design-snapshot.json",
+    "manifest": "tools/design-parity-manifest.json",
+    "branchStatesSource": "miniprogram/mock/branch-states.js",
+    "env": "微信开发者工具（稳定版）+ iOS / Android 真机（至少各一台）+ 弱网 / 无网模拟",
+    "disclaimer": "本轮无微信开发者工具与真机，静态自检 PASS 不代表像素级或真机验收。",
+    "note": "全部条目 status 一律为 pending。本清单是『待执行验收计划』，仅列出场景、步骤、期望与风险，未记录任何开发者工具或真机实测结果、未产生任何 pass/fail 结论，不得虚构真机结果。静态自检（如 check-design-parity.js）通过只能说明规则文件合规，不能替代下列像素级 / 运行时 / 真机验收。",
+    "statusLegend": "pending = 待在微信开发者工具 / 真机执行；本轮不回填实际结论",
+    "coverage": [
+      "编译与基础库",
+      "自定义 TabBar 三态",
+      "定位授权 / 拒绝 / 超时",
+      "7 个异常分支态（屏 17~23）",
+      "反馈提交与 202 轮询",
+      "管理分包 5 页与权限",
+      "写操作幂等键",
+      "包体积与首屏",
+      "屏幕适配与点击热区"
+    ],
+    "itemCount": 20
+  },
+  "checklist": [
+    {
+      "id": "DA-01",
+      "scene": "编译与基础库",
+      "steps": ["用微信开发者工具导入 miniprogram 目录", "选择基础库版本并记录实际版本号", "执行编译并观察 Console", "切到真机调试 / 预览复核基础库一致性"],
+      "expected": "编译 0 error；app.json 的 18 路由（13 主包 + 5 管理分包）全部注册成功；Console 无组件注册失败、无 require 找不到、无 token 样式 @import 报错；基础库版本号归档",
+      "status": "pending",
+      "risk": "基础库版本过低会使自定义 TabBar、分包加载、wx.getLocation 新签名等 API 不可用；开发者工具与真机基础库不一致导致『工具正常真机异常』"
+    },
+    {
+      "id": "DA-02",
+      "scene": "自定义 TabBar 三态",
+      "steps": ["进入首页列表视图", "切换到地图视图再切到我的", "逐个观察选中 / 未选中 / 无权限禁用三态", "快速连续切换观察是否闪烁或双 TabBar"],
+      "expected": "列表 / 地图 / 我的三态高亮与图标文案随路由同步；Pill 333×62、圆角 72rpx、选中态主色 #E07856；custom-tab-bar 组件与页面栈一致，无原生 + 自定义双 TabBar 叠加",
+      "status": "pending",
+      "risk": "自定义 TabBar 与原生 app.json tabBar 配置冲突；选中态不同步、切页闪烁、底部安全区被遮挡"
+    },
+    {
+      "id": "DA-03",
+      "scene": "定位授权 · 同意",
+      "steps": ["清缓存首次进入首页触发 wx.getLocation 授权弹窗", "点『允许』", "观察定位与结果行及列表刷新"],
+      "expected": "scope.userLocation 已在 app.json 声明；授权弹窗正常弹出；授权后返回坐标，列表按位置展示，定位提示条消失；Console 无授权报错",
+      "status": "pending",
+      "risk": "未声明 scope.userLocation 导致授权不弹或 getLocation 直接失败；用户隐私协议未配置导致真机被拒"
+    },
+    {
+      "id": "DA-04",
+      "scene": "定位授权 · 拒绝",
+      "steps": ["授权弹窗点『拒绝』", "观察首页仍可浏览", "点重新定位 / 去开启授权", "从系统设置重新开启后返回"],
+      "expected": "归一为 LOCATION_DENIED → 进入屏 17（locationHint）；定位提示条与授权引导出现；拒绝定位仍可浏览全部摊位；不出现任何业务规则解释文案；重新授权成功后可恢复",
+      "status": "pending",
+      "risk": "拒绝后整页白屏 / 把用户卡死在授权引导；把规则解释文案上屏触发 C03；拒绝态无法恢复"
+    },
+    {
+      "id": "DA-05",
+      "scene": "定位授权 · 超时 / 不可用",
+      "steps": ["关闭系统定位或开启弱网 / 无网", "进入首页或反馈表单等待定位超时", "观察 loading 是否收敛与兜底分支"],
+      "expected": "归一为 LOCATION_UNAVAILABLE / LOCATION_INVALID，不白屏、不永久 loading；给可重试入口；超时有上限并回落到中性短状态；反馈表单定位失败可落到屏 23",
+      "status": "pending",
+      "risk": "无超时兜底导致 loading 永久不消失；坐标 non-finite 未被归一导致崩溃；弱网下多次重试放大请求量"
+    },
+    {
+      "id": "DA-06",
+      "scene": "异常分支态 · 屏 17 定位拒绝",
+      "screen": "17",
+      "stateKey": "locationHint",
+      "entry": "首页 → 拒绝定位授权 / 系统关闭定位后重进",
+      "expectedState": "locationHint 置位：定位提示条 + 授权引导 + 摊位卡列表仍可浏览",
+      "steps": ["按 entry 进入屏 17", "核对状态徽章 / 提示条 / 卡片 / TabBar 视觉", "点重新定位验证可恢复"],
+      "expected": "屏 17 与设计稿截图一致；locationHint 态可稳定复现且有可达入口与出口；重新定位成功可退出分支",
+      "status": "pending",
+      "risk": "分支态不可达（死分支）或入口被错误拦截；状态卡文案含业务规则解释"
+    },
+    {
+      "id": "DA-07",
+      "scene": "异常分支态 · 屏 18 加载失败",
+      "screen": "18",
+      "stateKey": "viewState",
+      "entry": "首页 → 断网 / 列表接口失败（NETWORK_ERROR）",
+      "expectedState": "viewState=retryable-error：整页状态卡 + 重新加载按钮",
+      "steps": ["按 entry 触发加载失败", "核对整页状态卡与重新加载按钮", "点重新加载并恢复网络验证回列表"],
+      "expected": "屏 18 与设计稿一致；中性短状态文案、无规则解释；重新加载成功后退出分支；失败可重试不丢上下文",
+      "status": "pending",
+      "risk": "viewState 由 18 / 20 共享，stateKey 误绑定导致落到错误分支；重试无幂等保护产生重复请求"
+    },
+    {
+      "id": "DA-08",
+      "scene": "异常分支态 · 屏 19 导航复核失败",
+      "screen": "19",
+      "stateKey": "navReviewFailure",
+      "entry": "详情页 → 点导航前往 → 复核未通过（NAVIGATION_REVIEW_BLOCKED）",
+      "expectedState": "navReviewFailure=true：复核提示条 + 导航与复核资料卡 + 重新复核 / 返回详情双 CTA",
+      "steps": ["按 entry 触发复核失败", "核对提示条与双 CTA", "点重新复核与返回详情验证出口"],
+      "expected": "屏 19 与设计稿一致；复核失败不误判为成功导航；双 CTA 热区与文案正确；出口可达",
+      "status": "pending",
+      "risk": "复核结果被误判为通过而直接跳地图；CTA 热区过小；返回详情后状态残留"
+    },
+    {
+      "id": "DA-09",
+      "scene": "异常分支态 · 屏 20 不可查看",
+      "screen": "20",
+      "stateKey": "viewState",
+      "entry": "详情页 → 摊位已停止公开 / 下架 / 无访问权限（terminal-error）",
+      "expectedState": "viewState=terminal-error：不可查看卡 + 返回首页 CTA（终态）",
+      "steps": ["按 entry 进入不可查看态", "核对不可查看卡与返回 CTA", "尝试页内刷新验证终态不可就地恢复"],
+      "expected": "屏 20 与设计稿一致；终态不提供误导性重试以绕过限制；返回首页路径可用",
+      "status": "pending",
+      "risk": "与屏 18 共用 viewState 导致误落到可重试态；终态被错误提供『重新加载』绕过权限"
+    },
+    {
+      "id": "DA-10",
+      "scene": "异常分支态 · 屏 21 提交成功",
+      "screen": "21",
+      "stateKey": "fromSubmit",
+      "entry": "反馈表单 → 提交反馈 → 202 → 轮询终态 → 结果页",
+      "expectedState": "fromSubmit=true：提交成功区 + 本次反馈结果卡 + 查看记录 / 返回详情双 CTA",
+      "steps": ["完成一次反馈提交", "核对 202 轮询后是否进入屏 21", "核对结果卡与双 CTA", "重进页面验证 fromSubmit 不误常驻"],
+      "expected": "屏 21 与设计稿一致；仅来自提交流程（fromSubmit）才呈现，直接路由进入不伪造成功态；双 CTA 出口可用",
+      "status": "pending",
+      "risk": "把『结果待确认』误判为成功；fromSubmit 常驻导致直接进结果页也显示成功；重复提交产生多条反馈"
+    },
+    {
+      "id": "DA-11",
+      "scene": "异常分支态 · 屏 22 审核中",
+      "screen": "22",
+      "stateKey": "hasPending",
+      "entry": "摊主资料页 → 已提交审核且未出结果（PROFILE_REVIEW_PENDING）",
+      "expectedState": "hasPending=true：审核状态卡 + 资料对照卡 + CTA 审核中不可修改（禁用态）",
+      "steps": ["按 entry 进入审核中态", "核对状态卡与禁用 CTA", "尝试点击禁用 CTA 验证不可写"],
+      "expected": "屏 22 与设计稿一致；审核期间资料不可编辑、不可重复提交审核；禁用态色值/描边符合 token",
+      "status": "pending",
+      "risk": "审核中仍可修改资料产生脏数据；禁用 CTA 视觉与可用态混淆；审核结束后状态未刷新"
+    },
+    {
+      "id": "DA-12",
+      "scene": "异常分支态 · 屏 23 定位失败",
+      "screen": "23",
+      "stateKey": "locationFailed",
+      "entry": "反馈表单 → 定位未取得 / 坐标无效（LOCATION_INVALID）",
+      "expectedState": "locationFailed=true：位置证据色块 + 重新定位 / 返回详情双 CTA，表单仍可填写",
+      "steps": ["按 entry 触发定位失败", "核对位置证据色块与双 CTA", "点重新定位验证回到表单"],
+      "expected": "屏 23 与设计稿一致；定位失败不阻断表单填写；重新定位成功可退出分支；7 个分支态均有可达入口与出口、无死分支",
+      "status": "pending",
+      "risk": "定位失败把整页锁死；与屏 17 的 locationHint 混淆；重新定位后表单内容丢失"
+    },
+    {
+      "id": "DA-13",
+      "scene": "反馈提交与 202 轮询",
+      "steps": ["填写现场状态与位置证据后点提交反馈", "抓包确认服务端返回 202 Accepted 与轮询任务标识", "轮询期间退出 / 重进 / 切后台", "观察轮询至终态后落屏 21", "连点两次提交按钮"],
+      "expected": "提交返回 202 后按间隔轮询直到终态，有最大次数与超时上限；结果待确认不被误判为成功或失败；退出重进能续接轮询；重复点击 / 断网重试不产生重复记录",
+      "status": "pending",
+      "risk": "202 后不轮询或轮询无上限耗尽请求；把『结果待确认』当成功；轮询状态未持久化导致重进丢失；重复提交产生多条反馈"
+    },
+    {
+      "id": "DA-14",
+      "scene": "管理分包 5 页与权限",
+      "steps": ["用有管理权限账号依次打开 packageManagement/pages/index/index、profile-review/index、field-review/index、governance/index、impact-review/index", "用无权限账号重复进入 5 页", "观察分包是否按需加载及写操作入口", "核对越权访问审核 / 治理写接口的拦截"],
+      "expected": "5 个分包页面均可路由到达且与设计稿骨架一致；无权限账号被拦截且无写操作入口；分包按需注入、不进主包首屏；越权请求被服务端拒绝而非仅前端隐藏",
+      "status": "pending",
+      "risk": "分包预下载 / 配置错误拖慢首屏；前端隐藏但服务端未鉴权导致越权；分包路径与 app.json 不一致导致白屏"
+    },
+    {
+      "id": "DA-15",
+      "scene": "写操作幂等键",
+      "steps": ["对一键开摊 / 收摊 / 提交反馈 / 审核通过 / 驳回等写操作连点两次", "断网后重试同一操作", "抓包核对同一业务操作的幂等键是否稳定且一致", "核对后端落库条数"],
+      "expected": "每个写请求携带稳定幂等键（同一业务操作重试键不变），后端据此去重；无重复开摊、重复收摊、重复反馈、重复审核；禁止用『请勿重复提交』等规则文案上屏来替代机制（该串属禁用文案）",
+      "status": "pending",
+      "risk": "缺失幂等键导致重复记录；每次重试生成新键使去重失效；靠前端禁用按钮而非服务端幂等，丢包 / 切后台仍重复"
+    },
+    {
+      "id": "DA-16",
+      "scene": "包体积与首屏",
+      "steps": ["开发者工具查看主包与分包代码包大小", "真机清缓存冷启动计时首屏可交互（重复 3 次取均值）", "核对静态资源与图片占位策略", "核对分包注入时机"],
+      "expected": "主包 ≤ 2MB、总包 ≤ 20MB（记录实际阈值与实测值）；首屏无长时间白屏、骨架 / 占位先出；无一期禁用的摊位图片 / 照片上传资源；分包不拖慢主包首屏",
+      "status": "pending",
+      "risk": "主包超限无法上传；首屏请求串行或同步 getLocation 阻塞导致长白屏；占位资源过大挤占体积"
+    },
+    {
+      "id": "DA-17",
+      "scene": "屏幕适配与点击热区",
+      "steps": ["在 375×812 基准、小屏、大屏、刘海屏 / 全面屏、折叠屏分别核对四段式 frame", "核对 StatusBar 62 / NavBar 48 / 内容区左右 16 / TabBar 95 或 CTA 76(双按钮 120)", "核对顶部与底部安全区", "点测所有 CTA / Tab / 卡片入口热区 ≥ 44×44pt", "核对字号阶梯与圆角不溢出、不截断"],
+      "expected": "四段式 frame 不错位；安全区适配，底部 CTA 不被 home indicator 遮挡；所有可点热区达标；标题 56rpx / 副标题 26rpx / 卡名 34rpx / 状态 24rpx 不溢出；卡片圆角 32rpx 一致",
+      "status": "pending",
+      "risk": "安全区适配缺失导致底部 CTA 被遮挡或点击失效；热区过小误触；刘海屏 StatusBar 高度硬编码 62 导致错位；长文案截断"
+    },
+    {
+      "id": "DA-18",
+      "scene": "禁用能力 / 规则解释文案零上屏（真机复核）",
+      "steps": ["逐屏肉眼检索 23 屏所有可见文案", "核对关注 / 预约 / 提醒 / 预计出摊日历 / 摊位图片 / 信用分等一期禁用能力词", "核对阈值与规则解释串（如 300 米内、5 分钟内、请勿据此前往等）", "核对开发说明串（架构占位页 / 后续开发等）"],
+      "expected": "真机所有页面零一期禁用能力词、零规则解释串、零开发说明串；状态文案为 ≤8 字中性短状态；与 C03 / C04 / C11 静态自检结论一致",
+      "status": "pending",
+      "risk": "动态拼接 / 接口下发文案绕过静态扫描上屏；Toast / 弹窗 / 占位图内文案漏检"
+    },
+    {
+      "id": "DA-19",
+      "scene": "色值 / token 像素级比对",
+      "steps": ["取设计稿画布逐屏截图与真机截图并排比对", "核对背景 #FAF6EE、主色 #E07856、状态色 #87A878 / #D4A574、文字 #5C5A55 / #8A877F", "核对卡片 32rpx / 按钮 52rpx、44rpx 圆角与 686rpx 宽高规格", "检索参考稿旧色值（#FF7A45 等）零残留"],
+      "expected": "真机像素级色值、圆角、按钮规格与设计稿 / designTokenBaseline 一致；旧色值零残留；与 C01 / C05 / C10 / C12 静态自检一致",
+      "status": "pending",
+      "risk": "WXSS 硬编码色值绕过 token；深色模式 / 夜间模式或系统字体放大导致色值偏差；截图缩放导致圆角视觉误差误判"
+    },
+    {
+      "id": "DA-20",
+      "scene": "18 路由可达性与主包 / 分包边界",
+      "steps": ["逐一导航 13 个主包路由与 5 个管理分包路由", "核对 navigateTo / switchTab / redirectTo 用法与页面栈深度", "从任意深层页返回核对不出现空白页 / 栈溢出", "核对分包间跳转与返回路径"],
+      "expected": "18 路由全部可达且与 app.json / screenToRoute 一致；TabBar 页用 switchTab、普通页用 navigateTo；页面栈不超上限、返回路径正确；主包与分包跳转无白屏",
+      "status": "pending",
+      "risk": "路由路径与 app.json 不一致导致白屏；TabBar 页误用 navigateTo 造成页面栈堆积；深层返回路径错误"
+    }
+  ]
+}

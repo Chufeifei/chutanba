@@ -16,6 +16,6 @@
       <text wx:if="{{vendor.plannedEndText}}">预计 {{vendor.plannedEndText}} 收摊</text>
       <text class="foot-updated" wx:if="{{vendor.locatedText}}">位置更新于 {{vendor.locatedText}}</text>
     </view>
-    <view class="nav-btn" wx:if="{{!compact}}" data-mode="navigate" catchtap="onTap">导航</view>
+    <c-nav-button wx:if="{{!compact}}" text="导航" data-mode="navigate" bind:nav="onTap" />
   </view>
 </view>

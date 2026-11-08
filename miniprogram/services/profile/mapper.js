@@ -11,12 +11,12 @@ const { formatMoment } = require('../../utils/formatter');
 
 // 各资料阶段的本人可见说明。与需求文档 §4 的措辞保持一致，不在页面里另写一套。
 const STATE_HINT = Object.freeze({
-  [PROFILE_STATE.NONE]: '提交资料并通过审核后即可开摊。',
-  [PROFILE_STATE.FIRST_PENDING]: '资料审核中，审核通过后才能开摊。',
-  [PROFILE_STATE.FIRST_REJECTED]: '本次申请未通过，可按原因修改后重新提交。',
-  [PROFILE_STATE.INVALIDATED]: '资料已清除或失效，需要重新提交并通过审核。',
-  [PROFILE_STATE.UPDATE_PENDING]: '修改审核中，原资料继续使用。',
-  [PROFILE_STATE.UPDATE_REJECTED]: '本次修改未生效，原资料继续使用。',
+  [PROFILE_STATE.NONE]: '暂无摊主资料',
+  [PROFILE_STATE.FIRST_PENDING]: '资料审核中',
+  [PROFILE_STATE.FIRST_REJECTED]: '本次申请未通过',
+  [PROFILE_STATE.INVALIDATED]: '资料已失效',
+  [PROFILE_STATE.UPDATE_PENDING]: '修改审核中',
+  [PROFILE_STATE.UPDATE_REJECTED]: '本次修改未生效',
   [PROFILE_STATE.ACTIVE]: '当前资料已生效。',
 });
 

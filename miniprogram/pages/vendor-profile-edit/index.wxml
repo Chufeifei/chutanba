@@ -80,7 +80,7 @@
     </view>
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
-    <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
+    <button class="btn-secondary query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
   </block>
 
   <fixed-cta

@@ -1,24 +1,35 @@
+@import "../../../styles/component-tokens.wxss";
+
 /*
- * nav-button 样式。色值一律 var(--...)，单一真相源为 app.wxss 的 page 变量区。
- * 样式隔离风险：自定义组件默认 styleIsolation=isolated，page 上的 CSS 变量
- * 不会可靠继承到组件根节点；本轮「未接线」状态下 var(--...) 会取空值
- * （不报编译错，但品牌底/白字/圆角会视觉失效）。
- * 接线前提（二选一，本轮均不执行，留待终审裁决）：
- *   A) 组件根节点显式重声明所需 --变量（内联色值，会重建色值副本，不推荐）；
- *   B) 在本文件首行引入 C2 的 styles/component-tokens.wxss token 片段
- *      （相对路径 ../../styles/component-tokens.wxss），并给根节点挂
- *      .c-token-host 类，变量即定义于根节点并向子节点继承。
- * 本轮不含真实引入指令、不写死任何色值，避免未接线时编译失败。
+ * nav-button 样式。色值一律 var(--...)，本文件不写死任何十六进制色值。
+ * 三件复用组件均已按页面按需接线并在页面上实际生效，nav-button 已用于
+ * 摊位卡与找摊首页；对外事件名已统一，点击一次只转成一次导航意图。
+ * 色值、圆角均取自全局设计变量与组件 token 的同一份声明，变量在组件作用域内向
+ * 子节点继承，视觉表现与样式隔离级别无关；早期与现状不符的自述已按现状更正。
+ * 根节点透明扩展热区保持视觉 116×64rpx 不变，实际可点区域不小于 88rpx。
  */
 .c-nav-button {
   width: 116rpx;
   height: 64rpx;
-  border-radius: var(--radius-card); /* 等价设计稿全圆角 32rpx */
+  border-radius: var(--radius-pill); /* 全圆角 */
   background: var(--color-brand);
   display: flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
+  position: relative;
+}
+/* 透明扩展热区：视觉 116×64rpx 不变，实际可点区域 ≥88rpx */
+.c-nav-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  min-width: 88rpx;
+  height: 100%;
+  min-height: 88rpx;
+  transform: translate(-50%, -50%);
 }
 .c-nav-button__text {
   font-size: 26rpx;

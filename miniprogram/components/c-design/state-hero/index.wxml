@@ -1,4 +1,4 @@
-<view class="c-state-hero">
+<view class="c-state-hero c-token-host">
   <view class="c-state-hero__illustration">
     <slot name="illustration">
       <view class="c-state-hero__art {{illustrationClass}}" aria-hidden="true">

@@ -117,7 +117,7 @@ function toResultModel({
     vendorName,
     typeLabel,
     eventText: eventAtMs ? formatMoment(eventAtMs, nowMs) : '',
-    notice: '反馈只作为现场线索，由平台人工核实；提交不会自动处罚摊主，也不会自动结束营业。',
+    notice: '反馈由平台人工核实',
   };
   if (value === FEEDBACK_CASE_STATUS.PENDING) {
     return {

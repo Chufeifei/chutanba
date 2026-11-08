@@ -13,12 +13,12 @@ const TIP = Object.freeze({
   REASON_REQUIRED: '请填写复核说明',
   REASON_TOO_LONG: '复核说明超出长度上限',
   SUBMITTED: '复核申请已提交',
-  NOTICE: '复核不解除限制',
+  NOTICE: '可申请复核',
 });
 
 const SUBMIT_FAILURE_TEXT = Object.freeze({
-  [BIZ_CODE.STATE_CONFLICT]: '该影响已有待人工复核的申请，或记录已更新，请刷新后查看',
-  [BIZ_CODE.ALREADY_PROCESSED]: '该影响已有复核结论，不能重复申请',
+  [BIZ_CODE.STATE_CONFLICT]: '已有待复核申请，请刷新后查看',
+  [BIZ_CODE.ALREADY_PROCESSED]: '已有复核结论',
   [BIZ_CODE.WINDOW_CLOSED]: '已超过可申请复核的期限',
   [BIZ_CODE.RESOURCE_NOT_FOUND]: '该处理记录不存在或不属于本人',
 });

@@ -12,13 +12,13 @@ const mapper = require('./mapper');
 
 const NO_VENDOR_COPY = Object.freeze({
   title: '还不是摊主',
-  description: '提交摊主资料并通过审核后，这里会记录你的出摊天数。',
+  description: '请先提交摊主资料',
   actionText: '去申请资料',
 });
 
 const NOT_ELIGIBLE_COPY = Object.freeze({
   title: '当前无法查看出摊记录',
-  description: '摊主资料已失效或停止，恢复公开后可继续查看。',
+  description: '摊主资料已失效',
 });
 
 /**

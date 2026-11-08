@@ -5,7 +5,7 @@
       "teamC": "组件驱动 + token 单一真相源 + 静态符合度工具链，以 c-design 三件套组件、component-tokens.wxss、branch-states.js 与 check-design-parity.js 自检产出 A 版没有的增量"
     },
     "goal": "为 C5 的 check-design-parity.js 提供可直接 JSON.parse 消费的规则输入，统一设计 token 与禁用边界，并声明 Team C 另路径增量",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "generatedAt": "2026-11-08",
     "ownership": "C1 楚天阔 / Team C 另路径增强组",
     "designRef": {
@@ -71,7 +71,11 @@
       "请勿重复提交",
       "同日多次开摊记一天",
       "不会自动解除任何限制",
-      "按规则继续保留"
+      "按规则继续保留",
+      "累计出摊按日记录",
+      "复核不解除限制",
+      "审核通过后才能开摊",
+      "不会自动处罚摊主"
     ],
     "phaseOneDisabled": [
       "关注",
@@ -252,13 +256,31 @@
         "description": "设计稿快照锚点一致",
         "severity": "P1",
         "rule": "meta.designRef 的 fileId、snapshotVersion 须等于 tools/design-snapshot.json 的 meta 对应值；快照 screens 须覆盖 01~23 且各屏 route 等于 screenToRoute.route，contentBlocks 非空"
+      },
+      {
+        "id": "C14",
+        "description": "组件接线完整性：usingComponents 路径指向真实四件套、组件 properties 与 wxml 传入属性匹配",
+        "severity": "P1",
+        "rule": "各 json 的 usingComponents 解析出的组件目录须齐备 index.js/json/wxml/wxss；页面 wxml 传入组件的自定义属性须在该组件 properties 中声明（框架/事件/data 属性与 kebab→camel 等价命名放行）"
+      },
+      {
+        "id": "C15",
+        "description": "管理分包写操作契约：写操作均经 services/submission.runWrite、无裸 /api/v2 路径、无 listAuditEvents 调用",
+        "severity": "P1",
+        "rule": "miniprogram/services/management/** 中非读动词的 api 写调用须落在 runWrite(...) 块内，且不得出现裸 /api/v2 路径或 listAuditEvents 幽灵端点调用"
+      },
+      {
+        "id": "C16",
+        "description": "分支态可达性：7 个异常分支态(17–23)置位字段与 mock/branch-states.js 的 stateKey 对应",
+        "severity": "P1",
+        "rule": "解析 mock/branch-states.js 的 BRANCH_STATES 得 17–23 的 screen/route/stateKey，逐屏核对 route 等于 screenToRoute.route，且 stateKey 与 screenToRoute.stateField 在该屏 route 页面代码中可达"
       }
     ]
   },
   "risks": [
-    "C2、C3、C4、C5 产出文件由并行同事新建；本清单生成时 miniprogram/styles/component-tokens.wxss、miniprogram/components/c-design/**、miniprogram/mock/branch-states.js、tools/check-design-parity.js 均未落盘，已用 Glob 核实",
-    "screenToRoute 的 stateField 统一取项目实际字段 viewState，未逐屏绑定具体 VIEW_STATE 分支态值，因设计稿 23 屏与 branch-states 的 7 分支态对应关系未随任务提供",
-    "本清单仅为静态规则声明，未在微信开发者工具或真机执行视觉符合度验收，未运行 C5 自检脚本",
-    "routes 与 screenToRoute.route 采用 app.json 路由标识原值（相对 miniprogram 根），glob 与文件路径采用相对项目根 POSIX 字符串，两种基准需由 C5 分别解释"
+    "C2、C3、C4、C5 产出文件（component-tokens.wxss、c-design 三件套 nav-button/status-chip/state-hero、branch-states.js、check-design-parity.js）已全部落盘并完成接线：token 样式经首行 @import 引入组件、branch-states.js 被页面引用，nav-button/status-chip/state-hero 已在各页面 index.json 的 usingComponents 注册并在 wxml 实际使用；原「未落盘 / 未接线 / 留待终审裁决」表述与现状不符，已更正",
+    "口径对齐：screenToRoute.stateField 是页面级统一状态承载字段 viewState（与页面 setData({viewState}) 一致），并非逐屏分支键；mock/branch-states.js 的 BRANCH_STATES.stateKey 才是 7 个异常分支态（17–23）各自的置位键（locationHint / viewState / navReviewFailure / fromSubmit / hasPending / locationFailed）。两者口径不同但由页面代码建立对应：页面经 stateKeyOfKind 归一后按 stateKey 置位对应字段，viewState 作整页状态载体；C16 真实校验该对应关系的可达性。不改代码、不改状态枚举",
+    "本清单为静态规则声明；像素级视觉验收与真机渲染不在工具链覆盖范围（见 disclaimer）。C5 自检脚本 check-design-parity.js 已于本轮 TOOL-1 实跑（--json 输出机器可消费），并新增 C14–C16 三项 P1 检查，原「未运行 C5 自检脚本」表述已更正",
+    "routes 与 screenToRoute.route 采用 app.json 路由标识原值（相对 miniprogram 根），glob 与文件路径采用相对项目根 POSIX 字符串；两种基准已由 C5 工具链分别解释（routes 用于路由比对、glob 用于文件扫描）并落盘可复跑"
   ]
 }

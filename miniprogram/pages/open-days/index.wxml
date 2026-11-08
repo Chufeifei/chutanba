@@ -1,5 +1,6 @@
 <view class="page-shell">
   <state-view
+    class="state-hero"
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
     title="{{viewState.title}}"
@@ -29,7 +30,7 @@
         <view class="meta" wx:if="{{!item.hasLastEnded}}">当日仍有未结束的轮次</view>
       </view>
       <button
-        class="more-button"
+        class="btn-secondary more-button"
         wx:if="{{model.nextCursor}}"
         disabled="{{listLoading}}"
         bindtap="onLoadMore"

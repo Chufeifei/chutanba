@@ -1,6 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "phase-badge": "../phase-badge/index"
+    "phase-badge": "../phase-badge/index",
+    "c-nav-button": "/components/c-design/nav-button/index"
   }
 }

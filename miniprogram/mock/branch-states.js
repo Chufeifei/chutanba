@@ -1,20 +1,22 @@
 /**
  * 分支态结构化定义（设计稿 17–23）与单一 failureKind 映射。
  *
- * 【当前未接线】本模块尚未被任何页面 require，页面仍各自维护 data 字段与
- * viewState。是否接线、何时接线留待终审裁决；本文件不改动任何页面。
+ * 【已接线】discover / vendor-detail / feedback-form 三页的失败判定统一走
+ * resolveFailureKind(error)：错误进入时归一成标准 kind，页面只读分类结果
+ * （stateKeyOfKind / isLocationFailure）驱动对应分支态，不再各自比较结构化
+ * 字段或可见文案；分支名与 viewState 语义保持不变。
  *
  * 【另路径方案】首版以可见文案的正则嗅探反推「定位失败」，文案一改就会静默
- * 失效；返工版改读 ApiError.data.locationFailure，但 non-finite 坐标错误不带
- * 该标识，边缘路径仍覆盖不到。本模块把「错误来源 → 状态」集中成一张归一化
- * 表：只读结构化字段，页面只读 kind，不再看任何用户可见文案。
+ * 失效；返工版改读 ApiError.data.locationFailure，但 non-finite 坐标错误改挂
+ * data.kind / bizCode 时覆盖不到。本模块把「错误来源 → 状态」集中成一张归一化
+ * 表：按优先级只读结构化字段，页面只读 kind，不再看任何用户可见文案。
  *
- * 【最小接入示例】仅示意，终审裁决前不执行、不接线：
+ * 【接入方式】
  *   const states = require('../../mock/branch-states');
  *   const kind = states.resolveFailureKind(error);
- *   const meta = states.FAILURE_KIND[kind];
- *   const branch = states.getBranchByStateKey(meta.stateKey);
- *   this.setData({ kindLabel: meta.label, ...states.PREVIEW_DATA[branch.screen] });
+ *   const stateKey = states.stateKeyOfKind(kind);
+ *   // stateKey 即分支态字段名：locationHint / viewState / navReviewFailure /
+ *   // locationFailed / fromSubmit / hasPending，据此置位对应分支。
  */
 
 /** 7 个分支态。route 与 stateKey 均按 app.json / 页面 data 字段核对。 */
@@ -65,8 +67,8 @@ const BRANCH_STATES = [
     stateKey: 'fromSubmit',
     trigger: '反馈提交完成',
     view: ['成功提示', '结果卡', '返回详情'],
-    primaryCta: '返回详情',
-    secondaryCta: '返回首页',
+    primaryCta: '查看我的反馈记录',
+    secondaryCta: '返回详情',
     exit: '离开结果页',
   },
   {
@@ -222,11 +224,28 @@ function getBranchView(screen) {
 
 /**
  * 按 stateKey 查分支态；找不到返回 null。
- * viewState 由 18 / 20 共享，按数组顺序返回首个匹配（即 18）。
+ * viewState 由 18 / 20 共享，按数组顺序返回首个匹配（即 18）；
+ * 20 经 getBranchView('20') 直达，7 态均有可达路径，无死分支。
  */
 function getBranchByStateKey(stateKey) {
   if (typeof stateKey !== 'string' || stateKey === '') return null;
   return BRANCH_STATES.find((branch) => branch.stateKey === stateKey) || null;
+}
+
+/** 归一后的 kind → 分支态字段名；未知 kind 一律回落到 UNKNOWN 的 stateKey。 */
+function stateKeyOfKind(kind) {
+  const meta = FAILURE_KIND[kind] || FAILURE_KIND.UNKNOWN;
+  return meta.stateKey;
+}
+
+/** 归一后的 kind 是否属于定位失败；页面据此驱动定位失败分支，不再读结构化字段。 */
+const LOCATION_FAILURE_KINDS = Object.freeze([
+  'LOCATION_DENIED',
+  'LOCATION_UNAVAILABLE',
+  'LOCATION_INVALID',
+]);
+function isLocationFailure(kind) {
+  return LOCATION_FAILURE_KINDS.indexOf(kind) >= 0;
 }
 
 /** 7 态最小预览数据，仅含渲染所需字段，不含任何真实数据或凭据。 */
@@ -253,6 +272,8 @@ module.exports = {
   BRANCH_STATES,
   FAILURE_KIND,
   resolveFailureKind,
+  stateKeyOfKind,
+  isLocationFailure,
   getBranchView,
   getBranchByStateKey,
   PREVIEW_DATA,

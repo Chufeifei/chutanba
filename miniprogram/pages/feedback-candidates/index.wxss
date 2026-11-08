@@ -3,7 +3,7 @@
 .tab-item { position: relative; height: 88rpx; padding: 0 8rpx; display: flex; align-items: center; font-size: 30rpx; color: var(--color-text-muted); }
 .tab-item + .tab-item { margin-left: 48rpx; }
 .tab-item.active { color: var(--color-brand); font-weight: 600; }
-.tab-underline { position: absolute; left: 0; right: 0; bottom: 0; height: 3rpx; border-radius: 3rpx; background: var(--color-brand); }
+.tab-underline { position: absolute; left: 0; right: 0; bottom: 0; height: 3rpx; border-radius: 0; background: var(--color-brand); }
 
 /* 连续记录列表：统一行高 152rpx、32rpx 圆角、32rpx padding（.card 提供） */
 .record-row { height: 152rpx; margin-top: 16rpx; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; }

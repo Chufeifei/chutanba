@@ -2,6 +2,7 @@
   "navigationBarTitleText": "摊主工作台",
   "usingComponents": {
     "phase-badge": "/components/phase-badge/index",
-    "countdown": "/components/countdown/index"
+    "countdown": "/components/countdown/index",
+    "c-status-chip": "/components/c-design/status-chip/index"
   }
 }

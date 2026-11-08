@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "反馈结果",
-  "usingComponents": {}
+  "usingComponents": {
+    "c-state-hero": "/components/c-design/state-hero/index"
+  }
 }

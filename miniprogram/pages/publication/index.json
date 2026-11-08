@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "公开与资料处理",
-  "usingComponents": {}
+  "usingComponents": {
+    "c-state-hero": "/components/c-design/state-hero/index"
+  }
 }

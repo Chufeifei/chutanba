@@ -35,7 +35,7 @@ const DEFAULT_COPY = Object.freeze({
   },
   [VIEW_STATE.STALE]: {
     title: '状态未更新',
-    description: '暂时无法确认最新状态，请勿据此前往或发起操作',
+    description: '暂时无法确认最新状态',
     actionText: '重新确认',
   },
   [VIEW_STATE.PERMISSION]: {
@@ -53,7 +53,7 @@ const DEFAULT_COPY = Object.freeze({
   },
   [VIEW_STATE.WRITE_PENDING]: {
     title: '正在处理',
-    description: '请勿重复提交',
+    description: '正在处理，请稍候',
   },
   [VIEW_STATE.WRITE_UNKNOWN]: {
     title: '结果待确认',

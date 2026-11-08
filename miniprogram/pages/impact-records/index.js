@@ -53,10 +53,6 @@ Page({
     }
   },
 
-  onStateAction() {
-    this.load();
-  },
-
   onReviewTap(event) {
     const id = String(event.currentTarget.dataset.id || '');
     if (!id) return;

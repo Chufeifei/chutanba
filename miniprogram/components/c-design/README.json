@@ -4,12 +4,12 @@
   "designRef": "Ardot 743864343511294",
   "root": "miniprogram/components/c-design/",
   "pathDifference": "A 组为页面直写视图层（每个页面各自内联写卡片、胶囊、状态卡）；C 组为组件驱动，把重复出现的三类元素抽成可复用组件，页面只声明引用。",
-  "registration": "按需在页面 index.json 的 usingComponents 中引用，未注册到 app.json；接线动作留待终审裁决。",
+  "registration": "三个组件均已在各页面 index.json 的 usingComponents 按需注册、在 wxml 实际使用，接线动作已完成；未注册到 app.json，按页面按需引用。",
   "tokenWiring": {
-    "state": "未接线",
+    "state": "已接线",
     "source": "miniprogram/styles/component-tokens.wxss",
-    "note": "色值一律 var(--...)。组件默认样式隔离，page 变量不继承；接线时在组件 wxss 首行引入该 token 片段并给根节点挂 .c-token-host 类。",
-    "notExecuted": true
+    "note": "色值一律 var(--...)。组件 wxss 首行 @import 该 token 片段，根节点挂 .c-token-host 类，变量定义于根节点并向子节点继承，结果与样式隔离级别无关；组件内不写死任何色值。",
+    "notExecuted": false
   },
   "components": [
     {
@@ -17,31 +17,33 @@
       "selector": "c-nav-button",
       "dir": "nav-button/",
       "files": ["index.js", "index.json", "index.wxml", "index.wxss"],
-      "description": "摊位卡右下角导航小按钮，116×64rpx、全圆角 32rpx、品牌底白字。",
+      "description": "摊位卡右下角导航小按钮，116×64rpx、全圆角 32rpx、品牌底白字；对外事件名已由 tap 统一为 nav，点击一次只转成一次导航意图。",
       "properties": {
         "text": { "type": "String", "default": "导航" },
         "disabled": { "type": "Boolean", "default": false }
       },
       "events": {
-        "tap": {
+        "nav": {
           "trigger": "catchtap=onTap",
           "detail": { "mode": "navigate" },
           "guard": "disabled 时不触发；catchtap 阻止冒泡到卡片整体"
         }
       },
-      "wiring": "页面 index.json 的 usingComponents 加 \"c-nav-button\": \"/components/c-design/nav-button/index\"；页面用 <c-nav-button bind:tap=\"onNavigate\" />。"
+      "wiring": "页面 index.json 的 usingComponents 加 \"c-nav-button\": \"/components/c-design/nav-button/index\"；页面用 <c-nav-button bind:nav=\"onNavigate\" />。已在 vendor-card 与 discover 完成接线。"
     },
     {
       "name": "status-chip",
       "selector": "c-status-chip",
       "dir": "status-chip/",
       "files": ["index.js", "index.json", "index.wxml", "index.wxss"],
-      "description": "状态胶囊，36rpx 圆角，active/disabled 态，文字居中且 overflow:hidden 不出框。",
+      "description": "状态胶囊，36rpx 圆角，active/disabled 态，文字居中且 overflow:hidden 不出框；tone/fluid 已作为属性开放。",
       "properties": {
         "text": { "type": "String", "default": "" },
         "active": { "type": "Boolean", "default": false },
         "disabled": { "type": "Boolean", "default": false },
-        "value": { "type": "null(任意)", "default": null }
+        "value": { "type": "null(任意)", "default": null },
+        "tone": { "type": "String", "default": "neutral" },
+        "fluid": { "type": "Boolean", "default": false }
       },
       "events": {
         "change": {
@@ -50,7 +52,7 @@
           "guard": "disabled 时不触发"
         }
       },
-      "wiring": "页面 index.json 的 usingComponents 加 \"c-status-chip\": \"/components/c-design/status-chip/index\"；页面用 <c-status-chip text=\"营业中\" active=\"{{true}}\" bind:change=\"onChipChange\" />。"
+      "wiring": "页面 index.json 的 usingComponents 加 \"c-status-chip\": \"/components/c-design/status-chip/index\"；页面用 <c-status-chip text=\"营业中\" active=\"{{true}}\" bind:change=\"onChipChange\" />。已在 workbench、feedback-form 完成接线。"
     },
     {
       "name": "state-hero",
@@ -62,7 +64,8 @@
         "title": { "type": "String", "default": "" },
         "description": { "type": "String", "default": "" },
         "actionText": { "type": "String", "default": "" },
-        "illustration": { "type": "String", "default": "empty", "enum": ["empty", "error", "success", "pending"] }
+        "illustration": { "type": "String", "default": "empty", "enum": ["empty", "error", "success", "pending"] },
+        "type": { "type": "String", "default": "" }
       },
       "events": {
         "action": {
@@ -76,18 +79,17 @@
         "action": "具名插槽，覆盖内置 CTA"
       },
       "options": { "multipleSlots": true },
+      "wiredInto": "已接入 discover / feedback-result / data-clear / publication 四页的空、错、成功态，页面以整页状态入参驱动兜底插画配色；feedback-result 第 21 屏成功区按裁决保留原结构，未替换为组件。",
       "wiring": "页面 index.json 的 usingComponents 加 \"c-state-hero\": \"/components/c-design/state-hero/index\"；页面用 <c-state-hero title=\"附近还没有出摊的摊位\" description=\"换个品类看看\" actionText=\"重新加载\" bind:action=\"onRetry\" />。"
     }
   ],
   "risks": [
-    "组件未接线，var(--...) 在样式隔离下取空值，视觉失效；需终审执行 tokenWiring。",
-    "具名 slot 需 options.multipleSlots=true（已设置）；slot 默认内容(fallback)的库版本支持存在分歧，未做真机验证，必要时把内置兜底/内置 CTA 提为独立节点并用属性开关与插槽互斥。",
-    "事件名 tap 与 A 组 vendor-card 注释「事件名不用 tap」口径不一致，终审接线时需统一。"
+    "具名 slot 默认内容的基础库支持存在分歧，未做真机验证；若目标运行环境不渲染默认内容，需把内置兜底与内置动作提为独立节点并用属性开关与插槽互斥。",
+    "本轮无微信开发者工具编译与真机/像素级验收，静态自检通过不代表视觉与运行时验收；待按交付索引的截图比对清单与真机验收清单执行后回填。",
+    "六个根节点仍各保留一份色值变量副本，与单一真相源并存，待规则修正后统一收敛。"
   ],
   "notExecuted": [
-    "未注册到 app.json 的 usingComponents",
-    "未修改任何页面 index.json / wxml",
-    "未在组件 wxss 引入 token 片段、未挂 .c-token-host 类",
-    "未运行微信开发者工具编译 / 真机视觉验收"
+    "未运行微信开发者工具编译 / 真机视觉验收",
+    "像素级截图比对未回填实测结论"
   ]
 }

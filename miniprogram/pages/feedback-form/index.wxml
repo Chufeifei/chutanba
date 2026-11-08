@@ -27,24 +27,20 @@
     </view>
 
     <!-- 4 枚胶囊：一行均分，文字不出框 -->
-    <radio-group class="chip-group" bindchange="onTypeChange">
-      <label class="chip-cell">
-        <radio class="chip-native" value="OWNER_ABSENT" checked="{{selectedType === 'OWNER_ABSENT'}}" disabled="{{typeOptions[0].disabled}}" color="#E07856" />
-        <view class="chip {{selectedType === 'OWNER_ABSENT' ? 'active' : ''}} {{typeOptions[0].disabled ? 'is-disabled' : ''}}"><text>未出摊</text></view>
-      </label>
-      <label class="chip-cell">
-        <radio class="chip-native" value="ALREADY_LEFT" checked="{{selectedType === 'ALREADY_LEFT'}}" disabled="{{typeOptions[2].disabled}}" color="#E07856" />
-        <view class="chip {{selectedType === 'ALREADY_LEFT' ? 'active' : ''}} {{typeOptions[2].disabled ? 'is-disabled' : ''}}"><text>已收摊</text></view>
-      </label>
-      <label class="chip-cell">
-        <radio class="chip-native" value="LOCATION_MISMATCH" checked="{{selectedType === 'LOCATION_MISMATCH'}}" disabled="{{typeOptions[1].disabled}}" color="#E07856" />
-        <view class="chip {{selectedType === 'LOCATION_MISMATCH' ? 'active' : ''}} {{typeOptions[1].disabled ? 'is-disabled' : ''}}"><text>位置不符</text></view>
-      </label>
-      <label class="chip-cell">
-        <radio class="chip-native" value="OTHER" disabled color="#E07856" />
-        <view class="chip is-disabled"><text>其他</text></view>
-      </label>
-    </radio-group>
+    <view class="chip-group">
+      <view class="chip-cell">
+        <c-status-chip fluid="{{true}}" text="未出摊" value="OWNER_ABSENT" active="{{selectedType === 'OWNER_ABSENT'}}" disabled="{{typeOptions[0].disabled}}" bind:change="onTypeChange" />
+      </view>
+      <view class="chip-cell">
+        <c-status-chip fluid="{{true}}" text="已收摊" value="ALREADY_LEFT" active="{{selectedType === 'ALREADY_LEFT'}}" disabled="{{typeOptions[2].disabled}}" bind:change="onTypeChange" />
+      </view>
+      <view class="chip-cell">
+        <c-status-chip fluid="{{true}}" text="位置不符" value="LOCATION_MISMATCH" active="{{selectedType === 'LOCATION_MISMATCH'}}" disabled="{{typeOptions[1].disabled}}" bind:change="onTypeChange" />
+      </view>
+      <view class="chip-cell">
+        <c-status-chip fluid="{{true}}" text="其他" value="OTHER" disabled="{{true}}" bind:change="onTypeChange" />
+      </view>
+    </view>
 
     <!-- 位置证据卡（含重新定位小按钮） / 定位失败蜜色色块 -->
     <view class="card location-card" wx:if="{{!locationFailed}}">
@@ -66,7 +62,7 @@
       class="desc-input"
       value="{{description}}"
       maxlength="{{descriptionMax}}"
-      placeholder="补充说明（选填）"
+      placeholder="补充说明 选填"
       bindinput="onDescriptionInput"
     />
 

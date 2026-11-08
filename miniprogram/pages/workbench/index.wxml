@@ -14,12 +14,12 @@
       <view class="card status-card">
         <view class="status-left">
           <view class="status-head">
-            <view class="status-point {{model.isOpen ? 'on' : ''}}"></view>
+            <view class="status-point {{model.phaseTone}}"></view>
             <text class="status-name">{{model.isOpen ? '出摊中' : '休息中'}}</text>
           </view>
           <text class="status-sub">{{model.isOpen ? model.phaseLabel : '开摊后即可被看到'}}</text>
           <view class="status-tags" wx:if="{{model.isOpen}}">
-            <text class="chip">{{model.remainingText}}</text>
+            <c-status-chip text="{{model.remainingText}}" tone="{{model.phaseTone}}" />
             <text class="status-meta">开始 {{model.startedText}}</text>
           </view>
         </view>

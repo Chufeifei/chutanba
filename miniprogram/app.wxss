@@ -9,8 +9,8 @@ page {
   --color-surface: #FFFFFF;
   --color-text: #5C5A55;
   --color-text-muted: #8A877F;
-  /* hint 取介于 muted(#8A877F) 与 border(#F0ECE8) 之间的灰 */
-  --color-text-hint: #BDBAB4;
+  /* hint 辅助文字统一收敛到 text-muted，保证对比度，不新增色值 */
+  --color-text-hint: var(--color-text-muted);
   --color-border: #F0ECE8;
   --color-brand: #E07856;
   --color-brand-soft: #FDEDE5;
@@ -25,6 +25,8 @@ page {
   /* 设计稿口径新增语义变量 */
   --radius-chip: 36rpx;
   --radius-button: 52rpx;
+  --radius-secondary: 44rpx;
+  --radius-pill: 72rpx;
   --space-card: 32rpx;
   --space-gap: 16rpx;
 
@@ -43,8 +45,8 @@ button::after { border: 0; }
 
 .surface-card { padding: 32rpx; border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; }
 .surface-card + .surface-card { margin-top: 32rpx; }
-.surface-sheet { border-radius: var(--radius-sheet) var(--radius-sheet) 0 0; background: var(--color-surface); }
-.surface-hero { border-radius: 52rpx; background: var(--color-surface); }
+.surface-sheet { border-radius: var(--radius-card) var(--radius-card) 0 0; background: var(--color-surface); }
+.surface-hero { border-radius: var(--radius-button); background: var(--color-surface); }
 
 .space-x16 { margin-top: 32rpx; }
 .text-primary { color: var(--color-text); }
@@ -63,7 +65,7 @@ button::after { border: 0; }
 .card + .card { margin-top: var(--space-gap); }
 
 .btn-primary { width: 686rpx; height: 104rpx; border-radius: var(--radius-button); background: var(--color-brand); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
-.btn-secondary { width: 686rpx; height: 88rpx; border-radius: 44rpx; border: 1rpx solid var(--color-brand); background: var(--color-surface); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
+.btn-secondary { width: 686rpx; height: 88rpx; border-radius: var(--radius-secondary); border: 1rpx solid var(--color-brand); background: var(--color-surface); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
 
 .chip { display: inline-flex; align-items: center; justify-content: center; padding: 10rpx 24rpx; border-radius: var(--radius-chip); background: var(--color-neutral-soft); color: var(--color-text-muted); font-size: 24rpx; }
 .chip.active { background: var(--color-brand); color: var(--color-surface); }
