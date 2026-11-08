@@ -14,20 +14,20 @@ function confirmCopy(action, params = {}) {
   if (action === ACTION.OPEN) {
     return {
       title: '确认开摊',
-      description: `预计 ${params.cutoffText || ''} 收摊，位置「${name}」。开摊后顾客才能看到你的摊位。`,
+      description: `${params.cutoffText || ''} 收摊 · ${name}`,
       confirmText: '确认开摊',
     };
   }
   if (action === ACTION.REFRESH) {
     return {
       title: '确认刷新位置',
-      description: `将位置更新为「${name}」，刷新成功后顾客看到的导航地址会一起更新。`,
+      description: `刷新位置：${name}`,
       confirmText: '确认刷新',
     };
   }
   return {
     title: '确认收摊',
-    description: '收摊后本轮营业结束，顾客将不能再导航到你的摊位。',
+    description: '确认收摊',
     confirmText: '确认收摊',
   };
 }

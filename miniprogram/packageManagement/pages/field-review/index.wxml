@@ -1,7 +1,42 @@
-<view class="page-shell">
-  <state-view
-    type="{{viewState.type}}"
-    title="{{viewState.title}}"
-    description="{{viewState.description}}"
-  />
+<view class="page-shell has-cta">
+  <!-- 反馈详情卡 -->
+  <view class="card">
+    <view class="row-between">
+      <text class="field-label">反馈对象</text>
+      <text class="field-value">—</text>
+    </view>
+    <view class="field-row row-between">
+      <text class="field-label">反馈类型</text>
+      <text class="field-value">未出摊</text>
+    </view>
+    <view class="field-row row-between">
+      <text class="field-label">提交时间</text>
+      <text class="field-value">—</text>
+    </view>
+  </view>
+
+  <!-- 核实状态：一行两枚并排胶囊，选中态实心 -->
+  <view class="verify-block">
+    <text class="field-label">核实状态</text>
+    <view class="verify-row">
+      <view class="chip {{verifyState === 'CONFIRMED' ? 'active' : ''}}" data-state="CONFIRMED" bindtap="onVerifyTap">属实</view>
+      <view class="chip {{verifyState === 'DENIED' ? 'active' : ''}}" data-state="DENIED" bindtap="onVerifyTap">不属实</view>
+    </view>
+  </view>
+
+  <!-- 顾客补充说明与处理记录合并成一张卡 -->
+  <view class="card">
+    <text class="field-label">顾客补充说明</text>
+    <view class="block-body">暂无</view>
+    <view class="divider"></view>
+    <text class="field-label">处理记录</text>
+    <view class="block-body">暂无</view>
+    <view class="block-body">暂无</view>
+  </view>
+
+  <!-- 底部 CTA -->
+  <view class="cta-bar">
+    <button class="btn-primary cta-btn" hover-class="cta-hover" bindtap="onSubmitTap">提交处理</button>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onRejectTap">驳回</button>
+  </view>
 </view>

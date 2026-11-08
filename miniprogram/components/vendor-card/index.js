@@ -13,11 +13,13 @@ Component({
   },
 
   methods: {
-    onTap() {
+    onTap(event) {
       const vendor = this.properties.vendor;
       if (!vendor || !vendor.vendorId) return;
+      const dataset = (event && event.currentTarget && event.currentTarget.dataset) || {};
       // 事件名不用 tap：会和原生 tap 同时触发，导致一次点击跳两次
-      this.triggerEvent('select', { vendorId: vendor.vendorId });
+      // 导航小按钮带 mode=navigate，卡片整体为默认 detail
+      this.triggerEvent('select', { vendorId: vendor.vendorId, mode: dataset.mode || 'detail' });
     },
   },
 });

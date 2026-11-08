@@ -9,8 +9,12 @@
 
 .card-summary { margin-top: 16rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
 
-.card-foot { display: flex; flex-direction: column; margin-top: 20rpx; font-size: 24rpx; line-height: 38rpx; color: var(--color-text-hint); }
+.card-foot { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 20rpx; font-size: 24rpx; line-height: 38rpx; color: var(--color-text-hint); }
+.card-foot-info { display: flex; flex-direction: column; }
 .foot-updated { margin-top: 4rpx; }
+
+/* 116×64rpx 全圆角导航小按钮：catchtap 阻止冒泡，卡片整体仍可点 */
+.nav-btn { flex: none; width: 116rpx; height: 64rpx; border-radius: 32rpx; background: var(--color-brand); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 26rpx; }
 
 .is-compact { padding: 24rpx 28rpx; }
 .is-compact .vendor-name { font-size: 30rpx; }

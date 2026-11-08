@@ -2,7 +2,7 @@
   <view class="tab-pill">
     <view
       wx:for="{{tabs}}"
-      wx:key="pagePath"
+      wx:key="key"
       class="tab-item {{selected === index ? 'active' : ''}}"
       data-index="{{index}}"
       bindtap="switchTab"

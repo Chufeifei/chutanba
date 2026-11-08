@@ -9,7 +9,7 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
+    <view class="card">
       <view class="stat-row">
         <text class="stat-value">{{model.totalDaysText}}</text>
         <text class="stat-label">累计出摊</text>
@@ -17,7 +17,7 @@
       <view class="hint">{{noticeText}}</view>
     </view>
 
-    <view class="surface-card" wx:if="{{model.hasRecords}}">
+    <view class="card" wx:if="{{model.hasRecords}}">
       <text class="section-title">按日记录</text>
       <view class="day-row" wx:for="{{model.days}}" wx:key="openDate">
         <view class="day-head">
@@ -36,11 +36,9 @@
       >{{listLoading ? '正在加载' : '加载更多'}}</button>
     </view>
 
-    <view class="surface-card" wx:if="{{!model.hasRecords}}">
+    <view class="card" wx:if="{{!model.hasRecords}}">
       <text class="section-title">还没有出摊记录</text>
-      <view class="meta">开摊一次后，这里会按日记录你的出摊情况。</view>
+      <view class="meta">开摊后按日记录</view>
     </view>
-
-    <view class="footnote">本页只显示天数与轮次摘要，不提供历史位置地图。</view>
   </block>
 </view>

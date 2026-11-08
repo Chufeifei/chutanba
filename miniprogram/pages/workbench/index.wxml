@@ -1,4 +1,4 @@
-<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}} {{model.isOpen ? 'with-dual-cta' : ''}}">
   <state-view
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
@@ -9,88 +9,105 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
-      <view class="workbench-head">
-        <text class="workbench-title">本轮状态</text>
-        <phase-badge label="{{model.phaseLabel}}" tone="{{model.phaseTone}}" />
+    <!-- 09/11 默认视图：状态大卡 → 数据小卡 → 位置卡 → 记录文字链 → 空态/条件状态 -->
+    <block wx:if="{{!confirmingTime}}">
+      <view class="card status-card">
+        <view class="status-left">
+          <view class="status-head">
+            <view class="status-point {{model.isOpen ? 'on' : ''}}"></view>
+            <text class="status-name">{{model.isOpen ? '出摊中' : '休息中'}}</text>
+          </view>
+          <text class="status-sub">{{model.isOpen ? model.phaseLabel : '开摊后即可被看到'}}</text>
+          <view class="status-tags" wx:if="{{model.isOpen}}">
+            <text class="chip">{{model.remainingText}}</text>
+            <text class="status-meta">开始 {{model.startedText}}</text>
+          </view>
+        </view>
+        <view class="status-deco">
+          <phase-badge label="{{model.phaseLabel}}" tone="{{model.phaseTone}}" />
+        </view>
       </view>
-      <view class="meta" wx:if="{{model.isOpen}}">开始于：{{model.startedText}}</view>
-      <view class="meta" wx:if="{{model.isOpen}}">预计收摊：{{model.plannedEndText}}</view>
-      <countdown
-        wx:if="{{model.isOpen}}"
-        text="{{model.remainingText}}"
-        label="剩余"
-        tone="{{model.phaseTone}}"
-      />
-      <view class="hint" wx:if="{{!model.isOpen}}">当前休息中，顾客看不到你的摊位。开摊需要先完成定位。</view>
-    </view>
 
-    <view class="surface-card">
-      <text class="section-title">位置</text>
-      <view class="meta" wx:if="{{model.hasLocation}}">当前位置：{{model.location.locationName}}</view>
-      <view class="meta" wx:if="{{model.hasLocation}}">最后成功定位时间：{{model.location.locatedText}}</view>
-      <view class="meta" wx:if="{{!model.hasLocation}}">还没有成功定位过位置</view>
-      <view class="meta">前台同步于：{{syncedText}}</view>
-      <view class="hint">
-        位置只在开摊或刷新时取样一次，平台不会在后台持续跟踪你的位置；两个时间不是同一件事。
+      <view class="stat-grid">
+        <view class="card stat-card">
+          <text class="stat-value">{{model.openDaysText}}</text>
+          <text class="stat-label">累计出摊</text>
+        </view>
+        <view class="card stat-card">
+          <text class="stat-value">{{model.isOpen ? model.remainingText : model.phaseLabel}}</text>
+          <text class="stat-label">{{model.isOpen ? '剩余时间' : '本轮阶段'}}</text>
+        </view>
       </view>
-      <view class="meta">位置名称（顾客看到的地址说明）</view>
-      <input
-        class="field-input"
-        value="{{locationName}}"
-        maxlength="80"
-        placeholder="例如：校门口第二个路口"
-        bindinput="onLocationNameInput"
-      />
-    </view>
 
-    <view class="surface-card" wx:if="{{model.restriction.hasRestriction}}">
-      <text class="section-title">当前限制</text>
-      <view class="limit-row" wx:for="{{model.restriction.notes}}" wx:key="*this">{{item}}</view>
-    </view>
+      <view class="card location-card" wx:if="{{model.isOpen}}">
+        <text class="location-label">当前位置</text>
+        <text class="location-value">{{model.hasLocation ? model.location.locationName : '暂无位置'}}</text>
+      </view>
 
-    <view class="surface-card" wx:if="{{!model.isOpen && !model.eligibility.eligible}}">
-      <text class="section-title">暂时不能开摊</text>
-      <view class="meta">{{model.eligibility.reasonText}}</view>
-    </view>
+      <view class="text-link" data-url="/pages/open-days/index" bindtap="onNavigateTap">出摊日记录 ›</view>
 
-    <view class="surface-card" wx:if="{{!model.isOpen}}">
-      <text class="section-title">预计收摊时间</text>
-      <picker
-        mode="selector"
-        range="{{cutoffOptions}}"
-        range-key="pickerText"
-        value="{{cutoffIndex}}"
-        bindchange="onCutoffChange"
-      >
-        <view class="picker-value">{{cutoffOptions[cutoffIndex].pickerText}}</view>
-      </picker>
-      <view class="hint">收摊时间由你确认，最长不超过 12 小时；开摊后仍以服务端记录的截止时刻为准。</view>
-    </view>
+      <view class="card today-empty" wx:if="{{!model.isOpen}}">
+        <text class="empty-title">今日记录</text>
+        <text class="empty-sub">暂无记录</text>
+      </view>
 
-    <view class="surface-card">
-      <text class="section-title">出摊记录</text>
-      <view class="meta">查看累计出摊天数与按日轮次摘要，不显示历史位置地图。</view>
-      <button
-        class="link-button"
-        data-url="/pages/open-days/index"
-        bindtap="onNavigateTap"
-      >查看出摊记录</button>
-    </view>
+      <view class="card" wx:if="{{model.restriction.hasRestriction}}">
+        <text class="block-title">当前限制</text>
+        <view class="state-line" wx:for="{{model.restriction.notes}}" wx:key="*this">{{item}}</view>
+      </view>
+      <view class="card" wx:if="{{!model.isOpen && !model.eligibility.eligible}}">
+        <text class="block-title">开摊条件</text>
+        <text class="state-line">{{model.eligibility.reasonText}}</text>
+      </view>
+    </block>
 
-    <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
+    <!-- 10 时间确认视图：返回 → 时间选择卡 → 定位说明卡 -->
+    <block wx:if="{{confirmingTime && !model.isOpen}}">
+      <view class="text-link" bindtap="onCancelConfirmTime">返回 ›</view>
+      <view class="card">
+        <text class="block-title">预计收摊时间</text>
+        <picker
+          mode="selector"
+          range="{{cutoffOptions}}"
+          range-key="pickerText"
+          value="{{cutoffIndex}}"
+          bindchange="onCutoffChange"
+        >
+          <view class="picker-value">{{cutoffOptions[cutoffIndex].pickerText}}</view>
+        </picker>
+      </view>
+      <view class="card">
+        <text class="block-title">位置名称</text>
+        <view class="state-line" wx:if="{{model.hasLocation}}">{{model.location.locationName}}</view>
+        <view class="state-line" wx:else>暂无位置</view>
+        <input
+          class="field-input"
+          value="{{locationName}}"
+          maxlength="80"
+          placeholder="给位置起个名字"
+          bindinput="onLocationNameInput"
+        />
+        <text class="field-note">前台同步 {{syncedText}}</text>
+      </view>
+    </block>
+
+    <view class="notice" wx:if="{{submitMessage}}">{{submitMessage}}</view>
     <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
   </block>
 
-  <fixed-cta
-    wx:if="{{showContent}}"
-    primary-text="{{model.isOpen ? '刷新位置' : '定位开摊'}}"
-    secondary-text="{{model.isOpen ? '收摊' : ''}}"
-    processing="{{submitPending}}"
-    disabled="{{model.isOpen ? !canOperate : !canOpen}}"
-    bind:primary="onPrimaryTap"
-    bind:secondary="onSecondaryTap"
-  />
+  <!-- 底部 CTA 区：11 主+次 / 10 确认并开摊 / 09 一键开摊 -->
+  <view class="cta-bar" wx:if="{{showContent}}">
+    <block wx:if="{{model.isOpen}}">
+      <button class="btn-primary" disabled="{{!canOperate || submitPending}}" loading="{{submitPending}}" bindtap="onSecondaryTap">收摊</button>
+      <button class="btn-secondary" wx:if="{{canOperate}}" disabled="{{!canOperate || submitPending}}" bindtap="onPrimaryTap">刷新位置</button>
+    </block>
+    <block wx:elif="{{confirmingTime}}">
+      <button class="btn-primary" disabled="{{!canOpen || submitPending}}" loading="{{submitPending}}" bindtap="onConfirmOpenTime">确认并开摊</button>
+    </block>
+    <block wx:else>
+      <button class="btn-primary" disabled="{{!canOpen || submitPending}}" loading="{{submitPending}}" bindtap="onStartConfirmTime">一键开摊</button>
+    </block>
+  </view>
 
   <confirm-sheet
     visible="{{confirmVisible}}"

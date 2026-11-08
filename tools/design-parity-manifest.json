@@ -1,0 +1,264 @@
+{
+  "meta": {
+    "pathDivergence": {
+      "teamA": "页面直写视图层：逐个页面的 index.wxml/wxss 按设计稿重排骨架、清违规文案、换色值",
+      "teamC": "组件驱动 + token 单一真相源 + 静态符合度工具链，以 c-design 三件套组件、component-tokens.wxss、branch-states.js 与 check-design-parity.js 自检产出 A 版没有的增量"
+    },
+    "goal": "为 C5 的 check-design-parity.js 提供可直接 JSON.parse 消费的规则输入，统一设计 token 与禁用边界，并声明 Team C 另路径增量",
+    "version": "1.1.0",
+    "generatedAt": "2026-11-08",
+    "ownership": "C1 楚天阔 / Team C 另路径增强组",
+    "designRef": {
+      "fileId": "743864343511294",
+      "fileUrl": "https://ardot.tencent.com/file/743864343511294",
+      "snapshot": "tools/design-snapshot.json",
+      "snapshotVersion": "2026-11-08.1",
+      "screenCount": 23,
+      "note": "设计稿本体存于云端画布，项目内只保存结构快照作为版本锚点；画布改动须重新导出快照并同步递增本版本，否则 C13 判为锚点不一致。"
+    }
+  },
+  "designTokens": {
+    "colors": {
+      "background": "#FAF6EE",
+      "primary": "#E07856",
+      "vending": "#87A878",
+      "closingSoon": "#D4A574",
+      "textPrimary": "#5C5A55",
+      "textSecondary": "#8A877F",
+      "white": "#FFFFFF",
+      "lightOrange": "#FDEDE5",
+      "honeyLight": "#FAEAD8"
+    },
+    "radius": {
+      "card": "32rpx",
+      "primaryButton": "52rpx",
+      "secondaryButton": "44rpx",
+      "capsule": "36rpx",
+      "pill": "72rpx"
+    },
+    "buttonSizes": {
+      "primary": { "width": "686rpx", "height": "104rpx" },
+      "secondary": { "width": "686rpx", "height": "88rpx" }
+    },
+    "fontSizes": {
+      "homeTitle": "56rpx",
+      "subtitle": "26rpx",
+      "cardName": "34rpx",
+      "description": "26rpx",
+      "status": "24rpx"
+    }
+  },
+  "forbidden": {
+    "legacyColors": [
+      "#FF7A45",
+      "#FAF8F5",
+      "#1D9E75",
+      "#B26A00",
+      "#34C759",
+      "#E54D42",
+      "#D85F32"
+    ],
+    "fonts": [
+      "Sarasa Gothic SC"
+    ],
+    "ruleExplanations": [
+      "300米内",
+      "5分钟内",
+      "同类新事实合并",
+      "准备收摊仍属于出摊中",
+      "拒绝定位仍可浏览全部摊位",
+      "请勿据此前往",
+      "请勿重复提交",
+      "同日多次开摊记一天",
+      "不会自动解除任何限制",
+      "按规则继续保留"
+    ],
+    "phaseOneDisabled": [
+      "关注",
+      "预约",
+      "提醒",
+      "预计出摊日历",
+      "摊位图片",
+      "照片上传",
+      "信用分",
+      "消息中心",
+      "核销",
+      "请假",
+      "常出摊位置",
+      "未来出摊日"
+    ],
+    "devNotices": [
+      "架构占位页",
+      "后续开发",
+      "业务实现在后续开发中完成",
+      "该功能将在后续版本开放"
+    ]
+  },
+  "scope": {
+    "scanInclude": [
+      "miniprogram/**/*.wxml",
+      "miniprogram/**/*.wxss",
+      "miniprogram/**/*.js",
+      "miniprogram/**/*.json"
+    ],
+    "scanExclude": [
+      "miniprogram/api/**",
+      "miniprogram/config/**",
+      "miniprogram/utils/**",
+      "miniprogram/behaviors/**",
+      "backend/**",
+      "node_modules/**",
+      "tools/**",
+      "**/*.md"
+    ]
+  },
+  "routes": {
+    "source": "miniprogram/app.json",
+    "total": 18,
+    "mainPackage": [
+      "pages/discover/index",
+      "pages/vendor-detail/index",
+      "pages/mine/index",
+      "pages/feedback-candidates/index",
+      "pages/feedback-form/index",
+      "pages/feedback-result/index",
+      "pages/vendor-profile/index",
+      "pages/vendor-profile-edit/index",
+      "pages/workbench/index",
+      "pages/open-days/index",
+      "pages/publication/index",
+      "pages/data-clear/index",
+      "pages/impact-records/index"
+    ],
+    "subPackages": [
+      "packageManagement/pages/index/index",
+      "packageManagement/pages/profile-review/index",
+      "packageManagement/pages/field-review/index",
+      "packageManagement/pages/governance/index",
+      "packageManagement/pages/impact-review/index"
+    ]
+  },
+  "screenToRoute": {
+    "01": { "route": "pages/discover/index", "stateField": "viewState" },
+    "02": { "route": "pages/discover/index", "stateField": "viewState" },
+    "03": { "route": "pages/discover/index", "stateField": "viewState" },
+    "04": { "route": "pages/vendor-detail/index", "stateField": "viewState" },
+    "05": { "route": "pages/vendor-detail/index", "stateField": "viewState" },
+    "06": { "route": "pages/vendor-detail/index", "stateField": "viewState" },
+    "07": { "route": "pages/feedback-form/index", "stateField": "viewState" },
+    "08": { "route": "pages/mine/index", "stateField": "viewState" },
+    "09": { "route": "pages/workbench/index", "stateField": "viewState" },
+    "10": { "route": "pages/workbench/index", "stateField": "viewState" },
+    "11": { "route": "pages/workbench/index", "stateField": "viewState" },
+    "12": { "route": "pages/vendor-profile/index", "stateField": "viewState" },
+    "13": { "route": "pages/publication/index", "stateField": "viewState" },
+    "14": { "route": "packageManagement/pages/profile-review/index", "stateField": "viewState" },
+    "15": { "route": "packageManagement/pages/field-review/index", "stateField": "viewState" },
+    "16": { "route": "pages/feedback-candidates/index", "stateField": "viewState" },
+    "17": { "route": "pages/discover/index", "stateField": "viewState" },
+    "18": { "route": "pages/discover/index", "stateField": "viewState" },
+    "19": { "route": "pages/vendor-detail/index", "stateField": "viewState" },
+    "20": { "route": "pages/vendor-detail/index", "stateField": "viewState" },
+    "21": { "route": "pages/feedback-result/index", "stateField": "viewState" },
+    "22": { "route": "pages/vendor-profile/index", "stateField": "viewState" },
+    "23": { "route": "pages/feedback-form/index", "stateField": "viewState" }
+  },
+  "acceptance": {
+    "gateOne": {
+      "description": "B 组六维加权评分不低于 85 且 P0 缺陷数为 0",
+      "weightedScoreMin": 85,
+      "p0Max": 0
+    },
+    "gateTwo": {
+      "description": "D 组三席评审全部通过",
+      "seats": 3,
+      "requirement": "all-pass"
+    },
+    "checks": [
+      {
+        "id": "C01",
+        "description": "参考稿旧色值零残留",
+        "severity": "P0",
+        "rule": "scope.scanInclude 命中且未被 scanExclude 排除的文件中不得出现 forbidden.legacyColors 任一色值"
+      },
+      {
+        "id": "C02",
+        "description": "禁用字体零残留",
+        "severity": "P0",
+        "rule": "扫描范围内不得出现 forbidden.fonts 中的字体名"
+      },
+      {
+        "id": "C03",
+        "description": "业务规则解释零上屏",
+        "severity": "P0",
+        "rule": "*.wxml 及 *.js 上屏文案中不得出现 forbidden.ruleExplanations 任一串，services 目录同样受检"
+      },
+      {
+        "id": "C04",
+        "description": "一期禁用能力词零上屏",
+        "severity": "P0",
+        "rule": "扫描范围内不得出现 forbidden.phaseOneDisabled 任一能力词"
+      },
+      {
+        "id": "C05",
+        "description": "圆角规格符合设计稿",
+        "severity": "P1",
+        "rule": "卡片、主按钮、次按钮、胶囊、Pill 的 border-radius 分别等于 designTokens.radius 对应值"
+      },
+      {
+        "id": "C06",
+        "description": "组件根节点变量声明",
+        "severity": "P1",
+        "rule": "miniprogram/components/c-design/** 每个组件根节点须声明来自 miniprogram/styles/component-tokens.wxss 的 token 变量，不得硬编码色值"
+      },
+      {
+        "id": "C07",
+        "description": "路由数等于 18",
+        "severity": "P0",
+        "rule": "miniprogram/app.json 的 pages 与 subPackages.pages 合计条数须等于 routes.total，且逐条等于 routes.mainPackage 与 routes.subPackages"
+      },
+      {
+        "id": "C08",
+        "description": "注册组件目录存在",
+        "severity": "P1",
+        "rule": "miniprogram/components/c-design/ 须存在，导航小按钮、状态胶囊、空态卡三件套各有 index.json 并在 usingComponents 注册"
+      },
+      {
+        "id": "C09",
+        "description": "state-view 覆盖值完整",
+        "severity": "P1",
+        "rule": "components/state-view 须覆盖 miniprogram/utils/view-state.js 中 VIEW_STATE 除 CONTENT 外的全部 MESSAGE_STATES 取值"
+      },
+      {
+        "id": "C10",
+        "description": "按钮规格符合设计稿",
+        "severity": "P1",
+        "rule": "主按钮与次按钮宽高须等于 designTokens.buttonSizes.primary 与 secondary"
+      },
+      {
+        "id": "C11",
+        "description": "开发说明串零残留",
+        "severity": "P2",
+        "rule": "扫描范围内不得出现 forbidden.devNotices 任一串"
+      },
+      {
+        "id": "C12",
+        "description": "字号阶梯符合设计稿",
+        "severity": "P2",
+        "rule": "首页标题、副标题、卡名、描述、状态的 font-size 须等于 designTokens.fontSizes 对应值"
+      },
+      {
+        "id": "C13",
+        "description": "设计稿快照锚点一致",
+        "severity": "P1",
+        "rule": "meta.designRef 的 fileId、snapshotVersion 须等于 tools/design-snapshot.json 的 meta 对应值；快照 screens 须覆盖 01~23 且各屏 route 等于 screenToRoute.route，contentBlocks 非空"
+      }
+    ]
+  },
+  "risks": [
+    "C2、C3、C4、C5 产出文件由并行同事新建；本清单生成时 miniprogram/styles/component-tokens.wxss、miniprogram/components/c-design/**、miniprogram/mock/branch-states.js、tools/check-design-parity.js 均未落盘，已用 Glob 核实",
+    "screenToRoute 的 stateField 统一取项目实际字段 viewState，未逐屏绑定具体 VIEW_STATE 分支态值，因设计稿 23 屏与 branch-states 的 7 分支态对应关系未随任务提供",
+    "本清单仅为静态规则声明，未在微信开发者工具或真机执行视觉符合度验收，未运行 C5 自检脚本",
+    "routes 与 screenToRoute.route 采用 app.json 路由标识原值（相对 miniprogram 根），glob 与文件路径采用相对项目根 POSIX 字符串，两种基准需由 C5 分别解释"
+  ]
+}

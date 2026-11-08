@@ -1,0 +1,45 @@
+/*
+ * status-chip 样式。色值一律 var(--...)，单一真相源为 app.wxss 的 page 变量区。
+ * 样式隔离风险：自定义组件默认 styleIsolation=isolated，page 上的 CSS 变量
+ * 不会可靠继承到组件根节点；本轮「未接线」状态下 var(--...) 会取空值
+ * （不报编译错，但胶囊底色/文字色/圆角会视觉失效）。
+ * 接线前提（二选一，本轮均不执行，留待终审裁决）：
+ *   A) 组件根节点显式重声明所需 --变量（内联色值，会重建色值副本，不推荐）；
+ *   B) 在本文件首行引入 C2 的 styles/component-tokens.wxss token 片段
+ *      （相对路径 ../../styles/component-tokens.wxss），并给根节点挂
+ *      .c-token-host 类，变量即定义于根节点并向子节点继承。
+ * 本轮不含真实引入指令、不写死任何色值，避免未接线时编译失败。
+ */
+.c-status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 68rpx; /* 设计稿 64~72rpx 区间 */
+  min-width: 96rpx;
+  max-width: 100%;
+  padding: 0 24rpx;
+  border-radius: var(--radius-chip);
+  background: var(--color-neutral-soft);
+  overflow: hidden; /* 文字不得飘出胶囊 */
+  box-sizing: border-box;
+}
+.c-status-chip__text {
+  display: block;
+  max-width: 100%;
+  font-size: 26rpx;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 超长单行省略，不撑破胶囊 */
+  color: var(--color-text-muted);
+}
+.c-status-chip.is-active {
+  background: var(--color-brand);
+}
+.c-status-chip.is-active .c-status-chip__text {
+  color: var(--color-surface);
+}
+.c-status-chip.is-disabled {
+  opacity: 0.45;
+}

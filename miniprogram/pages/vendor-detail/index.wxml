@@ -1,68 +1,105 @@
-<view class="page-shell {{showContent && isOpen ? 'with-fixed-cta' : ''}}">
-  <state-view
-    wx:if="{{!showContent}}"
-    type="{{viewState.type}}"
-    title="{{viewState.title}}"
-    description="{{viewState.description}}"
-    action-text="{{viewState.actionText}}"
-    bind:action="onStateAction"
-  />
+<view class="page-shell {{showContent ? 'with-fixed-cta' : ''}}">
 
-  <block wx:if="{{showContent}}">
-    <view class="surface-card" wx:if="{{detail.profile}}">
-      <view class="detail-head">
-        <text class="detail-name">{{detail.profile.name}}</text>
-        <phase-badge
-          wx:if="{{detail.session}}"
-          label="{{detail.session.phaseLabel}}"
-          tone="{{detail.session.phaseTone}}"
-        />
-      </view>
-      <view class="detail-category">{{detail.profile.categoryName}}</view>
-      <view class="detail-row" wx:if="{{detail.profile.summary}}">{{detail.profile.summary}}</view>
-      <view class="detail-row" wx:if="{{detail.profile.hasPrice}}">价格说明：{{detail.profile.priceDescription}}</view>
-      <view class="detail-block" wx:if="{{detail.profile.hasAnnouncement}}">{{detail.profile.announcement}}</view>
-    </view>
-
-    <view class="surface-card" wx:if="{{detail.session}}">
-      <view class="row-between">
-        <text class="section-title">本轮营业</text>
-        <countdown
-          text="{{detail.session.remainingText}}"
-          tone="{{detail.session.preparedToClose ? 'warning' : 'neutral'}}"
-        />
-      </view>
-      <view class="detail-row">预计收摊：{{detail.session.plannedEndText}}</view>
-      <view class="detail-row" wx:if="{{detail.location}}">当前位置：{{detail.location.locationName}}</view>
-      <view class="detail-row" wx:if="{{detail.location}}">位置更新于：{{detail.location.locatedText}}</view>
-      <view class="detail-note">
-        {{detail.session.preparedToClose ? '摊主已准备收摊，前往前会再确认一次最新状态。' : '摊主移动地点后会主动刷新位置，这里显示最后一次成功定位时间。'}}
-      </view>
-    </view>
-
-    <view class="detail-card rest" wx:if="{{detail.isResting}}">
-      该摊主当前休息中，暂无可用位置；可在营业时段再来查看
-    </view>
-
-    <view class="detail-note warn" wx:if="{{syncStale}}">
-      状态未更新，暂时无法确认是否仍在营业；请勿据此前往
-    </view>
-
-    <view class="disclaimer">价格仅供参考；平台提供找摊信息，不保证持续营业、有货或交易结果。</view>
+  <block wx:if="{{!showContent}}">
+    <!-- 20 不可查看 / 加载失败：状态白卡 + 短引导 + 失败态重试按钮 -->
+    <state-view
+      class="state-hero"
+      type="{{viewState.type}}"
+      title="{{viewState.type === 'loading' ? '正在加载' : (viewState.type === 'terminal-error' ? '当前不可查看' : '暂时没能加载')}}"
+      description="{{viewState.type === 'loading' ? '请稍候' : (viewState.type === 'terminal-error' ? '换个摊位看看吧' : '请重新加载')}}"
+      action-text="{{viewState.type === 'loading' || viewState.type === 'terminal-error' ? '' : '重新加载'}}"
+      bind:action="onStateAction"
+    />
+    <navigator class="btn-primary bottom-cta" open-type="switchTab" url="/pages/discover/index">返回首页</navigator>
   </block>
 
-  <fixed-cta
-    wx:if="{{showContent && isOpen}}"
-    primary-text="{{navBusy ? '正在确认最新状态…' : '导航前往'}}"
-    secondary-text="反馈现场状态"
-    disabled="{{syncStale}}"
-    processing="{{navBusy || feedbackBusy}}"
-    bind:primary="onNavigate"
-    bind:secondary="onFeedback"
-  />
+  <block wx:elif="{{detail.isResting}}">
+    <!-- 05 详情休息中：灰态视觉块 + 一张资料白卡 + 禁用按钮，无位置卡与导航入口 -->
+    <view class="category-visual is-muted"></view>
+    <view class="card profile-card">
+      <view class="row-between">
+        <text class="detail-name">{{detail.profile.name}}</text>
+        <phase-badge label="休息中" tone="neutral" />
+      </view>
+      <view class="chip category-chip">{{detail.profile.categoryName}}</view>
+      <view class="detail-row" wx:if="{{detail.profile.summary}}">{{detail.profile.summary}}</view>
+      <view class="status-phrase">摊主休息中，稍后再来看看</view>
+    </view>
+    <view class="btn-primary bottom-cta is-disabled">导航不可用</view>
+  </block>
 
+  <block wx:elif="{{confirmVisible}}">
+    <!-- 06 导航前复核：蜜色提示条 + 复核资料白卡 + 「仍要导航 / 暂不前往」 -->
+    <view class="review-bar">摊主准备收摊</view>
+    <view class="card review-card">
+      <view class="review-title">本次复核</view>
+      <view class="detail-row">导航目的地：{{detail.location ? detail.location.locationName : '—'}}</view>
+      <view class="detail-row">复核结果：摊主准备收摊</view>
+    </view>
+    <fixed-cta
+      primary-text="仍要导航"
+      secondary-text="暂不前往"
+      processing="{{navBusy}}"
+      bind:primary="onConfirmContinue"
+      bind:secondary="onConfirmCancel"
+    />
+  </block>
+
+  <block wx:elif="{{navReviewFailure}}">
+    <!-- 19 导航复核失败：蜜色提示条（短原因） + 复核资料白卡 + 「重新复核 / 返回详情」 -->
+    <view class="review-bar is-lg">{{navReviewMessage || '复核未通过'}}</view>
+    <view class="card review-card">
+      <view class="review-title">本次复核</view>
+      <view class="detail-row">导航目的地：{{detail.location ? detail.location.locationName : '—'}}</view>
+      <view class="detail-row">复核结果：未通过</view>
+    </view>
+    <fixed-cta
+      primary-text="重新复核"
+      secondary-text="返回详情"
+      processing="{{navBusy}}"
+      bind:primary="onRetryReview"
+      bind:secondary="onReviewBack"
+    />
+  </block>
+
+  <block wx:else>
+    <!-- 04 详情出摊中：品类视觉块 + 一张资料白卡 + 当前位置卡 + 单个导航前往主 CTA -->
+    <view class="category-visual"></view>
+    <view class="card profile-card">
+      <view class="row-between">
+        <text class="detail-name">{{detail.profile.name}}</text>
+        <phase-badge label="{{detail.session.phaseLabel}}" tone="{{detail.session.phaseTone}}" />
+      </view>
+      <view class="chip category-chip">{{detail.profile.categoryName}}</view>
+      <view class="detail-row time-row">
+        <countdown text="{{detail.session.remainingText}}" tone="{{detail.session.preparedToClose ? 'warning' : 'neutral'}}" />
+      </view>
+      <view class="detail-row" wx:if="{{detail.session.plannedEndText}}">预计 {{detail.session.plannedEndText}} 收摊</view>
+      <view class="detail-row" wx:if="{{detail.profile.summary}}">{{detail.profile.summary}}</view>
+      <view class="feedback-link" bindtap="onFeedback">现场反馈 ›</view>
+    </view>
+    <view class="card location-card" wx:if="{{detail.location}}">
+      <view class="location-map"></view>
+      <view class="row-between location-line">
+        <text>{{detail.location.locationName}}</text>
+        <text>更新于 {{detail.location.locatedText}}</text>
+      </view>
+    </view>
+    <fixed-cta
+      primary-text="{{navBusy ? '正在确认最新状态…' : '导航前往'}}"
+      disabled="{{syncStale}}"
+      processing="{{navBusy || feedbackBusy}}"
+      bind:primary="onNavigate"
+      bind:secondary="onFeedback"
+    />
+  </block>
+
+  <!-- 局部同步态：只保留状态短语 -->
+  <view class="notice-bar warn" wx:if="{{syncStale && showContent}}">状态未更新</view>
+
+  <!-- D01 遮罩收敛：confirm-sheet 保留组件引用但常关，06 改由页面内双 CTA 承载 -->
   <confirm-sheet
-    visible="{{confirmVisible}}"
+    visible="{{false}}"
     title="{{confirmSheet.title}}"
     description="{{confirmSheet.description}}"
     confirm-text="{{confirmSheet.confirmText}}"

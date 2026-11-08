@@ -1,3 +1,13 @@
+/* 组件样式隔离需显式重声明：page 上的变量在自定义组件内可能取不到 */
+.phase-badge {
+  --color-neutral-soft: #F3F1EF;
+  --color-text-hint: #BDBAB4;
+  --color-text-muted: #8A877F;
+  --color-success-soft: #EDF3E8;
+  --color-success: #87A878;
+  --color-warning-soft: #FAEAD8;
+  --color-warning: #D4A574;
+}
 .phase-badge { display: inline-flex; align-items: center; height: 40rpx; padding: 0 16rpx; border-radius: 20rpx; background: var(--color-neutral-soft); }
 .phase-dot { width: 12rpx; height: 12rpx; margin-right: 8rpx; border-radius: 50%; background: var(--color-text-hint); }
 .phase-text { font-size: 22rpx; line-height: 40rpx; color: var(--color-text-muted); }

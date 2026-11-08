@@ -1,4 +1,26 @@
-.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
-.hint { margin-top: 16rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
+/* 12/22 摊主资料：色值一律走 app.wxss 变量，卡片圆角统一 var(--radius-card) */
+.review-card { background: var(--color-warning-soft); }
+.review-title { font-size: 34rpx; font-weight: 500; color: var(--color-warning); }
+.review-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; margin-top: 16rpx; }
+.review-label { font-size: 26rpx; color: var(--color-text-muted); flex: none; }
+.review-value { font-size: 26rpx; color: var(--color-text); text-align: right; }
 
-.primary-button { margin-top: 28rpx; height: 88rpx; border-radius: 44rpx; background: var(--color-brand); color: #FFFFFF; font-size: 30rpx; line-height: 88rpx; }
+.block-title { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
+.field-line { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; margin-top: 16rpx; }
+.field-label { font-size: 26rpx; color: var(--color-text-muted); flex: none; }
+.field-value { font-size: 26rpx; color: var(--color-text); text-align: right; }
+.state-line { margin-top: 16rpx; font-size: 26rpx; color: var(--color-text-muted); }
+
+.compare-grid { display: flex; gap: 16rpx; margin-top: 16rpx; }
+.compare-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12rpx; }
+.compare-col + .compare-col { padding-left: 16rpx; border-left: 1rpx solid var(--color-border); }
+.compare-head { font-size: 26rpx; font-weight: 500; color: var(--color-brand); }
+.compare-item { font-size: 24rpx; line-height: 36rpx; color: var(--color-text); word-break: break-all; }
+
+.step-row { display: flex; align-items: center; justify-content: space-between; margin-top: 16rpx; }
+.step-name { font-size: 26rpx; color: var(--color-text-muted); }
+.step-value { font-size: 26rpx; color: var(--color-text); }
+
+.cta-bar { position: fixed; z-index: 900; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; padding: 24rpx var(--space-page) calc(24rpx + env(safe-area-inset-bottom)); background: var(--color-bg); box-sizing: border-box; }
+.btn-primary[disabled] { background: var(--color-neutral-soft); color: var(--color-text-hint); }
+.cta-bar button { margin: 0; }

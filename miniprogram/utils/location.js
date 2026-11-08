@@ -45,6 +45,7 @@ function getCurrentLocation() {
           reject(new ApiError({
             message: FAILURE_MESSAGE[LOCATION_FAILURE.UNAVAILABLE],
             category: ERROR_CATEGORY.BUSINESS_RULE,
+            data: { locationFailure: 'LOCATION_INVALID' },
           }));
           return;
         }

@@ -4,28 +4,32 @@
     type="{{viewState.type}}"
     title="{{viewState.title}}"
     description="{{viewState.description}}"
-    action-text="{{viewState.actionText}}"
+    action-text="{{viewState.actionText ? '返回详情' : ''}}"
     bind:action="onStateAction"
   />
 
   <block wx:if="{{showContent}}">
-    <view class="result-card">
-      <status-dot tone="{{result.statusTone}}" text="{{result.statusLabel}}" />
-      <view class="result-title">{{result.title}}</view>
-      <view class="result-desc">{{result.description}}</view>
+    <!-- 成功区：插画 + 主文案 + 副文案居中 -->
+    <view class="success-hero">
+      <view class="success-art" wx:if="{{fromSubmit}}"><view class="success-check"></view></view>
+      <view class="success-art is-neutral" wx:else><text class="success-art-text">{{result.statusLabel}}</text></view>
+      <text class="success-title">{{fromSubmit ? '反馈已提交' : result.title}}</text>
+      <text class="success-desc">{{fromSubmit ? result.title : result.description}}</text>
     </view>
 
-    <view class="surface-card">
-      <view class="meta" wx:if="{{result.submittedText}}">提交时间：{{result.submittedText}}</view>
-      <view class="meta" wx:if="{{result.reasonText}}">核实说明：{{result.reasonText}}</view>
-      <view class="notice">{{result.notice}}</view>
+    <!-- 本次反馈资料白卡：状态 / 对象 / 时间 -->
+    <view class="card detail-card">
+      <text class="section-title">本次反馈</text>
+      <view class="detail-line"><text class="detail-label">状态</text><text class="detail-value">{{result.statusLabel}}</text></view>
+      <view class="detail-line" wx:if="{{result.vendorName}}"><text class="detail-label">反馈对象</text><text class="detail-value">{{result.vendorName}}</text></view>
+      <view class="detail-line" wx:if="{{result.submittedText}}"><text class="detail-label">提交时间</text><text class="detail-value">{{result.submittedText}}</text></view>
     </view>
   </block>
 
   <fixed-cta
     wx:if="{{showContent}}"
     primary-text="查看我的反馈"
-    secondary-text="返回"
+    secondary-text="返回详情"
     bind:primary="onOpenRecords"
     bind:secondary="onStateAction"
   />

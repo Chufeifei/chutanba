@@ -76,8 +76,8 @@ function emptyReasonOf({ categoryCode } = {}) {
  */
 function locationHintOf(resolved) {
   if (!resolved || resolved.location) return '';
-  if (resolved.denied) return '未获得位置授权，仍可浏览全部摊位，只是不显示距离';
-  return resolved.message || '暂时无法取得位置，列表暂不显示距离';
+  if (resolved.denied) return '未获得位置授权';
+  return resolved.message || '暂时无法取得位置';
 }
 
 module.exports = {

@@ -23,8 +23,8 @@ function toConfirmSheet({ plannedEndAtMs, remainingMs }, nowMs) {
   return {
     title: '摊主准备收摊',
     description: endText
-      ? `预计 ${endText} 收摊${remainText ? `，约剩 ${remainText}` : ''}。继续前往前会再确认一次最新状态。`
-      : '摊主准备收摊，继续前往前会再确认一次最新状态。',
+      ? `预计 ${endText} 收摊${remainText ? `，约剩 ${remainText}` : ''}。`
+      : '摊主准备收摊',
     confirmText: '继续导航',
     cancelText: '暂不前往',
   };
@@ -33,8 +33,8 @@ function toConfirmSheet({ plannedEndAtMs, remainingMs }, nowMs) {
 /** 复核后仍不是 READY 时的统一说明：状态变了，必须重新取数，不能按旧页面继续。 */
 function toStaleNavigationMessage(decision) {
   return decision === NAV_DECISION.CONFIRM_REQUIRED
-    ? '摊主仍在准备收摊，请刷新后再试'
-    : '营业状态已变化，请查看最新状态';
+    ? '摊主准备收摊'
+    : '状态已变化';
 }
 
 module.exports = {

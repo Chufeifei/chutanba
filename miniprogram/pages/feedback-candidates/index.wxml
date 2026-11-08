@@ -9,49 +9,49 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="section">
-      <text class="section-title">可反馈的营业轮次</text>
-      <view class="section-note">只列出仍在受理窗口内的轮次；窗口一关闭就会从列表消失。</view>
-
-      <view
-        class="candidate"
-        wx:for="{{candidates}}"
-        wx:key="observationId"
-        data-id="{{item.observationId}}"
-        bindtap="onCandidateTap"
-      >
-        <view class="row-between">
-          <text class="candidate-name">{{item.vendorName}}</text>
-          <status-dot tone="{{item.eligible ? 'positive' : ''}}" text="{{item.eligible ? '可提交' : '已关闭'}}" />
-        </view>
-        <view class="candidate-meta">看到时间：{{item.eventText}}</view>
-        <view class="candidate-meta">{{item.windowText}}</view>
-        <view class="candidate-meta" wx:if="{{item.hasSubmitted}}">已提交：{{item.submittedText}}</view>
+    <!-- 顶部 Tab：双页签 + 3rpx 下划线 -->
+    <view class="tab-bar">
+      <view class="tab-item active">
+        <text>待反馈</text>
+        <view class="tab-underline"></view>
       </view>
-
-      <view class="empty-line" wx:if="{{!hasCandidates}}">暂无可反馈的营业轮次</view>
+      <view class="tab-item"><text>已提交</text></view>
     </view>
 
-    <view class="section">
-      <text class="section-title">已提交</text>
-      <view class="section-note">已提交的记录不会因为窗口关闭而消失，处理结果在这里查看。</view>
+    <!-- 一张连续记录列表 -->
+    <view class="record-list">
+      <!-- 首行：待反馈入口，作为列表第 1 项白卡 -->
+      <block wx:for="{{candidates}}" wx:key="observationId">
+        <view
+          class="card record-row"
+          wx:if="{{index === 0}}"
+          data-id="{{item.observationId}}"
+          bindtap="onCandidateTap"
+        >
+          <view class="row-between">
+            <text class="record-name">{{item.vendorName}}</text>
+            <text class="record-tag">待反馈</text>
+          </view>
+          <text class="record-meta">{{item.eventText}}</text>
+        </view>
+      </block>
 
+      <!-- 其余：已提交记录 -->
       <view
-        class="record"
+        class="card record-row"
         wx:for="{{records}}"
         wx:key="feedbackFactId"
         data-id="{{item.feedbackFactId}}"
         bindtap="onRecordTap"
       >
         <view class="row-between">
-          <text class="candidate-name">{{item.vendorName}} · {{item.typeLabel}}</text>
+          <text class="record-name">{{item.vendorName}} · {{item.typeLabel}}</text>
           <status-dot tone="{{item.statusTone}}" text="{{item.statusLabel}}" />
         </view>
-        <view class="candidate-meta">提交时间：{{item.submittedText}}</view>
-        <view class="candidate-meta" wx:if="{{item.reasonText}}">{{item.reasonText}}</view>
+        <text class="record-meta">{{item.submittedText}}</text>
       </view>
 
-      <view class="empty-line" wx:if="{{!hasRecords}}">还没有提交过现场反馈</view>
+      <view class="list-end">没有更多了</view>
     </view>
   </block>
 </view>

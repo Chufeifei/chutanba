@@ -28,20 +28,20 @@
     }
   ],
   "window": {
-    "navigationBarBackgroundColor": "#FAF8F5",
+    "navigationBarBackgroundColor": "#FAF6EE",
     "navigationBarTitleText": "出摊吧",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#FAF8F5"
+    "backgroundColor": "#FAF6EE"
   },
   "tabBar": {
     "custom": true,
-    "color": "#77746F",
-    "selectedColor": "#FF7A45",
-    "backgroundColor": "#FAF8F5",
+    "color": "#8A877F",
+    "selectedColor": "#E07856",
+    "backgroundColor": "#FAF6EE",
     "list": [
       {
         "pagePath": "pages/discover/index",
-        "text": "找摊"
+        "text": "首页"
       },
       {
         "pagePath": "pages/mine/index",
@@ -58,7 +58,7 @@
   "style": "v2",
   "permission": {
     "scope.userLocation": {
-      "desc": "用于按距离展示附近摊位、一键出摊定位和核实现场反馈；拒绝后仍可浏览全部当前摊位，只是不显示距离"
+      "desc": "用于展示附近摊位与一键出摊定位"
     }
   },
   "requiredPrivateInfos": ["getLocation"],

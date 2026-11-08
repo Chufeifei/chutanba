@@ -74,7 +74,7 @@ Page({
   permissionState() {
     return createViewState(VIEW_STATE.PERMISSION, {
       title: '登录后可以查看现场反馈',
-      description: '现场反馈与本人账号关联，请先完成登录',
+      description: '请完成登录后再查看',
     });
   },
 

@@ -1,0 +1,3 @@
+<view class="c-nav-button {{disabled ? 'is-disabled' : ''}}" catchtap="onTap">
+  <text class="c-nav-button__text">{{text}}</text>
+</view>

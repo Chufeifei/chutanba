@@ -9,7 +9,7 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
+    <view class="card">
       <text class="section-title">名称</text>
       <input
         class="field-input"
@@ -23,7 +23,7 @@
       <view class="field-error" wx:if="{{fieldErrors.vendorName}}">{{fieldErrors.vendorName}}</view>
     </view>
 
-    <view class="surface-card">
+    <view class="card">
       <text class="section-title">品类</text>
       <picker
         mode="selector"
@@ -37,7 +37,7 @@
       <view class="field-error" wx:if="{{fieldErrors.categoryCode}}">{{fieldErrors.categoryCode}}</view>
     </view>
 
-    <view class="surface-card">
+    <view class="card">
       <text class="section-title">常卖内容</text>
       <textarea
         class="desc-input"
@@ -51,7 +51,7 @@
       <view class="field-error" wx:if="{{fieldErrors.regularItemsText}}">{{fieldErrors.regularItemsText}}</view>
     </view>
 
-    <view class="surface-card">
+    <view class="card">
       <text class="section-title">价格说明</text>
       <textarea
         class="desc-input"
@@ -65,7 +65,7 @@
       <view class="field-error" wx:if="{{fieldErrors.priceDescription}}">{{fieldErrors.priceDescription}}</view>
     </view>
 
-    <view class="surface-card">
+    <view class="card">
       <text class="section-title">公告</text>
       <textarea
         class="desc-input"
@@ -77,10 +77,6 @@
       />
       <view class="counter">{{form.announcement.length}}/{{limits.announcement}}</view>
       <view class="field-error" wx:if="{{fieldErrors.announcement}}">{{fieldErrors.announcement}}</view>
-    </view>
-
-    <view class="hint">
-      资料修改需要重新审核，审核期间顾客看到的仍是当前生效资料。
     </view>
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>

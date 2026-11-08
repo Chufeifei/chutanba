@@ -9,11 +9,12 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
+    <view class="card">
       <view class="notice">{{noticeText}}</view>
     </view>
 
-    <view class="surface-card">
+    <!-- 本人处理记录：连续列表 -->
+    <view class="card">
       <text class="section-title">对本人有影响的处理</text>
       <view class="meta" wx:if="{{!records.hasRecords}}">暂时没有影响你的处理记录。</view>
 
@@ -61,7 +62,7 @@
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
     <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
 
-    <view class="surface-card" wx:if="{{reviews.hasReviews}}">
+    <view class="card" wx:if="{{reviews.hasReviews}}">
       <text class="section-title">我的复核申请</text>
       <view class="item-row" wx:for="{{reviews.reviews}}" wx:key="impactReviewId">
         <view class="item-head">

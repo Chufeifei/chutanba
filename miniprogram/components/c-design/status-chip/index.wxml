@@ -1,0 +1,3 @@
+<view class="c-status-chip {{active ? 'is-active' : ''}} {{disabled ? 'is-disabled' : ''}}" bindtap="onTap">
+  <text class="c-status-chip__text">{{text}}</text>
+</view>

@@ -1,6 +1,16 @@
-.status-row { display: inline-flex; align-items: center; gap: 12rpx; color: #6B6B6B; font-size: 26rpx; line-height: 36rpx; }
-.status-dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: #9AA0A6; flex: none; }
-.status-positive .status-dot { background: #34C759; }
-.status-warning .status-dot { background: #F5A623; }
-.status-negative .status-dot { background: #E54D42; }
-.status-brand .status-dot { background: #FF7A45; }
+/* 组件样式隔离需显式重声明：page 上的变量在自定义组件内可能取不到 */
+.status-row {
+  --color-text-muted: #8A877F;
+  --color-text-hint: #BDBAB4;
+  --color-success: #87A878;
+  --color-warning: #D4A574;
+  --color-brand: #E07856;
+  /* 设计稿无独立「错误红」变量，沿用陶土色系深红，仅在本组件内声明，避免与 warning / brand 态撞色 */
+  --status-dot-negative: #C15B3E;
+}
+.status-row { display: inline-flex; align-items: center; gap: 12rpx; color: var(--color-text-muted); font-size: 26rpx; line-height: 36rpx; }
+.status-dot { width: 16rpx; height: 16rpx; border-radius: 50%; background: var(--color-text-hint); flex: none; }
+.status-positive .status-dot { background: var(--color-success); }
+.status-warning .status-dot { background: var(--color-warning); }
+.status-negative .status-dot { background: var(--status-dot-negative); }
+.status-brand .status-dot { background: var(--color-brand); }

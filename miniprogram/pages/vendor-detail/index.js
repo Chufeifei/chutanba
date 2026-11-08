@@ -24,6 +24,8 @@ Page({
     // 同步失败标记：为真时禁用导航并提示"状态未更新"
     syncStale: false,
     navBusy: false,
+    navReviewFailure: false,
+    navReviewMessage: '',
     confirmVisible: false,
     confirmSheet: { title: '', description: '', confirmText: '继续导航', cancelText: '暂不前往' },
     feedbackBusy: false,
@@ -55,6 +57,8 @@ Page({
         showContent: false,
         isOpen: false,
         syncStale: false,
+        navReviewFailure: false,
+        navReviewMessage: '',
         viewState: createViewState(VIEW_STATE.TERMINAL_ERROR, { title: '当前不可查看', description: detail.notice }),
       });
       return;
@@ -64,6 +68,8 @@ Page({
       showContent: true,
       isOpen: detail.availability === AVAILABILITY.OPEN,
       syncStale: false,
+      navReviewFailure: false,
+      navReviewMessage: '',
       viewState: createViewState(VIEW_STATE.CONTENT),
     });
   },
@@ -71,7 +77,9 @@ Page({
   applyFailure(viewState) {
     this.setData({
       syncStale: Boolean(this.data.detail),
-      viewState: this.data.detail ? createViewState(VIEW_STATE.STALE) : viewState,
+      viewState: this.data.detail
+        ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
+        : viewState,
     });
   },
 
@@ -93,14 +101,21 @@ Page({
 
   applyNavigation(result) {
     if (result.kind === 'NEED_CONFIRM') {
-      this.setData({ confirmVisible: true, confirmSheet: result.sheet });
+      this.setData({ confirmVisible: true, confirmSheet: result.sheet, navReviewFailure: false, navReviewMessage: '' });
       return;
     }
     this.setData({ confirmVisible: false });
     if (result.kind === 'BLOCKED') {
-      wx.showToast({ title: result.message, icon: 'none' });
+      // 失败原因只取第一个短句：长规则解释压到 ≤12 字，别整句丢掉
+      const message = String(result.message || '复核未通过').split(/[，。；、]/)[0];
+      this.setData({
+        navReviewFailure: true,
+        navReviewMessage: message.length > 12 ? message.slice(0, 12) : message,
+      });
       if (result.reload) this.refreshLiveNow();
+      return;
     }
+    this.setData({ navReviewFailure: false, navReviewMessage: '' });
   },
 
   onNavigate() {
@@ -120,6 +135,15 @@ Page({
   onConfirmContinue() {
     // 弹层停留期间轮次或位置可能已变：必须换新意图重新复核，不能复用上次结论
     this.runNavigation(true);
+  },
+
+  onRetryReview() {
+    this.setData({ navReviewFailure: false, navReviewMessage: '' });
+    this.onNavigate();
+  },
+
+  onReviewBack() {
+    this.setData({ navReviewFailure: false, navReviewMessage: '' });
   },
 
   async onFeedback() {

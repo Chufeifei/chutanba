@@ -1,9 +1,19 @@
+/* 组件样式隔离需显式重声明：page 上的变量在自定义组件内可能取不到 */
+.sheet-mask {
+  --color-border: #F0ECE8;
+  --color-text: #5C5A55;
+  --color-text-muted: #8A877F;
+  --color-brand: #E07856;
+  --color-warning: #D4A574;
+  --color-neutral-soft: #F3F1EF;
+  --color-surface: #FFFFFF;
+}
 .sheet-mask { position: fixed; z-index: 1200; inset: 0; display: flex; align-items: flex-end; background: rgba(31,31,31,0.42); }
-.confirm-sheet { width: 100%; padding: 20rpx 32rpx calc(32rpx + env(safe-area-inset-bottom)); border-radius: 48rpx 48rpx 0 0; background: #FFFFFF; box-sizing: border-box; }
-.sheet-handle { width: 72rpx; height: 8rpx; margin: 0 auto 32rpx; border-radius: 4rpx; background: #D9D6D2; }
-.sheet-title { color: #1F1F1F; font-size: 36rpx; line-height: 50rpx; font-weight: 600; }
-.sheet-description { margin-top: 16rpx; color: #6B6B6B; font-size: 28rpx; line-height: 42rpx; }
+.confirm-sheet { width: 100%; padding: 20rpx 32rpx calc(32rpx + env(safe-area-inset-bottom)); border-radius: 48rpx 48rpx 0 0; background: var(--color-surface); box-sizing: border-box; }
+.sheet-handle { width: 72rpx; height: 8rpx; margin: 0 auto 32rpx; border-radius: 4rpx; background: var(--color-border); }
+.sheet-title { color: var(--color-text); font-size: 36rpx; line-height: 50rpx; font-weight: 600; }
+.sheet-description { margin-top: 16rpx; color: var(--color-text-muted); font-size: 28rpx; line-height: 42rpx; }
 .confirm-sheet button { height: 88rpx; border-radius: 44rpx; font-size: 30rpx; line-height: 88rpx; }
-.sheet-confirm { margin-top: 40rpx; background: #FF7A45; color: #FFFFFF; }
-.sheet-confirm.destructive { background: #E54D42; }
-.sheet-cancel { margin-top: 16rpx; background: #F3F1EF; color: #3F3F3F; }
+.sheet-confirm { margin-top: 40rpx; background: var(--color-brand); color: var(--color-surface); }
+.sheet-confirm.destructive { background: var(--color-warning); }
+.sheet-cancel { margin-top: 16rpx; background: var(--color-neutral-soft); color: var(--color-text); }

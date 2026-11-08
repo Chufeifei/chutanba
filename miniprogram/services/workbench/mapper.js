@@ -21,8 +21,8 @@ const PHASE_TONE = Object.freeze({
 
 function toRestriction({ selfStopped, governancePaused }) {
   const notes = [];
-  if (selfStopped) notes.push('你已停止公开，解除入口在「公开与资料处理」');
-  if (governancePaused) notes.push('当前处于治理暂停，需等待管理员处理');
+  if (selfStopped) notes.push('已停止公开');
+  if (governancePaused) notes.push('治理暂停中');
   return {
     selfStopped,
     governancePaused,

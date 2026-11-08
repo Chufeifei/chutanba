@@ -13,7 +13,7 @@ const TIP = Object.freeze({
   REASON_REQUIRED: '请填写复核说明',
   REASON_TOO_LONG: '复核说明超出长度上限',
   SUBMITTED: '复核申请已提交',
-  NOTICE: '提出复核不会自动解除任何限制，处理结果以人工复核结论为准。',
+  NOTICE: '复核不解除限制',
 });
 
 const SUBMIT_FAILURE_TEXT = Object.freeze({

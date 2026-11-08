@@ -1,0 +1,106 @@
+/*
+ * state-hero 样式。色值一律 var(--...)，单一真相源为 app.wxss 的 page 变量区。
+ * 样式隔离风险：自定义组件默认 styleIsolation=isolated，page 上的 CSS 变量
+ * 不会可靠继承到组件根节点；本轮「未接线」状态下 var(--...) 会取空值
+ * （不报编译错，但白卡/文案色/几何色块/圆角会视觉失效）。
+ * 接线前提（二选一，本轮均不执行，留待终审裁决）：
+ *   A) 组件根节点显式重声明所需 --变量（内联色值，会重建色值副本，不推荐）；
+ *   B) 在本文件首行引入 C2 的 styles/component-tokens.wxss token 片段
+ *      （相对路径 ../../styles/component-tokens.wxss），并给根节点挂
+ *      .c-token-host 类，变量即定义于根节点并向子节点继承。
+ * 本轮不含真实引入指令、不写死任何色值，避免未接线时编译失败。
+ */
+.c-state-hero {
+  width: 686rpx;
+  height: 400rpx;
+  padding: var(--space-card);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.c-state-hero__illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 160rpx;
+}
+/* 兜底简笔插画：纯 CSS 几何色块，无图片资源 */
+.c-state-hero__art {
+  position: relative;
+  width: 160rpx;
+  height: 140rpx;
+}
+.c-state-hero__art-shape {
+  position: absolute;
+  border-radius: var(--radius-chip);
+}
+.c-state-hero__art-shape--base {
+  left: 16rpx;
+  top: 24rpx;
+  width: 104rpx;
+  height: 88rpx;
+  background: var(--color-brand-soft);
+}
+.c-state-hero__art-shape--alt {
+  right: 12rpx;
+  bottom: 16rpx;
+  width: 72rpx;
+  height: 72rpx;
+  background: var(--color-warning-soft);
+}
+.c-state-hero__art-shape--dot {
+  left: 68rpx;
+  top: 4rpx;
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: var(--color-brand);
+}
+/* 枚举只切换兜底几何配色，不改结构 */
+.c-state-hero__art--success .c-state-hero__art-shape--dot { background: var(--color-success); }
+.c-state-hero__art--error .c-state-hero__art-shape--base { background: var(--color-warning-soft); }
+.c-state-hero__art--pending .c-state-hero__art-shape--alt { background: var(--color-neutral-soft); }
+
+.c-state-hero__title {
+  margin-top: 16rpx;
+  max-width: 100%;
+  font-size: 38rpx;
+  line-height: 1.3;
+  font-weight: 500;
+  text-align: center;
+  color: var(--color-text);
+  overflow: hidden;
+}
+.c-state-hero__desc {
+  margin-top: 8rpx;
+  max-width: 100%;
+  font-size: 32rpx;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--color-text-muted);
+  overflow: hidden;
+}
+.c-state-hero__action {
+  margin-top: 16rpx;
+  display: flex;
+  justify-content: center;
+}
+.c-state-hero__cta {
+  min-width: 220rpx;
+  height: 64rpx;
+  padding: 0 32rpx;
+  border-radius: var(--radius-button);
+  background: var(--color-brand);
+  color: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}

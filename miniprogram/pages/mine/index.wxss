@@ -1,19 +1,25 @@
-.limit-row {
-  margin-top: 20rpx;
-  padding: 16rpx 24rpx;
-  border-radius: 16rpx;
-  background: var(--color-warning-soft);
-  color: var(--color-warning);
-  font-size: 26rpx;
-}
-.entry-row {
-  display: flex;
-  align-items: center;
-  padding: 28rpx 0;
-  border-bottom: 1rpx solid var(--color-border);
-}
+/* 08 我的·个人中心：色值一律走 app.wxss 变量，卡片圆角统一 var(--radius-card) */
+.profile-head { display: flex; align-items: center; gap: 24rpx; margin: 8rpx 0 24rpx; }
+.avatar { width: 128rpx; height: 128rpx; border-radius: 50%; background: var(--color-brand-soft); flex: none; }
+.head-info { display: flex; flex-direction: column; gap: 12rpx; }
+.nickname { font-size: 36rpx; font-weight: 500; color: var(--color-text); }
+
+.switch-card { display: flex; align-items: center; justify-content: space-between; min-height: 128rpx; }
+.switch-left { display: flex; flex-direction: column; gap: 8rpx; min-width: 0; }
+.switch-title { font-size: 26rpx; color: var(--color-text-muted); }
+.switch-sub { font-size: 30rpx; color: var(--color-text); }
+.switch-btn { width: 212rpx; height: 80rpx; border-radius: var(--radius-card); background: var(--color-brand-soft); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 28rpx; flex: none; }
+
+.stat-grid { display: flex; gap: 16rpx; margin: 16rpx 0; }
+.stat-grid .card + .card { margin-top: 0; }
+.stat-card { flex: 1; min-height: 160rpx; display: flex; flex-direction: column; justify-content: center; gap: 8rpx; }
+.stat-value { font-size: 44rpx; font-weight: 600; color: var(--color-text); }
+.stat-label { font-size: 24rpx; color: var(--color-text-muted); }
+
+.status-line { margin: 12rpx 0; padding: 12rpx 24rpx; border-radius: var(--radius-card); background: var(--color-warning-soft); color: var(--color-warning); font-size: 24rpx; }
+
+.entry-list { padding: 0; }
+.entry-row { display: flex; align-items: center; justify-content: space-between; height: 112rpx; padding: 0 var(--space-card); border-bottom: 1rpx solid var(--color-border); }
 .entry-row:last-child { border-bottom: 0; }
-.entry-main { flex: 1; min-width: 0; }
-.entry-text { color: var(--color-text); font-size: 30rpx; }
-.entry-hint { margin-top: 8rpx; color: var(--color-text-muted); font-size: 24rpx; line-height: 34rpx; }
-.entry-arrow { color: var(--color-text-hint); font-size: 34rpx; }
+.entry-label { font-size: 30rpx; color: var(--color-text); }
+.entry-arrow { font-size: 34rpx; color: var(--color-text-hint); }

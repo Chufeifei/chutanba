@@ -5,27 +5,33 @@
  * 颜色统一在这里定义，页面与组件不得重复写十六进制色值。
  */
 page {
-  --color-bg: #FAF8F5;
+  --color-bg: #FAF6EE;
   --color-surface: #FFFFFF;
-  --color-text: #1F1F1F;
-  --color-text-muted: #6B6B6B;
-  --color-text-hint: #9A9691;
+  --color-text: #5C5A55;
+  --color-text-muted: #8A877F;
+  /* hint 取介于 muted(#8A877F) 与 border(#F0ECE8) 之间的灰 */
+  --color-text-hint: #BDBAB4;
   --color-border: #F0ECE8;
-  --color-brand: #FF7A45;
-  --color-brand-soft: #FFF1EB;
-  --color-warning: #B26A00;
-  --color-warning-soft: #FFF4E0;
+  --color-brand: #E07856;
+  --color-brand-soft: #FDEDE5;
+  --color-warning: #D4A574;
+  --color-warning-soft: #FAEAD8;
   --color-neutral-soft: #F3F1EF;
-  --color-success: #1D9E75;
-  --color-success-soft: #E1F5EE;
+  --color-success: #87A878;
+  --color-success-soft: #EDF3E8;
   --radius-card: 32rpx;
   --radius-sheet: 48rpx;
   --space-page: 32rpx;
+  /* 设计稿口径新增语义变量 */
+  --radius-chip: 36rpx;
+  --radius-button: 52rpx;
+  --space-card: 32rpx;
+  --space-gap: 16rpx;
 
   min-height: 100%;
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: "Sarasa Gothic SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 button { font-family: inherit; }
@@ -45,9 +51,24 @@ button::after { border: 0; }
 .text-secondary { color: var(--color-text-muted); }
 .text-hint { color: var(--color-text-hint); }
 .text-brand { color: var(--color-brand); }
-.bg-brand { background: var(--color-brand); color: #FFFFFF; }
+.bg-brand { background: var(--color-brand); color: var(--color-surface); }
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
 .section-title { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
 .section-note { margin-top: 12rpx; font-size: 26rpx; line-height: 40rpx; color: var(--color-text-muted); }
 .divider { height: 1rpx; background: var(--color-border); }
+
+/* ===== 设计稿口径追加语义类：色值一律走 var，不写死十六进制 ===== */
+.card { padding: var(--space-card); border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; }
+.card + .card { margin-top: var(--space-gap); }
+
+.btn-primary { width: 686rpx; height: 104rpx; border-radius: var(--radius-button); background: var(--color-brand); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
+.btn-secondary { width: 686rpx; height: 88rpx; border-radius: 44rpx; border: 1rpx solid var(--color-brand); background: var(--color-surface); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
+
+.chip { display: inline-flex; align-items: center; justify-content: center; padding: 10rpx 24rpx; border-radius: var(--radius-chip); background: var(--color-neutral-soft); color: var(--color-text-muted); font-size: 24rpx; }
+.chip.active { background: var(--color-brand); color: var(--color-surface); }
+
+.row-between { display: flex; align-items: center; justify-content: space-between; }
+
+/* 状态插画容器：白卡 + 200px 等价高度（750rpx 设计基准约 400rpx） */
+.state-hero { height: 400rpx; padding: var(--space-card); border-radius: var(--radius-card); background: var(--color-surface); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }

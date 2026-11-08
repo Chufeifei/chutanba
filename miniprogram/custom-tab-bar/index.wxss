@@ -1,1 +1,37 @@
-.tab-bar { position: fixed; z-index: 1000; right: 0; bottom: 0; left: 0; height: calc(132rpx + env(safe-area-inset-bottom)); padding: 16rpx 32rpx calc(16rpx + env(safe-area-inset-bottom)); background: #FAF8F5; box-sizing: border-box; }.tab-pill { display: flex; height: 100rpx; padding: 6rpx; border: 1rpx solid #F0ECE8; border-radius: 52rpx; background: #FFFFFF; box-sizing: border-box; }.tab-item { display: flex; flex: 1; align-items: center; justify-content: center; gap: 10rpx; border-radius: 44rpx; color: #77746F; font-size: 22rpx; }.tab-item.active { background: #FF7A45; color: #FFFFFF; font-weight: 600; }.tab-icon { width: 28rpx; height: 28rpx; opacity: .72; }.tab-item.active .tab-icon { opacity: 1; filter: brightness(0) invert(1); }
+/*
+ * 自定义组件默认开启样式隔离，不保证能继承 app.wxss 中 page 上声明的 CSS 变量，
+ * 因此在 .tab-bar 根节点重新声明所需变量（仅此处定义色值，其余属性一律 var 引用）。
+ */
+.tab-bar {
+  --color-bg: #FAF6EE;
+  --color-surface: #FFFFFF;
+  --color-brand: #E07856;
+  --color-border: #F0ECE8;
+  --color-text-muted: #8A877F;
+
+  position: fixed; z-index: 1000; right: 0; bottom: 0; left: 0;
+  height: calc(190rpx + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  display: flex; align-items: center; justify-content: center;
+  background: var(--color-bg);
+  box-sizing: border-box;
+}
+.tab-pill {
+  display: flex; align-items: center;
+  width: 666rpx; height: 124rpx;
+  padding: 6rpx;
+  border: 1rpx solid var(--color-border);
+  border-radius: 72rpx;
+  background: var(--color-surface);
+  box-sizing: border-box;
+}
+.tab-item {
+  display: flex; flex: 1; align-items: center; justify-content: center; gap: 10rpx;
+  height: 100%;
+  border-radius: 52rpx;
+  color: var(--color-text-muted);
+  font-size: 20rpx;
+}
+.tab-item.active { background: var(--color-brand); color: var(--color-surface); font-weight: 600; }
+.tab-icon { width: 28rpx; height: 28rpx; opacity: .72; }
+.tab-item.active .tab-icon { opacity: 1; filter: brightness(0) invert(1); }

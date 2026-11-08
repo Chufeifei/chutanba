@@ -1,6 +1,14 @@
-.result-card { padding: 48rpx 32rpx; border-radius: var(--radius-card); background: var(--color-surface); text-align: center; }
-.result-title { margin-top: 20rpx; font-size: 38rpx; font-weight: 600; color: var(--color-text); }
-.result-desc { margin-top: 12rpx; font-size: 28rpx; line-height: 44rpx; color: var(--color-text-muted); }
+/* 成功区：插画 + 主文案 38rpx + 副文案 32rpx 居中 */
+.success-hero { min-height: 500rpx; padding: 48rpx var(--space-card); border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.success-art { width: 320rpx; height: 320rpx; margin-bottom: 24rpx; border-radius: 50%; background: var(--color-brand-soft); display: flex; align-items: center; justify-content: center; }
+.success-art.is-neutral { background: var(--color-neutral-soft); }
+.success-art-text { font-size: 32rpx; color: var(--color-text-muted); }
+.success-check { width: 64rpx; height: 112rpx; border-right: 10rpx solid var(--color-brand); border-bottom: 10rpx solid var(--color-brand); border-radius: 4rpx; transform: rotate(45deg) translate(-8rpx, -8rpx); }
+.success-title { font-size: 38rpx; font-weight: 600; color: var(--color-text); }
+.success-desc { margin-top: 12rpx; font-size: 32rpx; line-height: 46rpx; color: var(--color-text-muted); }
 
-.meta { margin-top: 12rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
-.notice { margin-top: 24rpx; font-size: 24rpx; line-height: 38rpx; color: var(--color-text-hint); }
+/* 本次反馈资料白卡 */
+.detail-card { margin-top: 24rpx; }
+.detail-line { display: flex; align-items: center; justify-content: space-between; margin-top: 20rpx; font-size: 28rpx; }
+.detail-label { color: var(--color-text-muted); }
+.detail-value { color: var(--color-text); }

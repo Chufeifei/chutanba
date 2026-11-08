@@ -1,7 +1,33 @@
-<view class="page-shell">
-  <state-view
-    type="{{viewState.type}}"
-    title="{{viewState.title}}"
-    description="{{viewState.description}}"
-  />
+<view class="page-shell has-cta">
+  <!-- 待审申请卡 -->
+  <view class="card">
+    <view class="row-between">
+      <text class="field-label">申请人</text>
+      <text class="field-value">—</text>
+    </view>
+    <view class="field-row row-between">
+      <text class="field-label">提交时间</text>
+      <text class="field-value">—</text>
+    </view>
+    <view class="divider"></view>
+    <view class="field-block">
+      <text class="field-label">本次修改内容</text>
+      <text class="field-value">—</text>
+    </view>
+  </view>
+
+  <!-- 处理原因输入 + 历史审核结果卡内脚注 -->
+  <view class="card">
+    <text class="field-label">处理原因</text>
+    <view class="reason-input">
+      <text class="reason-placeholder">填写处理原因</text>
+    </view>
+    <view class="card-footnote">历史审核结果：暂无</view>
+  </view>
+
+  <!-- 底部 CTA -->
+  <view class="cta-bar">
+    <button class="btn-primary cta-btn" hover-class="cta-hover" bindtap="onApproveTap">通过</button>
+    <button class="btn-secondary cta-btn" hover-class="cta-hover" bindtap="onRejectTap">驳回</button>
+  </view>
 </view>

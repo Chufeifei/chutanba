@@ -1,15 +1,41 @@
 <view class="page-shell with-tab-bar">
-  <view class="surface-card">
-    <view class="section-title">账号</view>
-    <view class="section-note" wx:if="{{identified}}">资料状态：{{profileStateLabel}}</view>
-    <view class="section-note" wx:else>账号暂不可识别，浏览摊位不受影响；提交反馈或管理资料时需要重新识别账号。</view>
-
-    <view class="limit-row" wx:if="{{selfStopped}}">本人已停止公开</view>
-    <view class="limit-row" wx:if="{{governancePaused}}">当前处于治理暂停</view>
+  <!-- 一级个人中心：头像 / 昵称 / 身份胶囊 -->
+  <view class="profile-head">
+    <view class="avatar"></view>
+    <view class="head-info">
+      <text class="nickname">我的</text>
+      <view class="chip {{identified ? 'active' : ''}}">{{identified ? '已识别' : '未识别'}}</view>
+    </view>
   </view>
 
-  <view class="surface-card" wx:if="{{entries.length}}">
-    <view class="section-title">功能入口</view>
+  <!-- 身份切换卡：左两行状态 + 右切换入口 -->
+  <view class="card switch-card">
+    <view class="switch-left">
+      <text class="switch-title">当前身份</text>
+      <text class="switch-sub">{{profileStateLabel}}</text>
+    </view>
+    <view class="switch-btn" bindtap="onSwitchTap">切换 ›</view>
+  </view>
+
+  <!-- 两枚数据小卡：字段名保留 -->
+  <view class="stat-grid">
+    <view class="card stat-card">
+      <text class="stat-value">{{statOpenDays}}</text>
+      <text class="stat-label">累计出摊</text>
+    </view>
+    <view class="card stat-card">
+      <text class="stat-value">{{statFeedbackCount}}</text>
+      <text class="stat-label">我的反馈</text>
+    </view>
+  </view>
+
+  <!-- 状态行：只写状态，不写规则解释 -->
+  <view class="status-line" wx:if="{{!identified}}">账号暂不可识别</view>
+  <view class="status-line" wx:if="{{selfStopped}}">本人已停止公开</view>
+  <view class="status-line" wx:if="{{governancePaused}}">当前处于治理暂停</view>
+
+  <!-- 合并白卡入口列表：4 行 × 56 高 + 分割线，删行内小字 -->
+  <view class="card entry-list" wx:if="{{entries.length}}">
     <view
       wx:for="{{entries}}"
       wx:key="key"
@@ -17,10 +43,7 @@
       data-key="{{item.key}}"
       bindtap="onEntryTap"
     >
-      <view class="entry-main">
-        <view class="entry-text">{{item.text}}</view>
-        <view class="entry-hint">{{item.hint}}</view>
-      </view>
+      <text class="entry-label">{{item.key === 'publication' ? '资料与处理记录' : item.text}}</text>
       <text class="entry-arrow">›</text>
     </view>
   </view>

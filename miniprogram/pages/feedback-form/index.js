@@ -8,6 +8,7 @@ const { BIZ_CODE, PROFILE_LIMITS } = require('../../config/contracts');
 const { QUERY_OUTCOME } = require('../../services/submission');
 const feedback = require('../../services/feedback');
 const formSubmit = require('../../behaviors/form-submit');
+const location = require('../../utils/location');
 
 Page({
   behaviors: [formSubmit],
@@ -24,6 +25,7 @@ Page({
     // 已提交过 / 窗口已关闭：再点也不会成立，停用提交但不丢弃已填文字
     cannotSubmit: false,
     submitting: false,
+    locationFailed: false,
   },
 
   async onLoad(query) {
@@ -71,7 +73,8 @@ Page({
   windowClosedState(extra) {
     return createViewState(VIEW_STATE.TERMINAL_ERROR, {
       title: '本次反馈已无法提交',
-      description: extra || '该轮次的受理窗口已关闭，或反馈对象已不属于当前账号',
+      // extra 为候选窗口文案：有值=本轮已过期，无值=反馈对象已不在候选里；只上屏短状态句
+      description: extra ? '本轮已结束' : '反馈对象不可用',
     });
   },
 
@@ -83,27 +86,53 @@ Page({
 
   onDescriptionInput(event) { this.setData({ description: event.detail.value }); },
 
+  /** 只重新取位置，成功即复位定位失败态；不进入 submitFeedback 提交链。 */
+  async onRelocate() {
+    try {
+      await location.getCurrentLocation();
+      this.setData({ locationFailed: false });
+    } catch (error) {
+      // 仍不可用时保留失败态，仅给轻量提示
+      void error;
+      wx.showToast({ title: '仍无法获取位置', icon: 'none' });
+    }
+  },
+
+  onBack() { wx.navigateBack(); },
+
   async onSubmit() {
     if (!this.data.selectedType) {
       wx.showToast({ title: '请先选择现场情况', icon: 'none' });
       return;
     }
     if (this.isSubmitting()) return;
+    this._locationFailed = false;
     this.setData({ submitting: true, unknownVisible: false, cannotSubmit: false });
     try {
       const result = await this.runFormSubmit({
-        submitter: () => feedback.submitFeedback({
-          observationId: this._observationId,
-          observationVersion: this._observationVersion,
-          type: this.data.selectedType,
-          description: this.data.description,
-        }),
+        submitter: async () => {
+          try {
+            return await feedback.submitFeedback({
+              observationId: this._observationId,
+              observationVersion: this._observationVersion,
+              type: this.data.selectedType,
+              description: this.data.description,
+            });
+          } catch (error) {
+            // 定位失败以 ApiError.data.locationFailure 明确透出；只记录标识，错误原样抛回 form-submit
+            this._locationFailed = Boolean(error && error.data && error.data.locationFailure);
+            throw error;
+          }
+        },
         onSuccess: (data) => this.finish(data),
         onUnknown: () => this.setData({ unknownVisible: true }),
       });
       this.applySubmitResult(result);
     } finally {
-      this.setData({ submitting: false });
+      this.setData({
+        submitting: false,
+        locationFailed: Boolean(this._locationFailed),
+      });
     }
   },
 
@@ -113,7 +142,7 @@ Page({
     if (result.outcome === WRITE_OUTCOME.CONFLICT && result.bizCode === BIZ_CODE.ALREADY_PROCESSED) {
       this.setData({
         cannotSubmit: true,
-        submitMessage: '这一类问题你已经提交过，无需重复提交；可在反馈记录里查看处理进度',
+        submitMessage: '可在反馈记录里查看进度',
       });
       return;
     }

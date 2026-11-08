@@ -1,0 +1,20 @@
+<view class="c-state-hero">
+  <view class="c-state-hero__illustration">
+    <slot name="illustration">
+      <view class="c-state-hero__art {{illustrationClass}}" aria-hidden="true">
+        <view class="c-state-hero__art-shape c-state-hero__art-shape--base"></view>
+        <view class="c-state-hero__art-shape c-state-hero__art-shape--alt"></view>
+        <view class="c-state-hero__art-shape c-state-hero__art-shape--dot"></view>
+      </view>
+    </slot>
+  </view>
+
+  <view class="c-state-hero__title" wx:if="{{title}}">{{title}}</view>
+  <view class="c-state-hero__desc" wx:if="{{description}}">{{description}}</view>
+
+  <view class="c-state-hero__action">
+    <slot name="action">
+      <view wx:if="{{actionText}}" class="c-state-hero__cta" bindtap="onAction">{{actionText}}</view>
+    </slot>
+  </view>
+</view>

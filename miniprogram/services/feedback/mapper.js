@@ -123,7 +123,7 @@ function toResultModel({
     return {
       ...base,
       title: '已提交，等待人工核实',
-      description: merged ? '已补充到待处理反馈' : '平台会尽快核实，结果可在"现场反馈"里查看',
+      description: merged ? '已提交' : '平台会尽快核实，结果可在"现场反馈"里查看',
     };
   }
   if (value === FEEDBACK_CASE_STATUS.CONFIRMED) {

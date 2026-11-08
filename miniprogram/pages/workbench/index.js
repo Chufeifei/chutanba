@@ -30,6 +30,8 @@ Page({
     confirmVisible: false,
     confirmSheet: { title: '', description: '', confirmText: '确认' },
     unknownVisible: false,
+    // 09 → 10 的时间确认视图开关：仅控制开摊前的整屏状态，与 isOpen 无关
+    confirmingTime: false,
   },
 
   onLoad() {
@@ -89,12 +91,33 @@ Page({
     });
   },
 
+  /**
+   * 命名遗留：primary/secondary 沿用旧 fixed-cta 插槽名，与动作语义不再一一对应。
+   * 营业中主按钮「收摊」绑 onSecondaryTap(CLOSE)、次级「刷新位置」绑 onPrimaryTap(REFRESH)；
+   * 休息态「一键开摊」先走 onStartConfirmTime，时间确认后由 onConfirmOpenTime 回到本方法(OPEN)。
+   */
   onPrimaryTap() {
     this.openConfirm(this.data.model && this.data.model.isOpen ? ACTION.REFRESH : ACTION.OPEN);
   },
 
   onSecondaryTap() {
     this.openConfirm(ACTION.CLOSE);
+  },
+
+  /** 09 一键开摊：先进 10 时间确认视图，不直接弹确认层。 */
+  onStartConfirmTime() {
+    this.setData({ confirmingTime: true });
+  },
+
+  /** 10 返回：放弃时间确认，回到 09。 */
+  onCancelConfirmTime() {
+    this.setData({ confirmingTime: false });
+  },
+
+  /** 10 确认并开摊：收起时间视图后复用原有 OPEN 确认链路（不改 openConfirm / runAction）。 */
+  onConfirmOpenTime() {
+    this.setData({ confirmingTime: false });
+    this.onPrimaryTap();
   },
 
   onConfirmCancel() { this.setData({ confirmVisible: false }); },

@@ -1,0 +1,336 @@
+{
+  "meta": {
+    "fileId": "743864343511294",
+    "fileUrl": "https://ardot.tencent.com/file/743864343511294",
+    "canvasTitle": "出摊吧 · 第一期实时找摊 MVP ｜ 小程序页面设计稿（23 屏 · 参考稿布局对齐版）",
+    "snapshotVersion": "2026-11-08.1",
+    "capturedAt": "2026-11-08",
+    "captureMethod": "只读导出画布顶层节点清单与每屏手机屏容器的两层结构（节点 ID / 名称 / 高度），不含像素、不含图片资源",
+    "purpose": "把云端画布的结构基线落到项目内，供 tools/check-design-parity.js 与 tools/design-parity-manifest.json 核对版本与 23 屏骨架",
+    "limitation": "这是静态版本锚点，不是实时同步链路。脚本只能核对『manifest 声明版本 == 本快照版本』及两侧结构一致，无法自动感知云端画布是否已被改动。",
+    "refreshProtocol": "画布改动后由具备画布读取能力的一方重新导出本文件，递增 snapshotVersion，并同步 manifest.meta.designRef.snapshotVersion；只改一侧会被 C13 判为锚点不一致。",
+    "note": "设计稿本体仍存放在 Ardot 云端，本文件不替代画布，也不作为小程序运行时资源。"
+  },
+  "layoutSpec": {
+    "frame": "StatusBar 62 → 返回栏 48 / 页头 → 内容区左右 16 → 底部 TabBar 95 或 CTA 区 76（双按钮 120）",
+    "phone": "375×812",
+    "card": "343 宽 / 圆角 16 / padding 16 / 卡间距 8~12",
+    "primaryButton": "343×52 圆角 26",
+    "secondaryButton": "343×44 圆角 22 描边",
+    "tabBar": "白色 Pill 333×62 圆角 36，Tab 圆角 26",
+    "palette": ["#FAF6EE", "#E07856", "#87A878", "#D4A574", "#5C5A55", "#8A877F", "#FDEDE5"]
+  },
+  "componentLibrary": {
+    "nodeId": "3:1",
+    "name": "设计系统 · 出摊吧一期MVP通用组件",
+    "x": 2400,
+    "y": 80,
+    "components": [
+      { "id": "3:3", "name": "C_StatusBar 状态栏", "width": 375, "height": 62 },
+      { "id": "3:16", "name": "C_TabBar 底部导航", "width": 375, "height": 95 },
+      { "id": "3:33", "name": "C_NavBar 返回标题栏", "width": 375, "height": 48 },
+      { "id": "3:37", "name": "C_PrimaryButton 主按钮", "width": 343, "height": 52 },
+      { "id": "3:39", "name": "C_StallCard 摊位卡片（旧版 · 未使用）", "width": 335, "height": "hug_contents" },
+      { "id": "3:46", "name": "C_InfoRow 信息行", "width": 343, "height": "hug_contents" },
+      { "id": "3:49", "name": "C_Chip 品类标签", "width": "hug_contents", "height": 32 },
+      { "id": "3:51", "name": "C_NoteBar 提示条", "width": 343, "height": "hug_contents" },
+      { "id": "3:53", "name": "C_Input 输入框", "width": 343, "height": 48 },
+      { "id": "3:462", "name": "C_StallCardV2 摊位卡片（参考版）", "width": 343, "height": "hug_contents" }
+    ]
+  },
+  "nonPageNodes": [
+    { "id": "3:368", "name": "画布总标题", "x": 80, "y": 8 },
+    { "id": "3:369", "name": "画布范围说明", "x": 80, "y": 52 },
+    { "id": "3:370", "name": "需求规则对照 · 非页面内容（评审备注）", "x": 2400, "y": 1640 }
+  ],
+  "screens": [
+    {
+      "screen": "01", "nodeId": "3:55", "phoneNodeId": "3:57", "name": "01 首页 · 列表（顾客）", "x": 80, "y": 80,
+      "route": "pages/discover/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95"],
+      "contentBlocks": [
+        { "id": "3:60", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:61", "name": "页头副标题", "height": "hug_contents" },
+        { "id": "3:475", "name": "定位与结果行", "height": "hug_contents" },
+        { "id": "3:483", "name": "摊位卡 老周糖水铺", "height": "hug_contents" },
+        { "id": "3:484", "name": "摊位卡 阿琴煎饼", "height": "hug_contents" },
+        { "id": "3:485", "name": "摊位卡 巷口烤薯", "height": "hug_contents" },
+        { "id": "3:480", "name": "地图找摊入口", "height": 40 }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "02", "nodeId": "3:75", "phoneNodeId": "3:77", "name": "02 首页 · 地图（顾客）", "x": 511, "y": 80,
+      "route": "pages/discover/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95 · 地图激活"],
+      "contentBlocks": [
+        { "id": "3:80", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:81", "name": "页头副标题", "height": "hug_contents" },
+        { "id": "3:86", "name": "示意地图（非真实坐标）", "height": 548 }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "03", "nodeId": "3:108", "phoneNodeId": "3:110", "name": "03 首页 · 空状态（顾客）", "x": 942, "y": 80,
+      "route": "pages/discover/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95"],
+      "contentBlocks": [
+        { "id": "3:113", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:114", "name": "页头副标题", "height": "hug_contents" },
+        { "id": "3:116", "name": "空状态区", "height": 200 }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "04", "nodeId": "3:128", "phoneNodeId": "3:130", "name": "04 摊位详情 · 出摊中（顾客）", "x": 1373, "y": 80,
+      "route": "pages/vendor-detail/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:498", "name": "平台默认品类视觉", "height": 176 },
+        { "id": "3:134", "name": "审核通过的基本资料", "height": "hug_contents" },
+        { "id": "3:511", "name": "当前位置", "height": "hug_contents" }
+      ],
+      "cta": [{ "id": "3:148", "name": "导航前往", "height": 52 }]
+    },
+    {
+      "screen": "05", "nodeId": "3:149", "phoneNodeId": "3:151", "name": "05 摊位详情 · 休息中（顾客）", "x": 1804, "y": 80,
+      "route": "pages/vendor-detail/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:516", "name": "平台默认品类视觉（休息）", "height": 176 },
+        { "id": "3:155", "name": "休息中状态卡", "height": "hug_contents" },
+        { "id": "12:10", "name": "休息引导文案", "height": "hug_contents" }
+      ],
+      "cta": [{ "id": "3:165", "name": "导航不可用", "height": 52 }]
+    },
+    {
+      "screen": "06", "nodeId": "3:166", "phoneNodeId": "3:168", "name": "06 导航前复核 · 准备收摊（顾客）", "x": 80, "y": 1060,
+      "route": "pages/vendor-detail/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:172", "name": "复核结果卡", "height": "hug_contents" },
+        { "id": "3:175", "name": "准备收摊提示卡", "height": 48 }
+      ],
+      "cta": [
+        { "id": "3:183", "name": "仍要导航", "height": 52 },
+        { "id": "3:184", "name": "暂不前往", "height": 44 }
+      ]
+    },
+    {
+      "screen": "07", "nodeId": "3:185", "phoneNodeId": "3:187", "name": "07 简易现场状态反馈（顾客）", "x": 511, "y": 1060,
+      "route": "pages/feedback-form/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:518", "name": "页面切换", "height": 30 },
+        { "id": "3:191", "name": "反馈对象", "height": 48 },
+        { "id": "3:194", "name": "问题分组标题", "height": "hug_contents" },
+        { "id": "3:521", "name": "现场状态选项", "height": 36 },
+        { "id": "3:528", "name": "位置证据标题", "height": "hug_contents" },
+        { "id": "3:529", "name": "位置证据卡", "height": 48 },
+        { "id": "3:198", "name": "说明分组标题", "height": "hug_contents" },
+        { "id": "3:199", "name": "补充说明输入", "height": 80 }
+      ],
+      "cta": [{ "id": "3:203", "name": "提交反馈", "height": 52 }]
+    },
+    {
+      "screen": "08", "nodeId": "3:204", "phoneNodeId": "3:206", "name": "08 我的 · 个人中心", "x": 942, "y": 1060,
+      "route": "pages/mine/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95 · 我的激活"],
+      "contentBlocks": [
+        { "id": "3:209", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:412", "name": "账号卡", "height": "hug_contents" },
+        { "id": "3:535", "name": "当前身份", "height": 64 },
+        { "id": "3:541", "name": "数据小卡", "height": 80 },
+        { "id": "3:423", "name": "功能入口列表", "height": "hug_contents" }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "09", "nodeId": "3:227", "phoneNodeId": "3:229", "name": "09 摊主工作台 · 休息中", "x": 1373, "y": 1060,
+      "route": "pages/workbench/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:577", "name": "状态卡 · 休息中", "height": 120 },
+        { "id": "3:584", "name": "数据小卡", "height": 80 },
+        { "id": "3:241", "name": "出摊日记录文字链", "height": "hug_contents" },
+        { "id": "12:46", "name": "今日记录空态卡", "height": 196 }
+      ],
+      "cta": [{ "id": "3:583", "name": "一键开摊", "height": 52 }]
+    },
+    {
+      "screen": "10", "nodeId": "3:248", "phoneNodeId": "3:250", "name": "10 开摊 · 确认本轮预计收摊时间", "x": 1804, "y": 1060,
+      "route": "pages/workbench/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:254", "name": "时间选择卡", "height": "hug_contents" },
+        { "id": "3:262", "name": "定位说明卡", "height": "hug_contents" }
+      ],
+      "cta": [{ "id": "3:267", "name": "确认并定位开摊", "height": 52 }]
+    },
+    {
+      "screen": "11", "nodeId": "3:268", "phoneNodeId": "3:270", "name": "11 摊主工作台 · 出摊中/准备收摊", "x": 80, "y": 2040,
+      "route": "pages/workbench/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:596", "name": "状态卡 · 出摊中", "height": 120 },
+        { "id": "3:603", "name": "数据小卡", "height": 80 },
+        { "id": "3:280", "name": "当前位置卡", "height": 52 },
+        { "id": "3:612", "name": "出摊日记录", "height": "hug_contents" }
+      ],
+      "cta": [
+        { "id": "3:287", "name": "收摊", "height": 52 },
+        { "id": "3:607", "name": "手动收摊", "height": 44 }
+      ]
+    },
+    {
+      "screen": "12", "nodeId": "3:288", "phoneNodeId": "3:290", "name": "12 摊主资料与人工审核结果", "x": 511, "y": 2040,
+      "route": "pages/vendor-profile/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:294", "name": "审核结果卡", "height": "hug_contents" },
+        { "id": "3:297", "name": "基本资料表单", "height": "hug_contents" }
+      ],
+      "cta": [{ "id": "3:308", "name": "提交审核", "height": 52 }]
+    },
+    {
+      "screen": "13", "nodeId": "3:309", "phoneNodeId": "3:311", "name": "13 摊主资料与处理记录 · 停止公开/清除", "x": 942, "y": 2040,
+      "route": "pages/publication/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区"],
+      "contentBlocks": [
+        { "id": "3:315", "name": "本人停止公开状态卡", "height": "hug_contents" },
+        { "id": "3:325", "name": "本人处理记录", "height": "hug_contents" }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "14", "nodeId": "3:330", "phoneNodeId": "3:332", "name": "14 管理 · 资料人工审核", "x": 1373, "y": 2040,
+      "route": "packageManagement/pages/profile-review/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:337", "name": "待审申请卡", "height": "hug_contents" },
+        { "id": "3:343", "name": "处理原因输入", "height": 80 },
+        { "id": "3:391", "name": "本次修改内容", "height": "hug_contents" }
+      ],
+      "cta": [
+        { "id": "3:346", "name": "通过", "height": 52 },
+        { "id": "3:347", "name": "驳回", "height": 44 }
+      ]
+    },
+    {
+      "screen": "15", "nodeId": "3:348", "phoneNodeId": "3:350", "name": "15 管理 · 现场纠错与治理暂停公开", "x": 1804, "y": 2040,
+      "route": "packageManagement/pages/field-review/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:354", "name": "反馈详情卡", "height": "hug_contents" },
+        { "id": "12:35", "name": "核实状态", "height": "hug_contents" },
+        { "id": "3:396", "name": "补充说明与处理记录", "height": "hug_contents" }
+      ],
+      "cta": [
+        { "id": "3:366", "name": "结束错误营业", "height": 52 },
+        { "id": "3:367", "name": "治理暂停公开", "height": 44 }
+      ]
+    },
+    {
+      "screen": "16", "nodeId": "3:454", "phoneNodeId": "3:456", "name": "16 我的 → 现场反馈（二级页）", "x": 80, "y": 3020,
+      "route": "pages/feedback-candidates/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区"],
+      "contentBlocks": [
+        { "id": "3:553", "name": "页面切换", "height": 30 },
+        { "id": "3:216", "name": "记录 待反馈入口", "height": 76 },
+        { "id": "3:556", "name": "记录 阿琴煎饼", "height": 76 },
+        { "id": "3:561", "name": "记录 老周糖水铺", "height": 76 },
+        { "id": "3:566", "name": "记录 城南梨汤", "height": 76 },
+        { "id": "3:571", "name": "记录 巷口烤薯", "height": 76 },
+        { "id": "3:576", "name": "列表结束提示", "height": "hug_contents" }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "17", "nodeId": "3:616", "phoneNodeId": "3:618", "name": "17 首页 · 定位拒绝", "x": 511, "y": 3020,
+      "route": "pages/discover/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95"],
+      "contentBlocks": [
+        { "id": "3:621", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:622", "name": "页头副标题", "height": "hug_contents" },
+        { "id": "3:623", "name": "定位提示条", "height": 36 },
+        { "id": "3:634", "name": "摊位卡 老周糖水铺", "height": "hug_contents" },
+        { "id": "3:635", "name": "摊位卡 阿琴煎饼", "height": "hug_contents" },
+        { "id": "3:636", "name": "摊位卡 巷口烤薯", "height": "hug_contents" }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "18", "nodeId": "3:638", "phoneNodeId": "3:640", "name": "18 首页 · 加载失败", "x": 942, "y": 3020,
+      "route": "pages/discover/index", "hasTabBar": true,
+      "frame": ["StatusBar 62", "内容区", "TabBar 95"],
+      "contentBlocks": [
+        { "id": "3:643", "name": "页头标题", "height": "hug_contents" },
+        { "id": "3:644", "name": "页头副标题", "height": "hug_contents" },
+        { "id": "3:645", "name": "加载失败区", "height": 200 }
+      ],
+      "cta": []
+    },
+    {
+      "screen": "19", "nodeId": "3:656", "phoneNodeId": "3:658", "name": "19 详情 · 导航复核失败", "x": 1373, "y": 3020,
+      "route": "pages/vendor-detail/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:662", "name": "复核失败提示条", "height": 64 },
+        { "id": "3:665", "name": "导航与复核资料卡", "height": "hug_contents" }
+      ],
+      "cta": [
+        { "id": "3:670", "name": "重新复核", "height": 52 },
+        { "id": "3:671", "name": "返回详情", "height": 44 }
+      ]
+    },
+    {
+      "screen": "20", "nodeId": "3:672", "phoneNodeId": "3:674", "name": "20 详情 · 不可查看", "x": 1804, "y": 3020,
+      "route": "pages/vendor-detail/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [{ "id": "3:680", "name": "不可查看卡", "height": "hug_contents" }],
+      "cta": [{ "id": "3:691", "name": "返回首页", "height": 52 }]
+    },
+    {
+      "screen": "21", "nodeId": "3:692", "phoneNodeId": "3:694", "name": "21 现场反馈 · 提交成功", "x": 80, "y": 4000,
+      "route": "pages/feedback-result/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:698", "name": "提交成功区", "height": 250 },
+        { "id": "3:705", "name": "本次反馈", "height": "hug_contents" }
+      ],
+      "cta": [
+        { "id": "3:710", "name": "查看我的反馈记录", "height": 52 },
+        { "id": "3:711", "name": "返回详情", "height": 44 }
+      ]
+    },
+    {
+      "screen": "22", "nodeId": "3:712", "phoneNodeId": "3:714", "name": "22 摊主资料 · 审核中", "x": 511, "y": 4000,
+      "route": "pages/vendor-profile/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 76"],
+      "contentBlocks": [
+        { "id": "3:718", "name": "审核状态卡", "height": "hug_contents" },
+        { "id": "3:721", "name": "资料对照卡", "height": "hug_contents" }
+      ],
+      "cta": [{ "id": "3:730", "name": "审核中不可修改", "height": 52 }]
+    },
+    {
+      "screen": "23", "nodeId": "3:731", "phoneNodeId": "3:733", "name": "23 现场反馈 · 定位失败", "x": 942, "y": 4000,
+      "route": "pages/feedback-form/index", "hasTabBar": false,
+      "frame": ["StatusBar 62", "NavBar 48", "内容区", "CTA 120"],
+      "contentBlocks": [
+        { "id": "3:737", "name": "页面切换", "height": 30 },
+        { "id": "3:740", "name": "反馈对象", "height": 48 },
+        { "id": "3:742", "name": "现场状态", "height": "hug_contents" },
+        { "id": "3:743", "name": "现场状态选项", "height": 36 },
+        { "id": "3:745", "name": "位置证据", "height": "hug_contents" },
+        { "id": "3:746", "name": "位置证据色块", "height": 180 },
+        { "id": "3:765", "name": "描述标题", "height": "hug_contents" },
+        { "id": "3:766", "name": "描述输入", "height": 80 }
+      ],
+      "cta": [
+        { "id": "3:750", "name": "重新定位", "height": 52 },
+        { "id": "3:751", "name": "返回详情", "height": 44 }
+      ]
+    }
+  ]
+}

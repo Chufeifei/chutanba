@@ -1,40 +1,64 @@
 <view class="page-shell with-tab-bar">
-  <category-picker
-    items="{{categoryItems}}"
-    activeCode="{{activeCategoryCode}}"
-    bind:change="onCategoryChange"
-  />
-
-  <view class="notice-bar warn" wx:if="{{syncStale}}">
-    状态未更新，暂时无法确认是否仍在营业；请重新确认后再前往
+  <!-- 页头：大标题 + 副标题 + 定位/结果数行 + 紧凑横向品类 chip 条 -->
+  <view class="page-head">
+    <view class="page-title">正在出摊</view>
+    <view class="page-subtitle">附近此刻在营业的摊主</view>
+    <view class="page-location row-between">
+      <text>{{canShowLocation ? '已获取当前位置' : '未获取位置'}}</text>
+      <text wx:if="{{hasContent}}">附近 {{vendors.length}} 家</text>
+    </view>
+    <category-picker
+      class="header-picker"
+      items="{{categoryItems}}"
+      activeCode="{{activeCategoryCode}}"
+      bind:change="onCategoryChange"
+    />
   </view>
-  <view class="notice-bar" wx:if="{{locationHint}}">{{locationHint}}</view>
 
+  <!-- 17 定位拒绝：一行提示条（左定位状态 + 右开启定位） -->
+  <view class="location-bar" wx:if="{{locationHint}}">
+    <text class="location-bar-text">{{locationHint}}</text>
+    <button class="location-bar-action" open-type="openSetting" bindopensetting="onOpenSetting">开启定位</button>
+  </view>
+
+  <!-- 局部同步态：只保留状态短语 -->
+  <view class="notice-bar warn" wx:if="{{syncStale}}">状态未更新</view>
+
+  <!-- 03 空状态 / 18 加载失败：686×400rpx 白卡（插画 + 主文案 + 说明 + 重新加载） -->
   <state-view
     wx:if="{{!hasContent}}"
+    class="state-hero"
     type="{{viewState.type}}"
-    title="{{viewState.title}}"
-    description="{{viewState.description}}"
-    action-text="{{viewState.actionText}}"
+    title="{{viewState.type === 'retryable-error' ? '暂时没能加载' : (viewState.type === 'empty' ? '附近还没有摊位' : viewState.title)}}"
+    description="{{viewState.type === 'retryable-error' ? '请重新加载' : (viewState.type === 'empty' ? '换个品类，或稍后再来看看' : viewState.description)}}"
+    action-text="{{viewState.type === 'empty' || viewState.type === 'retryable-error' ? '重新加载' : viewState.actionText}}"
     bind:action="onStateAction"
   />
 
   <block wx:if="{{hasContent}}">
-    <view class="mode-switch">
-      <view class="mode-item {{viewMode === 'list' ? 'is-active' : ''}}" data-mode="list" bindtap="onViewModeChange">列表</view>
-      <view class="mode-item {{viewMode === 'map' ? 'is-active' : ''}}" data-mode="map" bindtap="onViewModeChange">地图</view>
-    </view>
-
     <block wx:if="{{viewMode === 'list'}}">
-      <vendor-card
-        wx:for="{{vendors}}"
-        wx:key="vendorId"
-        vendor="{{item}}"
-        bind:select="onVendorTap"
-      />
+      <!-- 01 首页列表 -->
+      <view class="vendor-list">
+        <vendor-card
+          class="vendor-card-slot"
+          wx:for="{{vendors}}"
+          wx:key="vendorId"
+          vendor="{{item}}"
+          bind:select="onVendorTap"
+        />
+      </view>
+      <!-- 浅橙「地图找摊 ›」：单向入口 + 副说明，双向切换交给 TabBar 三态 -->
+      <view class="map-entry" data-mode="map" bindtap="onViewModeChange">
+        <view class="map-entry-main">
+          <text>地图找摊</text>
+          <text class="map-entry-arrow">›</text>
+        </view>
+        <text class="map-entry-sub">按位置快速找到附近摊主</text>
+      </view>
     </block>
 
     <block wx:else>
+      <!-- 02 首页地图 -->
       <map
         class="vendor-map"
         latitude="{{mapLatitude}}"
@@ -44,6 +68,7 @@
         show-location="{{canShowLocation}}"
         bindmarkertap="onMarkerTap"
       />
+      <!-- 选中摊位浮层卡 -->
       <view class="map-card" wx:if="{{activeVendor}}">
         <vendor-card vendor="{{activeVendor}}" compact bind:select="onVendorTap" />
       </view>

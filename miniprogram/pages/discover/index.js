@@ -67,8 +67,14 @@ Page({
   },
 
   onShow() {
+    const app = getApp();
+    const preferred = wx.getStorageSync('preferredViewMode')
+      || (app.globalData && app.globalData.viewMode)
+      || 'list';
+    const viewMode = preferred === 'map' ? 'map' : 'list';
+    this.setData({ viewMode });
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 0 });
+      this.getTabBar().setData({ selected: viewMode === 'map' ? 1 : 0 });
     }
   },
 
@@ -104,7 +110,7 @@ Page({
     this.setData({
       syncStale: this.data.vendors.length > 0,
       viewState: this.data.vendors.length > 0
-        ? createViewState(VIEW_STATE.STALE)
+        ? createViewState(VIEW_STATE.STALE, { title: '状态未更新', description: '状态未更新' })
         : viewState,
     });
   },
@@ -116,8 +122,17 @@ Page({
   },
 
   onViewModeChange(event) {
-    // 只切换渲染方式，不重新取数（同一份 vendors）
-    this.setData({ viewMode: event.currentTarget.dataset.mode || 'list' });
+    // 只切换渲染方式，不重新取数（同一份 vendors）；
+    // 与 custom-tab-bar 的 persistViewMode 写同一组键，避免 onShow 恢复时把地图打回列表
+    const mode = event.currentTarget.dataset.mode === 'map' ? 'map' : 'list';
+    const app = getApp();
+    if (!app.globalData) app.globalData = {};
+    app.globalData.viewMode = mode;
+    wx.setStorageSync('preferredViewMode', mode);
+    this.setData({ viewMode: mode });
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: mode === 'map' ? 1 : 0 });
+    }
   },
 
   onMarkerTap(event) {
@@ -129,7 +144,16 @@ Page({
   onVendorTap(event) {
     const vendorId = event.detail.vendorId;
     if (!vendorId) return;
-    wx.navigateTo({ url: `/pages/vendor-detail/index?vendorId=${encodeURIComponent(vendorId)}` });
+    // 卡片整体 select 进详情；导航小按钮复用同一事件带 mode 标记
+    const intent = event.detail.mode === 'navigate' ? '&intent=navigate' : '';
+    wx.navigateTo({ url: `/pages/vendor-detail/index?vendorId=${encodeURIComponent(vendorId)}${intent}` });
+  },
+
+  onOpenSetting(event) {
+    const auth = event.detail && event.detail.authSetting;
+    if (!auth || !auth['scope.userLocation']) return;
+    this.setData({ locationHint: '' });
+    this.resolveLocation();
   },
 
   onStateAction() {

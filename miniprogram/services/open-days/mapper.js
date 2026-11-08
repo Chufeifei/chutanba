@@ -8,8 +8,8 @@
  */
 const { formatMoment, formatOpenDate, formatCount } = require('../../utils/formatter');
 
-// 需求 F04 的跨日说明：同日多次开摊记一天，跨零点不自动加次日
-const NOTICE_TEXT = '同日多次开摊记一天；连续跨过零点不自动增加次日记录。';
+// 需求 F04 的跨日说明：累计出摊按日记录
+const NOTICE_TEXT = '累计出摊按日记录';
 
 function toDayItem(row) {
   const source = row || {};

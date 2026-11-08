@@ -55,7 +55,7 @@ function toFailurePayload(viewState, hadData) {
     canOpen: false,
     canOperate: false,
     viewState: createViewState(VIEW_STATE.STALE, {
-      description: '状态未更新，暂时无法确认最新营业状态，请勿据此操作。',
+      description: '状态未更新',
     }),
   };
 }

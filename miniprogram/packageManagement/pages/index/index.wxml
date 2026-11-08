@@ -1,7 +1,24 @@
 <view class="page-shell">
-  <state-view
-    type="{{viewState.type}}"
-    title="{{viewState.title}}"
-    description="{{viewState.description}}"
-  />
+  <view class="card">
+    <view class="row-between">
+      <text class="field-label">当前状态</text>
+      <text class="field-value">待处理</text>
+    </view>
+    <navigator class="entry-row row-between" url="/packageManagement/pages/profile-review/index" hover-class="entry-hover">
+      <text class="field-label">资料审核</text>
+      <text class="field-value">—</text>
+    </navigator>
+    <navigator class="entry-row row-between" url="/packageManagement/pages/field-review/index" hover-class="entry-hover">
+      <text class="field-label">现场复核</text>
+      <text class="field-value">—</text>
+    </navigator>
+    <navigator class="entry-row row-between" url="/packageManagement/pages/governance/index" hover-class="entry-hover">
+      <text class="field-label">治理处理</text>
+      <text class="field-value">—</text>
+    </navigator>
+    <navigator class="entry-row row-between" url="/packageManagement/pages/impact-review/index" hover-class="entry-hover">
+      <text class="field-label">资料复核</text>
+      <text class="field-value">—</text>
+    </navigator>
+  </view>
 </view>

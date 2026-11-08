@@ -56,15 +56,15 @@ function toPendingSection(raw) {
   const notes = [];
   const pendingVersions = Number(source.pendingProfileVersions);
   if (Number.isFinite(pendingVersions) && pendingVersions > 0) {
-    notes.push(`待审资料 ${pendingVersions} 份会置为失效，之后需重新提交并通过审核`);
+    notes.push(`待审资料 ${pendingVersions} 份`);
   }
   const openCases = Number(source.openFeedbackCases);
   if (Number.isFinite(openCases) && openCases > 0) {
-    notes.push(`有 ${openCases} 个未结现场反馈事项，按规则继续保留`);
+    notes.push(`有 ${openCases} 个未结反馈，暂不清除`);
   }
   const openReviews = Number(source.openImpactReviews);
   if (Number.isFinite(openReviews) && openReviews > 0) {
-    notes.push(`有 ${openReviews} 份未结人工复核，按规则继续保留`);
+    notes.push(`有 ${openReviews} 份未结复核，暂不清除`);
   }
   return { hasNotes: notes.length > 0, notes };
 }

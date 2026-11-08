@@ -1,4 +1,4 @@
-<view class="page-shell">
+<view class="page-shell with-fixed-cta">
   <state-view
     wx:if="{{!showContent}}"
     type="{{viewState.type}}"
@@ -9,48 +9,78 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
-      <view class="section-title">资料状态：{{model.profileStateLabel}}</view>
-      <view class="section-note">{{model.stateHint}}</view>
-      <button
-        wx:if="{{model.canSubmit}}"
-        class="primary-button"
-        bindtap="onEditTap"
-      >{{model.submitEntryText}}</button>
-      <view class="hint" wx:else>资料审核期间不能重复提交，请等待审核结果。</view>
+    <!-- 12/22 审核结果 / 审核状态卡（蜜色） -->
+    <view class="card review-card">
+      <view class="row-between">
+        <text class="review-title">{{model.profileStateLabel}}</text>
+        <text class="chip">{{model.hasPending ? '审核中' : (model.latestDecision ? model.latestDecision.reviewStatusLabel : '未申请')}}</text>
+      </view>
+      <view class="review-line" wx:if="{{model.latestDecision}}">
+        <text class="review-label">最近结果</text>
+        <text class="review-value">{{model.latestDecision.reviewStatusLabel}} · {{model.latestDecision.decidedText}}</text>
+      </view>
+      <view class="review-line" wx:if="{{model.latestDecision && model.latestDecision.reason}}">
+        <text class="review-label">原因</text>
+        <text class="review-value">{{model.latestDecision.reason}}</text>
+      </view>
+      <view class="review-line" wx:if="{{model.hasPending}}">
+        <text class="review-label">提交时间</text>
+        <text class="review-value">{{model.pendingSubmission.submittedText}}</text>
+      </view>
     </view>
 
-    <view class="surface-card" wx:if="{{model.hasActive}}">
-      <text class="section-title">当前生效资料</text>
-      <view class="meta">名称：{{model.activeProfile.vendorName}}</view>
-      <view class="meta">品类：{{model.activeProfile.categoryName}}</view>
-      <view class="meta">常卖内容：{{model.activeProfile.regularItemsText}}</view>
-      <view class="meta">价格说明：{{model.activeProfile.priceDescription}}</view>
-      <view class="meta">公告：{{model.activeProfile.announcement}}</view>
-      <view class="meta">生效时间：{{model.activeProfile.approvedText}}</view>
+    <!-- 12 基本资料表单 -->
+    <view class="card" wx:if="{{!model.hasPending}}">
+      <text class="block-title">基本资料</text>
+      <block wx:if="{{model.hasActive}}">
+        <view class="field-line"><text class="field-label">名称</text><text class="field-value">{{model.activeProfile.vendorName}}</text></view>
+        <view class="field-line"><text class="field-label">品类</text><text class="field-value">{{model.activeProfile.categoryName}}</text></view>
+        <view class="field-line"><text class="field-label">常卖内容</text><text class="field-value">{{model.activeProfile.regularItemsText}}</text></view>
+        <view class="field-line"><text class="field-label">价格说明</text><text class="field-value">{{model.activeProfile.priceDescription}}</text></view>
+        <view class="field-line"><text class="field-label">公告</text><text class="field-value">{{model.activeProfile.announcement}}</text></view>
+        <view class="field-line"><text class="field-label">生效时间</text><text class="field-value">{{model.activeProfile.approvedText}}</text></view>
+      </block>
+      <text class="state-line" wx:else>暂无生效资料</text>
     </view>
 
-    <view class="surface-card" wx:if="{{model.hasPending}}">
-      <text class="section-title">本次待审修改</text>
-      <view class="meta">状态：{{model.pendingSubmission.reviewStatusLabel}}</view>
-      <view class="meta">提交时间：{{model.pendingSubmission.submittedText}}</view>
-      <view class="meta">名称：{{model.pendingSubmission.vendorName}}</view>
-      <view class="meta">品类：{{model.pendingSubmission.categoryName}}</view>
-      <view class="meta">常卖内容：{{model.pendingSubmission.regularItemsText}}</view>
-      <view class="meta">价格说明：{{model.pendingSubmission.priceDescription}}</view>
-      <view class="meta">公告：{{model.pendingSubmission.announcement}}</view>
-      <view class="hint">待审内容尚未生效，顾客看到的仍是当前生效资料。</view>
+    <!-- 22 资料对照卡：待审资料 / 当前展示版本两栏 -->
+    <view class="card" wx:if="{{model.hasPending}}">
+      <text class="block-title">资料对照</text>
+      <view class="compare-grid">
+        <view class="compare-col">
+          <text class="compare-head">待审资料</text>
+          <text class="compare-item">名称 {{model.pendingSubmission.vendorName}}</text>
+          <text class="compare-item">品类 {{model.pendingSubmission.categoryName}}</text>
+          <text class="compare-item">常卖 {{model.pendingSubmission.regularItemsText}}</text>
+          <text class="compare-item">价格 {{model.pendingSubmission.priceDescription}}</text>
+          <text class="compare-item">公告 {{model.pendingSubmission.announcement}}</text>
+        </view>
+        <view class="compare-col">
+          <text class="compare-head">当前展示版本</text>
+          <block wx:if="{{model.hasActive}}">
+            <text class="compare-item">名称 {{model.activeProfile.vendorName}}</text>
+            <text class="compare-item">品类 {{model.activeProfile.categoryName}}</text>
+            <text class="compare-item">常卖 {{model.activeProfile.regularItemsText}}</text>
+            <text class="compare-item">价格 {{model.activeProfile.priceDescription}}</text>
+            <text class="compare-item">公告 {{model.activeProfile.announcement}}</text>
+          </block>
+          <text class="compare-item" wx:else>暂无</text>
+        </view>
+      </view>
     </view>
 
-    <view class="surface-card" wx:if="{{model.latestDecision}}">
-      <text class="section-title">最近审核结果</text>
-      <view class="meta">结果：{{model.latestDecision.reviewStatusLabel}}</view>
-      <view class="meta">时间：{{model.latestDecision.decidedText}}</view>
-      <view class="meta" wx:if="{{model.latestDecision.reason}}">原因：{{model.latestDecision.reason}}</view>
-    </view>
-
-    <view class="hint">
-      资料只包含名称、品类、常卖内容、价格说明与公告，不展示固定地址、图片与营业计划。
+    <!-- 22 卡内 3 行审核进度 -->
+    <view class="card" wx:if="{{model.hasPending}}">
+      <text class="block-title">审核进度</text>
+      <view class="step-row"><text class="step-name">已提交</text><text class="step-value">{{model.pendingSubmission.submittedText}}</text></view>
+      <view class="step-row"><text class="step-name">审核中</text><text class="step-value">{{model.pendingSubmission.reviewStatusLabel}}</text></view>
+      <view class="step-row"><text class="step-name">待生效</text><text class="step-value">暂无</text></view>
     </view>
   </block>
+
+  <!-- 12 单 CTA / 22 底部禁用按钮 -->
+  <view class="cta-bar" wx:if="{{showContent}}">
+    <button class="btn-primary" wx:if="{{!model.hasPending && model.canSubmit}}" bindtap="onEditTap">{{model.submitEntryText}}</button>
+    <button class="btn-primary" wx:else disabled>{{model.hasPending ? '审核中不可修改' : '暂不可修改'}}</button>
+  </view>
 </view>

@@ -1,8 +1,8 @@
-.field-input { width: 100%; margin-top: 16rpx; padding: 20rpx; border-radius: 24rpx; background: var(--color-bg); box-sizing: border-box; font-size: 28rpx; line-height: 44rpx; }
-.picker-value { margin-top: 16rpx; padding: 20rpx; border-radius: 24rpx; background: var(--color-bg); font-size: 28rpx; line-height: 44rpx; color: var(--color-text); }
-.desc-input { width: 100%; min-height: 160rpx; margin-top: 16rpx; padding: 20rpx; border-radius: 24rpx; background: var(--color-bg); box-sizing: border-box; font-size: 28rpx; line-height: 44rpx; }
+/* 摊主资料编辑：色值一律走 app.wxss 变量，卡片圆角统一 var(--radius-card) */
+.field-input { width: 100%; margin-top: 16rpx; padding: 20rpx; border-radius: var(--radius-card); background: var(--color-bg); box-sizing: border-box; font-size: 28rpx; line-height: 44rpx; }
+.picker-value { margin-top: 16rpx; padding: 20rpx; border-radius: var(--radius-card); background: var(--color-bg); font-size: 28rpx; line-height: 44rpx; color: var(--color-text); }
+.desc-input { width: 100%; min-height: 160rpx; margin-top: 16rpx; padding: 20rpx; border-radius: var(--radius-card); background: var(--color-bg); box-sizing: border-box; font-size: 28rpx; line-height: 44rpx; }
 .counter { margin-top: 8rpx; font-size: 22rpx; text-align: right; color: var(--color-text-hint); }
 .field-error { margin-top: 8rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-warning); }
-.hint { margin-top: 16rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
-.submit-message { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-warning); }
-.query-button { margin-top: 16rpx; height: 88rpx; border-radius: 44rpx; background: var(--color-brand); color: #FFFFFF; font-size: 28rpx; line-height: 88rpx; }
+.submit-message { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: var(--radius-card); background: var(--color-warning-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-warning); }
+.query-button { margin-top: 16rpx; height: 88rpx; border-radius: var(--radius-card); background: var(--color-brand-soft); color: var(--color-brand); font-size: 28rpx; line-height: 88rpx; }

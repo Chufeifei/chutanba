@@ -1,0 +1,79 @@
+/*
+ * Team C 另路径产物，C2 燕青梧｜性能与 token 工程。
+ * 本文件是一份可被组件 @import 的纯变量声明片段，外加一组等价语义类，
+ * 不是完整页面样式，不含 page、字体、reset 等全局规则。
+ *
+ * 解决的问题：当前色值存在 6 份副本（custom-tab-bar 与 status-dot、
+ * confirm-sheet、fixed-cta、phase-badge、state-view 各自在根节点重声明了一组
+ * hex，外加 app.wxss 的 page 变量定义区），任一处调色即产生漂移，色值单一
+ * 真相源被破坏。本片段把设计稿 token 收敛到一处，供所有组件引用同一份定义。
+ *
+ * 选择器方案：微信小程序 WXSS 对 :root 不提供原生支持，写在 app.wxss 里的
+ * :root 变量会静默失效；page 选择器只命中页面根节点，自定义组件默认
+ * styleIsolation 隔离下组件根节点无法可靠继承 page 上的变量。故不采用
+ * :root 或 page，改用明确的宿主类 .c-token-host：组件 @import 本文件后，
+ * 该规则在组件自己的作用域内编译，只要组件根节点带 .c-token-host 类，
+ * 变量即定义于该根节点并向组件内所有子节点继承，结果与隔离级别无关。
+ * 组件根节点需带此类。
+ *
+ * 接入方式：在组件 wxss 的首行写
+ *   @import "../../styles/component-tokens.wxss";
+ * 并给该组件 WXML 的根节点加上 .c-token-host 类。
+ * 该相对路径适用于 miniprogram/components/ 下的组件；
+ * custom-tab-bar/index.wxss 需改用 ../styles/component-tokens.wxss。
+ * 本片段未给 var() 设置 fallback，因为语义类不得写死色值，生效前提就是
+ * 组件已完成上述 @import 且根节点挂载了宿主类。
+ *
+ * 当前未接线状态：A 组上述组件已在各自根节点内联声明了所需 hex，本次
+ * 不改动它们，避免覆盖与冲突。本文件目前只是提供单一真相源，尚未被任何
+ * 组件引用、未生效；把组件内联声明替换为 @import 并挂载宿主类的接线动作，
+ * 留待终审裁决后执行，本次不改 app.wxss、不改任何组件、页面与 js 文件。
+ */
+
+/* 设计稿 token：与 app.wxss 逐项一致；设计稿口径补全项单独标注 */
+.c-token-host {
+  --color-bg: #FAF6EE;
+  --color-surface: #FFFFFF;
+  --color-text: #5C5A55;
+  --color-text-muted: #8A877F;
+  --color-text-hint: #BDBAB4;
+  --color-border: #F0ECE8;
+  --color-brand: #E07856;
+  --color-brand-soft: #FDEDE5;
+  --color-warning: #D4A574;
+  --color-warning-soft: #FAEAD8;
+  --color-neutral-soft: #F3F1EF;
+  --color-success: #87A878;
+  --color-success-soft: #EDF3E8;
+
+  --radius-card: 32rpx;
+  --radius-sheet: 48rpx;        /* app.wxss 已定义，一并收录以保证逐项一致 */
+  --radius-chip: 36rpx;
+  --radius-button: 52rpx;
+  --radius-secondary: 44rpx;    /* 设计稿口径补全，app.wxss 未定义，对应组件既有 44rpx */
+  --radius-pill: 72rpx;         /* 设计稿口径补全，app.wxss 未定义，对应 tab-pill 既有 72rpx */
+  --space-page: 32rpx;
+  --space-card: 32rpx;
+  --space-gap: 16rpx;
+
+  /* 语义阴影：中性 rgba，替代组件内写死的纯黑半透明旧色系；
+     取全站主文字色 rgb(92,90,85) 加 alpha，与中性色系同源 */
+  --shadow-mask: rgba(92, 90, 85, 0.42);
+  --shadow-card: rgba(92, 90, 85, 0.06);
+}
+
+/* 可复用语义类：与 app.wxss 的 .card / .btn-primary / .btn-secondary /
+   .chip / .chip.active / .row-between / .state-hero 等价但不重名，
+   前缀 c- 避免与 A 组页面样式冲突；色值一律 var，不写死十六进制或 rgba */
+.c-card { padding: var(--space-card); border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; }
+.c-card + .c-card { margin-top: var(--space-gap); }
+
+.c-btn-primary { width: 686rpx; height: 104rpx; border-radius: var(--radius-button); background: var(--color-brand); color: var(--color-surface); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
+.c-btn-secondary { width: 686rpx; height: 88rpx; border-radius: var(--radius-secondary); border: 1rpx solid var(--color-brand); background: var(--color-surface); color: var(--color-brand); display: flex; align-items: center; justify-content: center; font-size: 34rpx; box-sizing: border-box; }
+
+.c-chip { display: inline-flex; align-items: center; justify-content: center; padding: 10rpx 24rpx; border-radius: var(--radius-chip); background: var(--color-neutral-soft); color: var(--color-text-muted); font-size: 24rpx; }
+.c-chip.active { background: var(--color-brand); color: var(--color-surface); }
+
+.c-row-between { display: flex; align-items: center; justify-content: space-between; }
+
+.c-state-hero { height: 400rpx; padding: var(--space-card); border-radius: var(--radius-card); background: var(--color-surface); display: flex; align-items: center; justify-content: center; box-sizing: border-box; }

@@ -1,1 +1,20 @@
-/* 页面专属样式；通用样式与设计变量见 app.wxss */
+/* 页面专属样式；色值一律走 app.wxss 变量 */
+.page-shell.has-cta { padding-bottom: calc(272rpx + env(safe-area-inset-bottom)); }
+
+.field-row { margin-top: 24rpx; }
+.field-label { font-size: 28rpx; color: var(--color-text); }
+.field-value { font-size: 26rpx; color: var(--color-text-muted); }
+.card .divider { margin: 24rpx 0; }
+.field-block { margin-top: 24rpx; display: flex; flex-direction: column; gap: 12rpx; }
+
+/* 处理原因输入：80px 等价 160rpx 高、32rpx 圆角 */
+.reason-input { margin-top: 24rpx; height: 160rpx; padding: 24rpx; border-radius: var(--radius-card); background: var(--color-bg); box-sizing: border-box; }
+.reason-placeholder { font-size: 28rpx; color: var(--color-text-hint); }
+/* 历史审核结果：卡内脚注 13px 等价 26rpx */
+.card-footnote { margin-top: 24rpx; font-size: 26rpx; line-height: 40rpx; color: var(--color-text-muted); }
+
+/* 底部 CTA：页面内唯一固定栏，约 120px 高 */
+.cta-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 900; display: flex; flex-direction: column; align-items: center; gap: 16rpx; padding: 16rpx var(--space-page) calc(16rpx + env(safe-area-inset-bottom)); border-top: 1rpx solid var(--color-border); background: var(--color-surface); box-sizing: border-box; }
+/* 原生 button 重置：去掉默认 margin/padding/行高，尺寸完全由语义类决定 */
+.cta-btn { margin: 0; padding: 0; line-height: normal; }
+.cta-hover { opacity: 0.85; }

@@ -32,6 +32,7 @@ const ENTRY_ROUTES = {
   profile: '/pages/vendor-profile/index',
   workbench: '/pages/workbench/index',
   publication: '/pages/publication/index',
+  management: '/packageManagement/pages/index/index',
 };
 
 Page({
@@ -39,13 +40,16 @@ Page({
     identified: false,
     unidentifiedState: createViewState(VIEW_STATE.PERMISSION, {
       title: '账号暂不可识别',
-      description: '完成微信身份识别后可查看本人记录与操作入口',
+      description: '请重新识别账号',
     }),
     profileStateLabel: '未申请',
     profileEligible: false,
     selfStopped: false,
     governancePaused: false,
     entries: [],
+    // 数据小卡字段：一期 /me 未下发统计值，确定值 0，待统计接口接入后由 renderIdentity 覆写
+    statOpenDays: 0,
+    statFeedbackCount: 0,
   },
 
   onLoad() {
@@ -55,7 +59,7 @@ Page({
 
   onShow() {
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
-      this.getTabBar().setData({ selected: 1 });
+      this.getTabBar().setData({ selected: 2 });
     }
     // 静默刷新：失败时保留已有快照，不把页面清空
     refreshIdentity({ silent: true }).catch(() => null);
@@ -83,9 +87,14 @@ Page({
     const key = event.currentTarget.dataset.key;
     const route = ENTRY_ROUTES[key];
     if (!route) {
-      wx.showToast({ title: '该功能将在后续版本开放', icon: 'none' });
+      wx.showToast({ title: '暂不可用', icon: 'none' });
       return;
     }
     wx.navigateTo({ url: route });
+  },
+
+  /** 身份由服务端 capabilities 判定，本入口只跳转到资料状态页查看，不做本地身份切换。 */
+  onSwitchTap() {
+    wx.navigateTo({ url: '/pages/vendor-profile/index' });
   },
 });

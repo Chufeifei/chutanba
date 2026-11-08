@@ -1,1 +1,4 @@
-/* 页面专属样式；通用样式与设计变量见 app.wxss */
+/* 页面专属样式；色值一律走 app.wxss 变量 */
+.field-row { margin-top: 24rpx; }
+.field-label { font-size: 28rpx; color: var(--color-text); }
+.field-value { font-size: 26rpx; color: var(--color-text-muted); }

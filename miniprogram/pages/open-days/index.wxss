@@ -1,5 +1,4 @@
-/* 页面专属样式；通用样式与设计变量见 app.wxss */
-
+/* 出摊记录：色值一律走 app.wxss 变量，卡片圆角统一 var(--radius-card) */
 .stat-row { display: flex; align-items: baseline; }
 .stat-value { font-size: 56rpx; font-weight: 600; color: var(--color-text); }
 .stat-label { margin-left: 16rpx; font-size: 26rpx; color: var(--color-text-muted); }
@@ -12,14 +11,4 @@
 .day-date { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
 .day-count { font-size: 24rpx; color: var(--color-text-hint); }
 
-.more-button {
-  margin-top: 24rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
-  background: var(--color-neutral-soft);
-  color: var(--color-text);
-  font-size: 26rpx;
-  line-height: 80rpx;
-}
-
-.footnote { margin-top: 24rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
+.more-button { margin-top: 24rpx; height: 80rpx; border-radius: var(--radius-card); background: var(--color-neutral-soft); color: var(--color-text); font-size: 26rpx; line-height: 80rpx; }

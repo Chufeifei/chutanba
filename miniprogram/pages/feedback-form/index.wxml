@@ -9,64 +9,85 @@
   />
 
   <block wx:if="{{showContent}}">
-    <view class="surface-card">
-      <text class="section-title">本次反馈对象</text>
-      <view class="meta">摊主：{{observation.vendorName}}</view>
-      <view class="meta">看到时间：{{observation.eventText}}</view>
-      <view class="meta">{{observation.windowText}}</view>
-      <view class="hint">反馈只针对这一次营业轮次；刷新位置、收摊或同日重开都不会替换本对象。</view>
+    <!-- 顶部 Tab：双页签 + 3rpx 下划线 -->
+    <view class="tab-bar">
+      <view class="tab-item active">
+        <text>待反馈</text>
+        <view class="tab-underline"></view>
+      </view>
+      <view class="tab-item"><text>已提交</text></view>
     </view>
 
-    <view class="surface-card">
-      <text class="section-title">现场情况</text>
-      <radio-group bindchange="onTypeChange">
-        <label
-          class="option {{item.disabled ? 'is-disabled' : ''}}"
-          wx:for="{{typeOptions}}"
-          wx:key="value"
-        >
-          <radio
-            value="{{item.value}}"
-            checked="{{selectedType === item.value}}"
-            disabled="{{item.disabled}}"
-            color="#FF7A45"
-          />
-          <view class="option-body">
-            <text class="option-label">{{item.label}}</text>
-            <text class="option-desc">{{item.disabled ? '该问题已提交过' : item.description}}</text>
-          </view>
-        </label>
-      </radio-group>
-    </view>
-
-    <view class="surface-card">
-      <text class="section-title">补充说明（可不填）</text>
-      <textarea
-        class="desc-input"
-        value="{{description}}"
-        maxlength="{{descriptionMax}}"
-        placeholder="补充能看到的现场情况；不要填写他人姓名或联系方式"
-        bindinput="onDescriptionInput"
-      />
-      <view class="counter">{{description.length}}/{{descriptionMax}}</view>
-    </view>
-
-    <view class="surface-card">
-      <text class="section-title">本次现场位置</text>
-      <view class="hint">
-        提交时会读取一次实时位置，用于核对是否在现场（距原营业位置 300 米内、定位在 5 分钟内有效）。
-        定位只参与本次核对，不会用于其他用途。
+    <!-- 反馈对象卡：蜜色，单行 -->
+    <view class="card object-card">
+      <view class="row-between">
+        <text class="field-label">反馈对象</text>
+        <text class="object-value">{{observation.vendorName}} · {{observation.eventText}}</text>
       </view>
     </view>
+
+    <!-- 4 枚胶囊：一行均分，文字不出框 -->
+    <radio-group class="chip-group" bindchange="onTypeChange">
+      <label class="chip-cell">
+        <radio class="chip-native" value="OWNER_ABSENT" checked="{{selectedType === 'OWNER_ABSENT'}}" disabled="{{typeOptions[0].disabled}}" color="#E07856" />
+        <view class="chip {{selectedType === 'OWNER_ABSENT' ? 'active' : ''}} {{typeOptions[0].disabled ? 'is-disabled' : ''}}"><text>未出摊</text></view>
+      </label>
+      <label class="chip-cell">
+        <radio class="chip-native" value="ALREADY_LEFT" checked="{{selectedType === 'ALREADY_LEFT'}}" disabled="{{typeOptions[2].disabled}}" color="#E07856" />
+        <view class="chip {{selectedType === 'ALREADY_LEFT' ? 'active' : ''}} {{typeOptions[2].disabled ? 'is-disabled' : ''}}"><text>已收摊</text></view>
+      </label>
+      <label class="chip-cell">
+        <radio class="chip-native" value="LOCATION_MISMATCH" checked="{{selectedType === 'LOCATION_MISMATCH'}}" disabled="{{typeOptions[1].disabled}}" color="#E07856" />
+        <view class="chip {{selectedType === 'LOCATION_MISMATCH' ? 'active' : ''}} {{typeOptions[1].disabled ? 'is-disabled' : ''}}"><text>位置不符</text></view>
+      </label>
+      <label class="chip-cell">
+        <radio class="chip-native" value="OTHER" disabled color="#E07856" />
+        <view class="chip is-disabled"><text>其他</text></view>
+      </label>
+    </radio-group>
+
+    <!-- 位置证据卡（含重新定位小按钮） / 定位失败蜜色色块 -->
+    <view class="card location-card" wx:if="{{!locationFailed}}">
+      <view class="row-between">
+        <text class="field-label">位置信息</text>
+        <view class="location-right">
+          <text class="field-value">提交时读取</text>
+          <view class="relocate-mini" bindtap="onRelocate">重新定位</view>
+        </view>
+      </view>
+    </view>
+    <view class="location-fail" wx:else>
+      <view class="location-fail-block"></view>
+      <text class="location-fail-tip">当前无法获取位置，请重新定位</text>
+    </view>
+
+    <!-- 描述输入 -->
+    <textarea
+      class="desc-input"
+      value="{{description}}"
+      maxlength="{{descriptionMax}}"
+      placeholder="补充说明（选填）"
+      bindinput="onDescriptionInput"
+    />
 
     <view class="submit-message" wx:if="{{submitMessage}}">{{submitMessage}}</view>
     <button class="query-button" wx:if="{{unknownVisible}}" bindtap="onQueryOutcome">查看最新结果</button>
     <button class="query-button" wx:if="{{cannotSubmit}}" bindtap="onOpenRecords">查看我的反馈记录</button>
   </block>
 
+  <!-- 屏 23 定位失败态：主=重新定位（只取位置），次=返回 -->
   <fixed-cta
-    wx:if="{{showContent}}"
-    primary-text="{{cannotSubmit ? '本次已结束' : (submitting ? '正在提交…' : '定位并提交反馈')}}"
+    wx:if="{{showContent && locationFailed}}"
+    primary-text="重新定位"
+    secondary-text="返回"
+    bind:primary="onRelocate"
+    bind:secondary="onBack"
+  />
+
+  <!-- 屏 07 正常态：单主 CTA 提交反馈 -->
+  <fixed-cta
+    wx:if="{{showContent && !locationFailed}}"
+    primary-text="{{cannotSubmit ? '本次已结束' : (submitting ? '正在提交…' : '提交反馈')}}"
     processing="{{submitting}}"
     disabled="{{!selectedType || cannotSubmit}}"
     bind:primary="onSubmit"

@@ -1,8 +1,19 @@
+/* 组件样式隔离需显式重声明：page 上的变量在自定义组件内可能取不到 */
+.state-view {
+  --color-surface: #FFFFFF;
+  --color-brand: #E07856;
+  --color-brand-soft: #FDEDE5;
+  --color-text: #5C5A55;
+  --color-text-muted: #8A877F;
+  --color-warning-soft: #FAEAD8;
+  --color-warning: #D4A574;
+  --color-neutral-soft: #F3F1EF;
+}
 .state-view { margin: 32rpx; padding: 64rpx 32rpx; border-radius: 32rpx; background: var(--color-surface); text-align: center; box-sizing: border-box; }
 .state-mark { width: 88rpx; height: 88rpx; margin: 0 auto 24rpx; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--color-brand-soft); color: var(--color-brand); font-size: 44rpx; font-weight: 700; }
 .state-title { color: var(--color-text); font-size: 34rpx; line-height: 48rpx; font-weight: 500; }
 .state-description { margin-top: 12rpx; color: var(--color-text-muted); font-size: 28rpx; line-height: 42rpx; }
-.state-action { min-width: 224rpx; height: 88rpx; margin-top: 32rpx; padding: 0 32rpx; border-radius: 44rpx; background: var(--color-brand); color: #FFFFFF; font-size: 30rpx; line-height: 88rpx; }
+.state-action { min-width: 224rpx; height: 88rpx; margin-top: 32rpx; padding: 0 32rpx; border-radius: 44rpx; background: var(--color-brand); color: var(--color-surface); font-size: 30rpx; line-height: 88rpx; }
 
 /* 需要用户注意的状态用警示色，避免和普通空态混淆 */
 .tone-warning .state-mark { background: var(--color-warning-soft); color: var(--color-warning); }

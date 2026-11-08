@@ -1,16 +1,32 @@
-.detail-head { display: flex; align-items: center; justify-content: space-between; }
+/* 04/05 品类视觉块 686×352rpx，纯色渐变装饰实现 */
+.category-visual { width: 100%; height: 352rpx; border-radius: var(--radius-card); background: linear-gradient(135deg, var(--color-brand-soft), var(--color-brand)); box-sizing: border-box; }
+.category-visual.is-muted { background: linear-gradient(135deg, var(--color-neutral-soft), var(--color-border)); }
+
+/* 一张资料白卡 */
+.profile-card { margin-top: var(--space-gap); }
 .detail-name { flex: 1; margin-right: 16rpx; font-size: 40rpx; font-weight: 600; color: var(--color-text); }
-
-.detail-category { margin-top: 8rpx; font-size: 26rpx; color: var(--color-text-muted); }
-
+.category-chip { margin-top: 16rpx; }
 .detail-row { margin-top: 16rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
-.detail-block { margin-top: 20rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-bg); font-size: 28rpx; line-height: 44rpx; color: var(--color-text); }
+.time-row { display: flex; align-items: center; }
+.status-phrase { margin-top: 24rpx; font-size: 28rpx; line-height: 42rpx; color: var(--color-text-muted); }
+.feedback-link { margin-top: 24rpx; font-size: 28rpx; color: var(--color-brand); }
 
-.row-between { display: flex; align-items: baseline; justify-content: space-between; }
+/* 04 当前位置卡：188rpx 地图色块 + 地址距离行 */
+.location-card { margin-top: var(--space-gap); }
+.location-map { width: 100%; height: 188rpx; border-radius: 24rpx; background: linear-gradient(135deg, var(--color-success-soft), var(--color-brand-soft)); }
+.location-line { margin-top: 16rpx; font-size: 26rpx; color: var(--color-text-muted); }
 
-.detail-note { margin-top: 20rpx; font-size: 24rpx; line-height: 36rpx; color: var(--color-text-hint); }
-.detail-note.warn { margin: 24rpx 0 0; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); color: var(--color-warning); font-size: 26rpx; }
+/* 06/19 蜜色提示条：48px≈96rpx / 64px≈128rpx */
+.review-bar { display: flex; align-items: center; height: 96rpx; margin-bottom: var(--space-gap); padding: 0 24rpx; border-radius: 24rpx; background: var(--color-warning-soft); color: var(--color-warning); font-size: 28rpx; box-sizing: border-box; }
+.review-bar.is-lg { height: 128rpx; }
+.review-card { margin-top: 0; }
+.review-title { font-size: 30rpx; font-weight: 500; color: var(--color-text); }
 
-.detail-card.rest { margin-top: 32rpx; padding: 40rpx 32rpx; border-radius: var(--radius-card); background: var(--color-surface); font-size: 28rpx; line-height: 44rpx; text-align: center; color: var(--color-text-muted); }
+/* 20 状态白卡 + 底部主 CTA */
+.state-hero { display: block; height: auto; min-height: 360rpx; margin: 0; padding: 0; border-radius: var(--radius-card); background: var(--color-surface); box-sizing: border-box; }
+.bottom-cta { position: fixed; z-index: 900; left: var(--space-page); bottom: calc(var(--space-page) + env(safe-area-inset-bottom)); }
+.bottom-cta.is-disabled { background: var(--color-neutral-soft); color: var(--color-text-muted); }
 
-.disclaimer { margin-top: 32rpx; font-size: 22rpx; line-height: 34rpx; color: var(--color-text-hint); }
+/* 局部同步态 */
+.notice-bar { margin-top: 24rpx; padding: 20rpx 24rpx; border-radius: 24rpx; background: var(--color-neutral-soft); font-size: 26rpx; line-height: 38rpx; color: var(--color-text-muted); }
+.notice-bar.warn { background: var(--color-warning-soft); color: var(--color-warning); }
